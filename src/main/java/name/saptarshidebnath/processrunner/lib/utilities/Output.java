@@ -16,7 +16,7 @@ public class Output {
    * @param outputSource {@link OutputSource}
    * @param outputText
    */
-  Output(final long timeStamp, final OutputSource outputSource, final String outputText) {
+  public Output(final OutputSource outputSource, final String outputText) {
     this.timeStamp = getCurrentTime();
     this.outputSource = outputSource;
     this.outputText = outputText;

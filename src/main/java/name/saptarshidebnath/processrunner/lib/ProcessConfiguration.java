@@ -1,4 +1,4 @@
-package name.saptarshidebnath.processrunner.lib.utilities;
+package name.saptarshidebnath.processrunner.lib;
 
 import name.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 
@@ -12,31 +12,8 @@ public class ProcessConfiguration {
   private final File currentDirectory;
   private final File sysOut;
   private final File sysError;
-
-  /**
-   * Process configuration with default value for {@link File} sysout and {@link File} syserror.
-   * Both the files are marked to be auto deleted at system exit.
-   *
-   * @param commandRunnerInterPreter : sets the {@link String} command interpreter like /bin/bash in
-   *     unix
-   * @param command : set the actual {@link String} command to be executed
-   * @param currentDirectory : sets the working directory in {@link File} format
-   * @throws ProcessConfigurationException : Exception thrown if configuration received is not at
-   *     par.
-   * @throws IOException : Exception thrown if there are any error while validating the {@link File}
-   *     objects
-   */
-  public ProcessConfiguration(
-      final String commandRunnerInterPreter, final String command, final File currentDirectory)
-      throws IOException, ProcessConfigurationException {
-    this(
-        commandRunnerInterPreter,
-        command,
-        currentDirectory,
-        File.createTempFile("ProcessRunner-sysout-", ".txt"),
-        File.createTempFile("ProcessRunner-syserr-", ".txt"),
-        true);
-  }
+  /** Original data dump for the log */
+  private final File originalDump;
 
   /**
    * Most detailed constructor to set the {@link ProcessConfiguration}.
@@ -92,12 +69,19 @@ public class ProcessConfiguration {
     this.currentDirectory = currentDirectory;
     this.sysOut = sysOut;
     this.sysError = sysError;
-    sysOut.createNewFile();
-    sysError.createNewFile();
+    this.sysOut.createNewFile();
+    this.sysError.createNewFile();
+    this.originalDump = File.createTempFile("ProcessRunner-datadump-", ".json");
+    //this.originalDump.deleteOnExit();
     if (autoDeleteFileOnExit) {
       sysOut.deleteOnExit();
       sysError.deleteOnExit();
     }
+    System.out.println(this.toString());
+  }
+
+  public File getOriginalDump() {
+    return this.originalDump;
   }
 
   public String getCommandRunnerInterPreter() {
@@ -114,6 +98,19 @@ public class ProcessConfiguration {
 
   public File getSysOut() {
     return this.sysOut;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("ProcessConfiguration{");
+    sb.append("commandRunnerInterPreter='").append(this.commandRunnerInterPreter).append('\'');
+    sb.append(", command='").append(this.command).append('\'');
+    sb.append(", currentDirectory=").append(this.currentDirectory);
+    sb.append(", sysOut=").append(this.sysOut);
+    sb.append(", sysError=").append(this.sysError);
+    sb.append(", originalDump=").append(this.originalDump);
+    sb.append('}');
+    return sb.toString();
   }
 
   public File getSysError() {
