@@ -9,6 +9,7 @@
 
     <name>ProcessRunner</name>
     <url>https://github.com/saptarshidebnath/processrunner</url>
+    <ciManagement>test</ciManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
