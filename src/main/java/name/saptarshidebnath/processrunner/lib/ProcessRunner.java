@@ -8,6 +8,8 @@ import java.io.IOException;
 /** Process Runner interface is the base interface to run any system process or shell script */
 public interface ProcessRunner extends Constants {
 
+  boolean search(final String regex) throws IOException;
+
   /**
    * Triggers the command;
    *
@@ -28,12 +30,4 @@ public interface ProcessRunner extends Constants {
    * @return
    */
   File getSysErr();
-
-  /**
-   * Returns the reference to a {@link File} for the output with the sysout and syserror merged like
-   * a console output
-   *
-   * @return
-   */
-  File getOutPut();
 }

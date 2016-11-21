@@ -1,31 +1,45 @@
 package name.saptarshidebnath.processrunner.lib;
 
-import name.saptarshidebnath.processrunner.lib.utilities.Constants;
-import name.saptarshidebnath.processrunner.lib.utilities.Output;
-import name.saptarshidebnath.processrunner.lib.utilities.OutputSource;
-import name.saptarshidebnath.processrunner.lib.utilities.WriteJsonArrayToOutputStream;
+import name.saptarshidebnath.processrunner.lib.utilities.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+/** Implementation of the {@link ProcessRunner} interface */
 class ProcessRunnerImpl implements ProcessRunner {
   private final ProcessConfiguration configuration;
   private final Runtime runTime;
-  private final WriteJsonArrayToOutputStream<Output> jsonArrayToOutputStream;
+  private final WriteJsonArrayToFile<Output> jsonArrayToOutputStream;
 
+  /**
+   * Consturctor reciving the {@link ProcessConfiguration} to create the process runner.
+   *
+   * @param configuration a valid object of {@link ProcessConfiguration}
+   * @throws IOException
+   */
   ProcessRunnerImpl(final ProcessConfiguration configuration) throws IOException {
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
-    this.jsonArrayToOutputStream =
-        new WriteJsonArrayToOutputStream<>(
-            new FileOutputStream(this.configuration.getOriginalDump(), false),
-            StandardCharsets.UTF_8);
+    this.jsonArrayToOutputStream = new WriteJsonArrayToFile<>(this.configuration.getOriginalDump());
+  }
+
+  @Override
+  public boolean search(final String regex) throws IOException {
+    boolean isMatching = false;
+    final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
+        new ReadJsonArrayFromFile<>(this.configuration.getOriginalDump());
+    Output output = null;
+    do {
+      output = readJsonArrayFromFile.readNext(Output.class);
+      if (output != null) {
+        isMatching = output.getOutputText().matches(regex);
+      }
+    } while (output != null && isMatching == false);
+    readJsonArrayFromFile.cleanUp();
+    return isMatching;
   }
 
   public int run() throws IOException, InterruptedException {
@@ -37,16 +51,16 @@ class ProcessRunnerImpl implements ProcessRunner {
     final Process currentProcess =
         this.runTime.exec(
             commandToExecute.toString(), null, this.configuration.getCurrentDirectory());
-    this.jsonArrayToOutputStream.beginWriting();
-    final ExecutorService executor = Executors.newFixedThreadPool(10);
-    executor.execute(this.logData(currentProcess.getInputStream(), OutputSource.SYSOUT));
-    executor.execute(this.logData(currentProcess.getErrorStream(), OutputSource.SYSERROR));
+    this.jsonArrayToOutputStream.startJsonObject();
+    final ExecutorService executor = Executors.newFixedThreadPool(2);
+    executor.execute(this.logData(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
+    executor.execute(this.logData(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
     executor.shutdown();
-    while (!executor.isShutdown()) {
-      System.out.println("Waiting for log capture threads to finish");
-    }
+    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
     currentProcess.waitFor();
-    this.jsonArrayToOutputStream.endWriting();
+    this.jsonArrayToOutputStream.endJsonObjectWrite();
+    this.jsonArrayToOutputStream.cleanup();
+    this.distributeLog();
     return currentProcess.exitValue();
   }
 
@@ -58,26 +72,64 @@ class ProcessRunnerImpl implements ProcessRunner {
     return this.configuration.getSysOut();
   }
 
-  public File getOutPut() {
-    return null;
+  /**
+   * Seperate the log into sysout and syserror from the original data dump
+   *
+   * @throws IOException
+   */
+  private void distributeLog() throws IOException {
+    Output output = null;
+    final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
+        new ReadJsonArrayFromFile<>(this.configuration.getOriginalDump());
+    final PrintWriter sysOut =
+        new PrintWriter(new BufferedWriter(new FileWriter(this.configuration.getSysOut(), true)));
+    final PrintWriter sysErr =
+        new PrintWriter(new BufferedWriter(new FileWriter(this.configuration.getSysError(), true)));
+    do {
+      output = readJsonArrayFromFile.readNext(Output.class);
+      if (output != null) {
+        PrintWriter currentWriter = null;
+        if (output.getOutputSourceType() == OutputSourceType.SYSOUT) {
+          currentWriter = sysOut;
+        } else if (output.getOutputSourceType() == OutputSourceType.SYSERROR) {
+          currentWriter = sysErr;
+        }
+        currentWriter.println(output.getOutputText());
+        currentWriter.flush();
+      }
+    } while (output != null);
+    readJsonArrayFromFile.cleanUp();
+    sysOut.close();
+    sysErr.close();
   }
 
-  public Runnable logData(final InputStream inputStreamToWrite, final OutputSource outputSource)
+  /**
+   * Log a inputStream to the sysout and syserror as configured in {@link ProcessConfiguration}
+   *
+   * @param inputStreamToWrite : {@link InputStream} to write to
+   * @param outputSourceType {@link OutputSourceType} depicting the source of the output
+   * @return {@link Runnable} instance
+   * @throws IOException
+   */
+  private Runnable logData(
+      final InputStream inputStreamToWrite, final OutputSourceType outputSourceType)
       throws IOException {
-    System.out.println("Capturing Output Source : " + outputSource);
-    return new Runnable() {
-      @Override
-      public void run() {
-        try {
-          final Scanner scanner = new Scanner(inputStreamToWrite);
-          while (scanner.hasNext()) {
-            final String currentLine = scanner.nextLine();
-            System.out.println(outputSource + " : " + currentLine);
-            ProcessRunnerImpl.this.jsonArrayToOutputStream.writeArrayObject(
-                new Output(outputSource, currentLine));
+    return () -> {
+      final Scanner scanner = new Scanner(inputStreamToWrite);
+      while (scanner.hasNext()) {
+        final String currentLine = scanner.nextLine();
+        if (ProcessRunnerImpl.this.configuration.getAutoDeleteFileOnExit()) {
+          if (OutputSourceType.SYSOUT == outputSourceType) {
+            System.out.println(currentLine);
+          } else if (OutputSourceType.SYSERROR == outputSourceType) {
+            System.err.println(currentLine);
           }
-        } catch (final IOException exception) {
-          exception.printStackTrace();
+        }
+        try {
+          ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
+              new Output(outputSourceType, currentLine));
+        } catch (final IOException e) {
+          e.printStackTrace();
         }
       }
     };

@@ -7,18 +7,18 @@ import com.google.gson.GsonBuilder;
 public class Output {
   private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private final long timeStamp;
-  private final OutputSource outputSource;
+  private final OutputSourceType outputSourceType;
   private final String outputText;
 
   /**
    * Constructor to store the Output line by line
    *
-   * @param outputSource {@link OutputSource}
+   * @param outputSourceType {@link OutputSourceType}
    * @param outputText
    */
-  public Output(final OutputSource outputSource, final String outputText) {
+  public Output(final OutputSourceType outputSourceType, final String outputText) {
     this.timeStamp = getCurrentTime();
-    this.outputSource = outputSource;
+    this.outputSourceType = outputSourceType;
     this.outputText = outputText;
   }
 
@@ -29,6 +29,18 @@ public class Output {
    */
   private static synchronized long getCurrentTime() {
     return System.nanoTime();
+  }
+
+  public long getTimeStamp() {
+    return this.timeStamp;
+  }
+
+  public OutputSourceType getOutputSourceType() {
+    return this.outputSourceType;
+  }
+
+  public String getOutputText() {
+    return this.outputText;
   }
 
   /**

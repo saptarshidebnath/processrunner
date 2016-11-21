@@ -15,6 +15,8 @@ public class ProcessConfiguration {
   /** Original data dump for the log */
   private final File originalDump;
 
+  private final boolean autoDeleteFileOnExit;
+
   /**
    * Most detailed constructor to set the {@link ProcessConfiguration}.
    *
@@ -69,15 +71,19 @@ public class ProcessConfiguration {
     this.currentDirectory = currentDirectory;
     this.sysOut = sysOut;
     this.sysError = sysError;
+    this.autoDeleteFileOnExit = autoDeleteFileOnExit;
     this.sysOut.createNewFile();
     this.sysError.createNewFile();
     this.originalDump = File.createTempFile("ProcessRunner-datadump-", ".json");
-    //this.originalDump.deleteOnExit();
+    this.originalDump.deleteOnExit();
     if (autoDeleteFileOnExit) {
       sysOut.deleteOnExit();
       sysError.deleteOnExit();
     }
-    System.out.println(this.toString());
+  }
+
+  public boolean getAutoDeleteFileOnExit() {
+    return this.autoDeleteFileOnExit;
   }
 
   public File getOriginalDump() {
