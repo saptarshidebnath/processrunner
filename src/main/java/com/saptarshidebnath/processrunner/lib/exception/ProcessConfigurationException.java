@@ -1,6 +1,6 @@
-package name.saptarshidebnath.processrunner.lib.exception;
+package com.saptarshidebnath.processrunner.lib.exception;
 
-import name.saptarshidebnath.processrunner.lib.ProcessConfiguration;
+import com.saptarshidebnath.processrunner.lib.ProcessConfiguration;
 
 /** Basic exception denote that the {@link ProcessConfiguration} is not configured correctly */
 public class ProcessConfigurationException extends Exception {

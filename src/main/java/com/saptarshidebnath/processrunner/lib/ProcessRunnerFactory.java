@@ -1,19 +1,19 @@
-package name.saptarshidebnath.processrunner.lib;
+package com.saptarshidebnath.processrunner.lib;
 
-import name.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
-import name.saptarshidebnath.processrunner.lib.utilities.Utilities;
+import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
+import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 
 import java.io.File;
 import java.io.IOException;
 
-import static name.saptarshidebnath.processrunner.lib.utilities.Constants.DEFAULT_CURRENT_DIR;
+import static com.saptarshidebnath.processrunner.lib.utilities.Constants.FILE_PREFIX_NAME_LOG_DUMP;
 
 /** Factory method to to run command or to get an instance of {@link ProcessRunner} */
 public class ProcessRunnerFactory {
   /**
    * Run a process and respond back with return code. Uses current directory as the working
-   * directory. Create temporary file for sysout and syserror. Files are auto deleted after
-   * execution.
+   * directory. Create temporary file for json log dump. Files are auto deleted after execution.
    *
    * @param commandInterPreter : Command Interpreter to be used
    * @param command : command to be executed
@@ -28,16 +28,15 @@ public class ProcessRunnerFactory {
             new ProcessConfiguration(
                 commandInterPreter,
                 command,
-                DEFAULT_CURRENT_DIR,
-                Utilities.createTempSysOut(),
-                Utilities.createTempSysErr(),
+                Constants.DEFAULT_CURRENT_DIR,
+                File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON),
                 true))
         .run();
   }
 
   /**
-   * Creates a process with bare basic parameters. Supplies default file for sysout and syseror.
-   * Auto deletion of file is set to false
+   * Creates a process with bare basic parameters. Supplies default {@link File} for log dump. Auto
+   * deletion of file is set to false.
    *
    * @param commandInterPreter : The command interpreter
    * @param command : The command to be executed
@@ -51,37 +50,34 @@ public class ProcessRunnerFactory {
       throws IOException, ProcessConfigurationException {
     return new ProcessRunnerImpl(
         new ProcessConfiguration(
-            commandInterPreter,
-            command,
-            workingDirectory,
-            Utilities.createTempSysOut(),
-            Utilities.createTempSysErr(),
-            false));
+            commandInterPreter, command, workingDirectory, Utilities.createTempLogDump(), false));
   }
 
   /**
-   * Create a detailed process
+   * Creates a ProcessRunner with all the required parameters
    *
-   * @param commandInterPreter : command interpreter to be used like /bin/bash
-   * @param command : command to be executed
-   * @param workingDirectory : {@link File} representing working directory for the command execution
-   * @param sysOut : {@link File} where sysout to be stored
-   * @param sysError : {@link File} where syserr to be stored
-   * @param autodeleteFile : boolean to denote if files need to be deleted automatically
+   * @param commandRunnerInterPreter : {@link String} value with the command interpreter to be used
+   *     example "/bin/bash"
+   * @param command : {@link String} value for the process we are going to run. Can be a shell
+   *     script or a batch file also
+   * @param workingDirectory : {@link File} reference to the working directory from where it should
+   *     be executing
+   * @param logDump : {@link File} reference to the json log file where the logs will be stored.
+   * @param autoDeleteFile {@link Boolean} object confiroming if the file need to be auto deleted at
+   *     the end of the jvm exit
    * @return
    * @throws IOException
    * @throws ProcessConfigurationException
    */
   public static ProcessRunner getProcess(
-      final String commandInterPreter,
+      final String commandRunnerInterPreter,
       final String command,
       final File workingDirectory,
-      final File sysOut,
-      final File sysError,
-      final boolean autodeleteFile)
+      final File logDump,
+      final boolean autoDeleteFile)
       throws IOException, ProcessConfigurationException {
     return new ProcessRunnerImpl(
         new ProcessConfiguration(
-            commandInterPreter, command, workingDirectory, sysOut, sysError, autodeleteFile));
+            commandRunnerInterPreter, command, workingDirectory, logDump, autoDeleteFile));
   }
 }
