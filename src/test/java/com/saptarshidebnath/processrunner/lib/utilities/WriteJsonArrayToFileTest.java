@@ -3,6 +3,8 @@ package com.saptarshidebnath.processrunner.lib.utilities;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
+import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
+import com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,5 +65,13 @@ public class WriteJsonArrayToFileTest {
         "Checking array contents",
         Arrays.asList(this.arrayOfDataReadFromTestFile),
         hasItems(this.arrayOfDataToWrite));
+  }
+
+  @Test(expected = JsonArrayWriterException.class)
+  public void writeJsonObjectAfterEndingJsonObject() throws IOException, JsonArrayWriterException {
+    this.testObject.startJsonObject();
+    this.testObject.endJsonObjectWrite();
+    this.testObject.cleanup();
+    this.testObject.writeJsonObject("Test String");
   }
 }

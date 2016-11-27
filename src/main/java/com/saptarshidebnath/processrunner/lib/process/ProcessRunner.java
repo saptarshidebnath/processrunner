@@ -1,5 +1,6 @@
-package com.saptarshidebnath.processrunner.lib;
+package com.saptarshidebnath.processrunner.lib.process;
 
+import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
 import java.io.File;
@@ -15,7 +16,7 @@ public interface ProcessRunner extends Constants {
    * @return
    * @throws IOException
    */
-  boolean search(final String regex) throws IOException;
+  boolean search(final String regex) throws IOException, JsonArrayReaderException;
 
   /**
    * Triggers the process or command;
@@ -30,7 +31,7 @@ public interface ProcessRunner extends Constants {
    * @param sysOut : {@link File} depicting where the sysout is going to stored
    * @return a {@link File}
    */
-  File saveSysOut(File sysOut) throws IOException;
+  File saveSysOut(File sysOut) throws IOException, JsonArrayReaderException;
 
   /**
    * Generate the syserror
@@ -38,7 +39,7 @@ public interface ProcessRunner extends Constants {
    * @param sysError {@link File} depicting where the sys error is going to stored
    * @return
    */
-  File saveSysError(File sysError) throws IOException;
+  File saveSysError(File sysError) throws IOException, JsonArrayReaderException;
 
   /**
    * Returns a {@link File} reference to the log where the Json Log Data is dumped

@@ -1,7 +1,12 @@
-package com.saptarshidebnath.processrunner.lib;
+package com.saptarshidebnath.processrunner.lib.process;
 
+import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
-import com.saptarshidebnath.processrunner.lib.utilities.*;
+import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
+import com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile;
+import com.saptarshidebnath.processrunner.lib.output.Output;
+import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
+import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
 import java.io.*;
 import java.util.Scanner;
@@ -36,7 +41,7 @@ class ProcessRunnerImpl implements ProcessRunner {
   }
 
   @Override
-  public boolean search(final String regex) throws IOException {
+  public boolean search(final String regex) throws IOException, JsonArrayReaderException {
     this.logger.info("Searching for regular expression :" + regex);
     boolean isMatching = false;
     final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
@@ -93,13 +98,13 @@ class ProcessRunnerImpl implements ProcessRunner {
   }
 
   @Override
-  public File saveSysOut(final File sysOut) throws IOException {
+  public File saveSysOut(final File sysOut) throws IOException, JsonArrayReaderException {
     this.logger.info("Saving sys out to " + sysOut.getCanonicalPath());
     return this.writeLog(sysOut, OutputSourceType.SYSOUT);
   }
 
   @Override
-  public File saveSysError(final File sysError) throws IOException {
+  public File saveSysError(final File sysError) throws IOException, JsonArrayReaderException {
     this.logger.info("Saving sys error to : " + sysError.getCanonicalPath());
     return this.writeLog(sysError, OutputSourceType.SYSERROR);
   }
@@ -116,9 +121,10 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @param outputSourceType : {@link OutputSourceType} to designate type of output
    * @return
    * @throws IOException
+   * @throws JsonArrayReaderException
    */
   private File writeLog(final File targetFile, final OutputSourceType outputSourceType)
-      throws IOException {
+      throws IOException, JsonArrayReaderException {
     this.logger.info(
         "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
     Output output = null;

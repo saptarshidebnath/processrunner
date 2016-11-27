@@ -1,4 +1,4 @@
-package com.saptarshidebnath.processrunner.lib.utilities;
+package com.saptarshidebnath.processrunner.lib.jsonutils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

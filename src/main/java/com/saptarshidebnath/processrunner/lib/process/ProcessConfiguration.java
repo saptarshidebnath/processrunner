@@ -1,4 +1,4 @@
-package com.saptarshidebnath.processrunner.lib;
+package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 
