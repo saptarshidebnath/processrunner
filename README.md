@@ -6,7 +6,7 @@
 #####Short Tutorial
 ----
 
-* **Just do it - [Laydh](https://www.youtube.com/watch?v=XlsIq4V_cNI "What is Laydh") level : Extraordinary**
+* Scenario 1 >> **Just do it - [Laydh](https://www.youtube.com/watch?v=XlsIq4V_cNI "What is Laydh") level : Extraordinary**
   * Runs the command / process.
   * Auto deletes the log file. 
   * Returns the exit code.
@@ -18,7 +18,7 @@ import com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory;
 int runStatus = ProcessRunnerFactory.startProcess("/bin/bash","mkdir -p ~/processrunner/created/directory");
 ````
 
-* **Lets Do it - [Laydh](https://www.youtube.com/watch?v=XlsIq4V_cNI "What is Laydh") level : Standard**
+* Scenario 2 >> **Lets Do it - [Laydh](https://www.youtube.com/watch?v=XlsIq4V_cNI "What is Laydh") level : Standard**
   * Creates a [ProcessConfiguration](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) 
   * Triggers the Porcess/command
   * Returns the [ProcessRunner](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java)
@@ -47,7 +47,8 @@ processRunner.saveSysOut(new File("~/sysout.txt"));
 processRunner.saveSysError(new File("~/syserr.txt"));
 jsonLog.delete();
 ````
-* **I want control - [Laydh](https://www.youtube.com/watch?v=XlsIq4V_cNI "What is Laydh") level : Khatua chelle**
+
+* Scenario 3 >>  **I want control - [Laydh](https://www.youtube.com/watch?v=XlsIq4V_cNI "What is Laydh") level : Khatua chelle**
   * Evenrthing will be exactly similar to the aove implementation, except the the configuration will be written in full detail.
   * Creates a [ProcessConfiguration](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) with all the details. You neeed to provide :-
     * command interpretter
