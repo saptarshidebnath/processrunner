@@ -22,7 +22,7 @@ int runStatus = ProcessRunnerFactory.startProcess("/bin/bash","mkdir -p ~/proces
   * Creates a [ProcessConfiguration](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) 
   * Triggers the Porcess/command
   * Returns the [ProcessRunner](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java)
-  * From the [ProcessRunner](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) you can get the differnet types of log
+  * From the [ProcessRunner](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) you can get the differnet types of log. **Please note that the logs are not auto deleted. You have to manually delete the logs if you want to.**
     * JSON Format log dump : the JSON log an array of the class [OutPut](./src/main/java/com/saptarshidebnath/processrunner/lib/output/Output.java)
     * Seperate
       * sysout
@@ -47,3 +47,32 @@ processRunner.saveSysOut(new File("~/sysout.txt"));
 processRunner.saveSysError(new File("~/syserr.txt"));
 jsonLog.delete();
 ````
+* **I want control - [Laydh](https://www.youtube.com/watch?v=XlsIq4V_cNI "What is Laydh") level : Khatua chelle**
+  * Evenrthing will be exactly similar to the aove implementation, except the the configuration will be written in full detail.
+  * Creates a [ProcessConfiguration](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) with all the details. You neeed to provide :-
+    * command interpretter
+    * command to be executed
+    * A File object denoting the work directory
+    * A File object denoting where the json log dump file need to be saved.
+    * A Boolean denoting if the json file needs to be auto deleted or not
+  * The method returns a ProcessRunner from which you can run, get the json log dump create sys out and syserror files
+  
+```java
+
+import com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory;
+import com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory;
+...
+...
+ProcessRunner processRunner = ProcessRunnerFactory.getProcess(
+                                  "/bin/bash -x",
+                                  "mkdir -p ~/processrunner/created/directory", 
+                                  new File("/my/commands/working/directory),
+                                  new File("~/logdump.json"),
+                                  true);
+int runStatus = processRunner.run();
+
+File jsonLog = processRunner.getJsonLogDump();
+processRunner.saveSysOut(new File("~/sysout.txt"));
+processRunner.saveSysError(new File("~/syserr.txt"));
+```
+ 
