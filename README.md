@@ -1,6 +1,8 @@
 # processrunner
 ===============
 
+[![Build Status](https://travis-ci.org/saptarshidebnath/processrunner.svg?branch=master)](https://travis-ci.org/saptarshidebnath/processrunner)
+
 ***Process Runner*** is java based library using which one can **execute system process or scripts from inside your java program**.
 
 #####Short Tutorial
