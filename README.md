@@ -78,3 +78,5 @@ File jsonLog = processRunner.getJsonLogDump();
 processRunner.saveSysOut(new File("~/sysout.txt"));
 processRunner.saveSysError(new File("~/syserr.txt"));
 ```
+
+Need to checkout : https://docs.travis-ci.com/user/sonarqube/
