@@ -35,8 +35,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jacoco.version>0.7.5.201505241946</jacoco.version>
-        <jacoco.code.coverage.line.min>0.7</jacoco.code.coverage.line.min>
-        <jacoco.code.coverage.branch.min>0.7</jacoco.code.coverage.branch.min>
+        <jacoco.code.coverage.line.min>0.1</jacoco.code.coverage.line.min>
+        <jacoco.code.coverage.branch.min>0.1</jacoco.code.coverage.branch.min>
         <gpg.passphrase></gpg.passphrase>
     </properties>
 
