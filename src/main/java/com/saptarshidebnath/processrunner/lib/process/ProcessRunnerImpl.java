@@ -9,6 +9,7 @@ import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,8 +17,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** Implementation of the {@link ProcessRunner} interface */
-class ProcessRunnerImpl implements ProcessRunner {
+/** Implementation of the {@link ProcessRunnerInterface} interface. */
+@edu.umd.cs.findbugs.annotations.SuppressFBWarnings("COMMAND_INJECTION")
+public class ProcessRunner implements ProcessRunnerInterface {
   private final ProcessConfiguration configuration;
   private final Runtime runTime;
   private final WriteJsonArrayToFile<Output> jsonArrayToOutputStream;
@@ -33,7 +35,7 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @param configuration a valid object of {@link ProcessConfiguration}
    * @throws IOException
    */
-  ProcessRunnerImpl(final ProcessConfiguration configuration) throws IOException {
+  public ProcessRunner(final ProcessConfiguration configuration) throws IOException {
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
     this.jsonArrayToOutputStream = new WriteJsonArrayToFile<>(this.configuration.getLogDump());
@@ -46,13 +48,13 @@ class ProcessRunnerImpl implements ProcessRunner {
     boolean isMatching = false;
     final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
         new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-    Output output = null;
+    Output output;
     do {
       output = readJsonArrayFromFile.readNext(Output.class);
       if (output != null) {
         isMatching = output.getOutputText().matches(regex);
       }
-    } while (output != null && isMatching == false);
+    } while (output != null && !isMatching);
     if (isMatching) {
       this.logger.info("Regex \'" + regex + "\" is found");
     } else {
@@ -127,11 +129,14 @@ class ProcessRunnerImpl implements ProcessRunner {
       throws IOException, JsonArrayReaderException {
     this.logger.info(
         "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
-    Output output = null;
+    Output output;
     final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
         new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
+
     final PrintWriter printWriter =
-        new PrintWriter(new BufferedWriter(new FileWriter(targetFile, true)));
+        new PrintWriter(
+            new OutputStreamWriter(
+                new FileOutputStream(targetFile, true), Charset.defaultCharset()));
     do {
       output = readJsonArrayFromFile.readNext(Output.class);
       if (output != null) {
@@ -161,8 +166,7 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @throws IOException
    */
   private Runnable logData(
-      final InputStream inputStreamToWrite, final OutputSourceType outputSourceType)
-      throws IOException {
+      final InputStream inputStreamToWrite, final OutputSourceType outputSourceType) {
     return () -> {
       try {
         this.logger.info(
@@ -174,7 +178,7 @@ class ProcessRunnerImpl implements ProcessRunner {
         while (scanner.hasNext()) {
           final String currentLine = scanner.nextLine();
           this.logger.info(outputSourceType.toString() + " >> " + currentLine);
-          ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
+          ProcessRunner.this.jsonArrayToOutputStream.writeJsonObject(
               new Output(outputSourceType, currentLine));
         }
       } catch (final IOException | JsonArrayWriterException ex) {

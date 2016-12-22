@@ -1,4 +1,4 @@
-package com.saptarshidebnath.processrunner.lib.utilities;
+package com.saptarshidebnath.processrunner.lib.jsonutils;
 
 import org.junit.After;
 import org.junit.Before;

@@ -1,10 +1,9 @@
-package com.saptarshidebnath.processrunner.lib.utilities;
+package com.saptarshidebnath.processrunner.lib.jsonutils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
-import com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
