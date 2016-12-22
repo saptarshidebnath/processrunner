@@ -78,17 +78,26 @@ public class ProcessConfiguration {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("ProcessConfiguration{").append(NEW_LINE);
-    sb.append("commandRunnerInterPreter='")
-        .append(this.commandRunnerInterPreter)
-        .append('\'')
-        .append(NEW_LINE);
-    sb.append(", command='").append(this.command).append('\'').append(NEW_LINE);
-    sb.append(", currentDirectory=").append(this.currentDirectory).append(NEW_LINE);
-    sb.append(", logDump=").append(this.logDump).append(NEW_LINE);
-    sb.append(", autoDeleteFileOnExit=").append(this.autoDeleteFileOnExit).append(NEW_LINE);
-    sb.append('}');
-    return sb.toString();
+    return "ProcessConfiguration{"
+        + NEW_LINE
+        + "commandRunnerInterPreter='"
+        + this.commandRunnerInterPreter
+        + '\''
+        + NEW_LINE
+        + ", command='"
+        + this.command
+        + '\''
+        + NEW_LINE
+        + ", currentDirectory="
+        + this.currentDirectory
+        + NEW_LINE
+        + ", logDump="
+        + this.logDump
+        + NEW_LINE
+        + ", autoDeleteFileOnExit="
+        + this.autoDeleteFileOnExit
+        + NEW_LINE
+        + '}';
   }
 
   public boolean getAutoDeleteFileOnExit() {

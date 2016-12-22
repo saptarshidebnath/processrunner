@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 /** Process Runner interface is the base interface to run any system process or shell script */
-public interface ProcessRunnerInterface extends Constants {
+public interface ProcessRunner extends Constants {
 
   /**
    * Searches for the regular expression throughout the content of the log

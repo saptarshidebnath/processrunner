@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** Implementation of the {@link ProcessRunnerInterface} interface. */
+/** Implementation of the {@link ProcessRunner} interface. */
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("COMMAND_INJECTION")
-public class ProcessRunner implements ProcessRunnerInterface {
+public class ProcessRunnerImpl implements ProcessRunner {
   private final ProcessConfiguration configuration;
   private final Runtime runTime;
   private final WriteJsonArrayToFile<Output> jsonArrayToOutputStream;
@@ -35,7 +35,7 @@ public class ProcessRunner implements ProcessRunnerInterface {
    * @param configuration a valid object of {@link ProcessConfiguration}
    * @throws IOException
    */
-  public ProcessRunner(final ProcessConfiguration configuration) throws IOException {
+  public ProcessRunnerImpl(final ProcessConfiguration configuration) throws IOException {
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
     this.jsonArrayToOutputStream = new WriteJsonArrayToFile<>(this.configuration.getLogDump());
@@ -178,7 +178,7 @@ public class ProcessRunner implements ProcessRunnerInterface {
         while (scanner.hasNext()) {
           final String currentLine = scanner.nextLine();
           this.logger.info(outputSourceType.toString() + " >> " + currentLine);
-          ProcessRunner.this.jsonArrayToOutputStream.writeJsonObject(
+          ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
               new Output(outputSourceType, currentLine));
         }
       } catch (final IOException | JsonArrayWriterException ex) {

@@ -22,11 +22,11 @@ int runStatus = ProcessRunnerFactory.startProcess("/bin/bash","mkdir -p ~/proces
 
 * **Scenario 2 >> Lets Do it - [Laydh](https://www.youtube.com/watch?v=XlsIq4V_cNI "What is Laydh") level : Standard**
   * Creates a [ProcessConfiguration](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) 
-  * Triggers the Porcess/command
+  * Triggers the Process/command
   * Returns the [ProcessRunner](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java)
-  * From the [ProcessRunner](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) you can get the differnet types of log. **Please note that the logs are not auto deleted. You have to manually delete the logs if you want to.**
+  * From the [ProcessRunner](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) you can get the different types of log. **Please note that the logs are not auto deleted. You have to manually delete the logs if you want to.**
     * JSON Format log dump : the JSON log an array of the class [OutPut](./src/main/java/com/saptarshidebnath/processrunner/lib/output/Output.java)
-    * Seperate
+    * Separate
       * sysout
       * syserror
 
@@ -51,9 +51,9 @@ jsonLog.delete();
 ````
 
 * **Scenario 3 >> I want control - [Laydh](https://www.youtube.com/watch?v=XlsIq4V_cNI "What is Laydh") level : Khatua chelle**
-  * Evenrthing will be exactly similar to the aove implementation, except the the configuration will be written in full detail.
-  * Creates a [ProcessConfiguration](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) with all the details. You neeed to provide :-
-    * command interpretter
+  * Everything will be exactly similar to the above implementation, except the the configuration will be written in full detail.
+  * Creates a [ProcessConfiguration](./src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) with all the details. You need to provide :-
+    * command interpreter
     * command to be executed
     * A File object denoting the work directory
     * A File object denoting where the json log dump file need to be saved.
