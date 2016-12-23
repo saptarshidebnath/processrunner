@@ -49,7 +49,7 @@ public class ProcessRunnerImplFactoryTest {
       throws IOException, ProcessConfigurationException, InterruptedException {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(), "echo Saptarshi Debnath", Constants.DEFAULT_CURRENT_DIR);
+            getDefaultInterpreter(), " --version", Constants.DEFAULT_CURRENT_DIR);
     final int response = processRunner.run();
     assertThat("Validating process return code : ", response, is(0));
     final File jsonLogDump = processRunner.getJsonLogDump();
@@ -90,7 +90,7 @@ public class ProcessRunnerImplFactoryTest {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
             getDefaultInterpreter(),
-            "echo SapDev",
+            " --version",
             Constants.DEFAULT_CURRENT_DIR,
             File.createTempFile("temp-file-name", ".json"),
             false);
