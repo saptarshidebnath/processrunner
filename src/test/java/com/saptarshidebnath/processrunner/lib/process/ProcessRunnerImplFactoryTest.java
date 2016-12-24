@@ -20,6 +20,7 @@ import java.util.Scanner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.StringStartsWith.startsWith;
 
 /** Created by saptarshi on 12/22/2016. */
 public class ProcessRunnerImplFactoryTest {
@@ -39,8 +40,7 @@ public class ProcessRunnerImplFactoryTest {
   @Test
   public void startProcess()
       throws InterruptedException, ProcessConfigurationException, IOException {
-    final int response =
-        ProcessRunnerFactory.startProcess(getDefaultInterpreter(), "echo Saptarshi");
+    final int response = ProcessRunnerFactory.startProcess(getDefaultInterpreter(), " --version");
     assertThat("Validating process runner for simple process : ", response, is(0));
   }
 
@@ -59,9 +59,11 @@ public class ProcessRunnerImplFactoryTest {
     final Type listTypeOuputArray = new TypeToken<List<Output>>() {}.getType();
     final List<Output> output = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
     assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
-    assertThat("Validating json log record number : ", output.size(), is(1));
+    assertThat("Validating json log record number : ", output.size(), is(6));
     assertThat(
-        "Validating json log content : ", output.get(0).getOutputText(), is("Saptarshi Debnath"));
+        "Validating json log content : ",
+        output.get(0).getOutputText(),
+        startsWith("GNU bash, version"));
     //TODO
     //Add test case for sys file and sys error file creation.
     jsonLogDump.delete();
@@ -103,8 +105,11 @@ public class ProcessRunnerImplFactoryTest {
     final Type listTypeOuputArray = new TypeToken<List<Output>>() {}.getType();
     final List<Output> output = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
     assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
-    assertThat("Validating json log record number : ", output.size(), is(1));
-    assertThat("Validating json log content : ", output.get(0).getOutputText(), is("SapDev"));
+    assertThat("Validating json log record number : ", output.size(), is(6));
+    assertThat(
+        "Validating json log content : ",
+        output.get(0).getOutputText(),
+        startsWith("GNU bash, version"));
     //TODO
     //Add test case for sys file and sys error file creation.
     jsonLogDump.delete();
