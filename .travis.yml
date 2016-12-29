@@ -20,7 +20,6 @@ after_success:
 
 os:
   - linux
-  - osx
 
 cache:
   directories:
@@ -29,7 +28,3 @@ cache:
 branches:
   only:
   - master
-
-notifications:
-  email:
-  - saptarshi.devnath@gmail.com
