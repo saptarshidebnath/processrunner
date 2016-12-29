@@ -20,7 +20,7 @@ after_success:
 
 os:
   - linux
-  - windows
+  - osx
 
 cache:
   directories:
