@@ -44,7 +44,7 @@ public class ReadJsonArrayFromFile<T> {
    *
    * @throws IOException indicating some problem while closing the stream.
    */
-  public synchronized void cleanUp() throws IOException {
+  public synchronized void closeJsonReader() throws IOException {
     if (this.jsonReader != null) {
       this.jsonReader.close();
       this.jsonReader = null;

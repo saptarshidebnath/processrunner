@@ -8,7 +8,12 @@ import com.saptarshidebnath.processrunner.lib.output.Output;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -33,7 +38,7 @@ public class ProcessRunnerImpl implements ProcessRunner {
    * Constructor receiving the {@link ProcessConfiguration} to create the process runner.
    *
    * @param configuration a valid object of {@link ProcessConfiguration}
-   * @throws IOException
+   * @throws IOException if Unable to work with the log files
    */
   public ProcessRunnerImpl(final ProcessConfiguration configuration) throws IOException {
     this.configuration = configuration;
@@ -60,7 +65,7 @@ public class ProcessRunnerImpl implements ProcessRunner {
     } else {
       this.logger.info("Regex \'" + regex + "\" NOT found");
     }
-    readJsonArrayFromFile.cleanUp();
+    readJsonArrayFromFile.closeJsonReader();
     return isMatching;
   }
 
@@ -68,8 +73,8 @@ public class ProcessRunnerImpl implements ProcessRunner {
    * Runs the process with the providedconfiguration
    *
    * @return integer value depicting the process exit code
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException If unable to work with File.
+   * @throws InterruptedException If the thread operations are interrupted.
    */
   public int run() throws IOException, InterruptedException {
     this.logger.info("Starting process");
@@ -121,9 +126,10 @@ public class ProcessRunnerImpl implements ProcessRunner {
    *
    * @param targetFile : {@link File} object to where the program should write the log
    * @param outputSourceType : {@link OutputSourceType} to designate type of output
-   * @return
-   * @throws IOException
-   * @throws JsonArrayReaderException
+   * @return a {@link File} object
+   * @throws IOException If unable to log file.
+   * @throws JsonArrayReaderException If unable to read Json array {@link JsonArrayReaderException}
+   *     from {@link File}
    */
   private File writeLog(final File targetFile, final OutputSourceType outputSourceType)
       throws IOException, JsonArrayReaderException {
@@ -148,7 +154,7 @@ public class ProcessRunnerImpl implements ProcessRunner {
         }
       }
     } while (output != null);
-    readJsonArrayFromFile.cleanUp();
+    readJsonArrayFromFile.closeJsonReader();
     printWriter.flush();
     printWriter.close();
     this.logger.info(
@@ -163,7 +169,7 @@ public class ProcessRunnerImpl implements ProcessRunner {
    *     written to a File
    * @param outputSourceType {@link OutputSourceType} depicting the source of the output
    * @return {@link Runnable} instance
-   * @throws IOException
+   * @throws IOException If unable to log data to file.
    */
   private Runnable logData(
       final InputStream inputStreamToWrite, final OutputSourceType outputSourceType) {

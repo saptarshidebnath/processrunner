@@ -18,7 +18,7 @@ public class ProcessRunnerFactory {
    * @param commandInterPreter : Command Interpreter to be used
    * @param command : command to be executed
    * @return
-   * @throws IOException
+   * @throws IOException If any error occurs
    * @throws ProcessConfigurationException
    * @throws InterruptedException
    */

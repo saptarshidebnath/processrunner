@@ -2,11 +2,17 @@ package com.saptarshidebnath.processrunner.lib.jsonutils;
 
 import com.google.gson.GsonBuilder;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -31,7 +37,10 @@ public class ReadJsonArrayFromFileTest {
   @Before
   public void setUp() throws Exception {
     this.testFile = File.createTempFile("test-read-object-prefix", "-suffix");
-    final PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(this.testFile)));
+    final PrintWriter pw =
+        new PrintWriter(
+            new OutputStreamWriter(
+                new FileOutputStream(this.testFile, true), Charset.defaultCharset()));
     pw.print(this.jsonContent);
     pw.flush();
     pw.close();
@@ -43,10 +52,10 @@ public class ReadJsonArrayFromFileTest {
     if (this.testFile.delete()) {
       this.logger.severe(
           "Unable to delete file : "
-              + this.testFile.getCanonicalPath()
+              + StringEscapeUtils.escapeJava(this.testFile.getCanonicalPath())
               + ". Please delete manually");
     }
-    this.testObject.cleanUp();
+    this.testObject.closeJsonReader();
   }
 
   @Test
@@ -69,7 +78,7 @@ public class ReadJsonArrayFromFileTest {
 
   @Test(expected = JsonArrayReaderException.class)
   public void writeJsonObjectAfterEndingJsonObject() throws IOException, JsonArrayReaderException {
-    this.testObject.cleanUp();
+    this.testObject.closeJsonReader();
     this.testObject.readNext(String.class);
   }
 }

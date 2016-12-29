@@ -4,7 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 
 /**
@@ -23,10 +27,9 @@ public class WriteJsonArrayToFile<T> {
    * Constructor with the target file in mind.
    *
    * @param targetFile : {@link File} reference where the content is going to be saved
-   * @throws IOException
+   * @throws IOException When the target file could not be opened for the {@link File}
    */
   public WriteJsonArrayToFile(final File targetFile) throws IOException {
-    //this.printWriter = new PrintWriter(new FileWriter(targetFile, true));
     this.printWriter =
         new PrintWriter(
             new OutputStreamWriter(
