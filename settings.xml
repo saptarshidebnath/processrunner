@@ -1,0 +1,21 @@
+<settings>
+    <servers>
+        <server>
+            <id>ossrh</id>
+            <username>sdebnath</username>
+            <password>{Ka2GRXl0wJYHfqH6Os9oZQaHckX19TtM+C8qLOeS6bU=}</password>
+        </server>
+    </servers>
+    <profiles>
+        <profile>
+            <id>ossrh</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <gpg.executable>gpg2</gpg.executable>
+                <gpg.passphrase>{Ka2GRXl0wJYHfqH6Os9oZQaHckX19TtM+C8qLOeS6bU=}</gpg.passphrase>
+            </properties>
+        </profile>
+    </profiles>
+</settings>
