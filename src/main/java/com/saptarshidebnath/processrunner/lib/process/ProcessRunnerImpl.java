@@ -16,15 +16,20 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** Implementation of the {@link ProcessRunner} interface. */
+/**
+ * Implementation of the {@link ProcessRunner} interface. Gives a solid body to the {@link
+ * ProcessRunner}.
+ */
 @edu.umd.cs.findbugs.annotations.SuppressFBWarnings("COMMAND_INJECTION")
-public class ProcessRunnerImpl implements ProcessRunner {
+class ProcessRunnerImpl implements ProcessRunner {
   private final ProcessConfiguration configuration;
   private final Runtime runTime;
   private final WriteJsonArrayToFile<Output> jsonArrayToOutputStream;
@@ -40,7 +45,7 @@ public class ProcessRunnerImpl implements ProcessRunner {
    * @param configuration a valid object of {@link ProcessConfiguration}
    * @throws IOException if Unable to work with the log files
    */
-  public ProcessRunnerImpl(final ProcessConfiguration configuration) throws IOException {
+  ProcessRunnerImpl(final ProcessConfiguration configuration) throws IOException {
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
     this.jsonArrayToOutputStream = new WriteJsonArrayToFile<>(this.configuration.getLogDump());
@@ -70,13 +75,14 @@ public class ProcessRunnerImpl implements ProcessRunner {
   }
 
   /**
-   * Runs the process with the providedconfiguration
+   * Runs the process with the provided configuration in the same {@link Thread}.
    *
    * @return integer value depicting the process exit code
    * @throws IOException If unable to work with File.
    * @throws InterruptedException If the thread operations are interrupted.
    */
-  public int run() throws IOException, InterruptedException {
+  @Override
+  public Integer run() throws IOException, InterruptedException {
     this.logger.info("Starting process");
     final StringBuilder commandToExecute = new StringBuilder();
     commandToExecute
@@ -102,6 +108,19 @@ public class ProcessRunnerImpl implements ProcessRunner {
     final int processExitValue = currentProcess.exitValue();
     this.logger.info("Process exited with exit value : " + processExitValue);
     return processExitValue;
+  }
+
+  /**
+   * Runs the process with the provided configuration in the seperate {@link Thread}.
+   *
+   * @return {@link Future<Integer>} reference so that the result of the method invocation can be
+   *     retrieved.
+   */
+  @Override
+  public Future<Integer> run(final boolean threadEnabledFlag) {
+    final ExecutorService executor = Executors.newSingleThreadExecutor();
+    final Callable<Integer> callable = this::run;
+    return executor.submit(callable);
   }
 
   @Override
@@ -132,44 +151,43 @@ public class ProcessRunnerImpl implements ProcessRunner {
    *     from {@link File}
    */
   private File writeLog(final File targetFile, final OutputSourceType outputSourceType)
-      throws IOException, JsonArrayReaderException {
-    this.logger.info(
-        "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
-    Output output;
+      throws JsonArrayReaderException, IOException {
     final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
         new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-
-    final PrintWriter printWriter =
+    try (PrintWriter printWriter =
         new PrintWriter(
             new OutputStreamWriter(
-                new FileOutputStream(targetFile, true), Charset.defaultCharset()));
-    do {
-      output = readJsonArrayFromFile.readNext(Output.class);
-      if (output != null) {
-        final String currentOutputLine;
-        if (output.getOutputSourceType() == outputSourceType) {
-          currentOutputLine = output.getOutputText();
-          this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
-          printWriter.println(currentOutputLine);
+                new FileOutputStream(targetFile, true), Charset.defaultCharset()))) {
+      this.logger.info(
+          "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
+      Output output;
+      do {
+        output = readJsonArrayFromFile.readNext(Output.class);
+        if (output != null) {
+          final String currentOutputLine;
+          if (output.getOutputSourceType() == outputSourceType) {
+            currentOutputLine = output.getOutputText();
+            this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
+            printWriter.println(currentOutputLine);
+          }
         }
-      }
-    } while (output != null);
-    readJsonArrayFromFile.closeJsonReader();
-    printWriter.flush();
-    printWriter.close();
-    this.logger.info(
-        outputSourceType.toString() + " written completely to : " + targetFile.getCanonicalPath());
+      } while (output != null);
+
+      this.logger.info(
+          outputSourceType.toString()
+              + " written completely to : "
+              + targetFile.getCanonicalPath());
+    }
     return targetFile;
   }
 
   /**
-   * Log a inputStream to the log dump as configured in {@link ProcessConfiguration}
+   * Log a inputStream to the log dump as configured in {@link ProcessConfiguration}.
    *
    * @param inputStreamToWrite : {@link InputStream} from which the content is being read and
    *     written to a File
    * @param outputSourceType {@link OutputSourceType} depicting the source of the output
    * @return {@link Runnable} instance
-   * @throws IOException If unable to log data to file.
    */
   private Runnable logData(
       final InputStream inputStreamToWrite, final OutputSourceType outputSourceType) {

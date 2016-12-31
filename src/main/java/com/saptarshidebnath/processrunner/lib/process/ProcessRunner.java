@@ -5,6 +5,7 @@ import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Future;
 
 /** Process Runner interface is the base interface to run any system process or shell script */
 public interface ProcessRunner extends Constants {
@@ -23,7 +24,19 @@ public interface ProcessRunner extends Constants {
    *
    * @return the {@link Integer} exit code for the process
    */
-  int run() throws IOException, InterruptedException;
+  Integer run() throws IOException, InterruptedException;
+
+  /**
+   * Runs the process as a {@link java.util.concurrent.Callable} thread. The method returns a {@link
+   * Future} reference from which the response of the method can be rtrived.
+   *
+   * @param threadEnabled The {@link Boolean} input is a flag input. The value of the passed
+   *     parameter doesnt matter. The process will run thread enabled even if you pass {@link
+   *     Boolean#FALSE}.
+   * @return A reference to the {@link Future<Integer>} from which the user can retrieve the method
+   *     output.
+   */
+  Future<Integer> run(final boolean threadEnabled);
 
   /**
    * Generate the sysout
