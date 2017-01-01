@@ -20,11 +20,7 @@ public class ProcessConfiguration {
   private final File logDump;
 
   private final boolean autoDeleteFileOnExit;
-  private final Logger logger;
-
-  {
-    this.logger = Logger.getLogger(this.getClass().getCanonicalName());
-  }
+  private final Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
   /**
    * Most detailed constructor to set the {@link ProcessConfiguration}.
