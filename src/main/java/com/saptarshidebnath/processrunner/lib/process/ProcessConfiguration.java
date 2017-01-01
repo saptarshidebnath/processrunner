@@ -100,23 +100,23 @@ public class ProcessConfiguration {
         + '}';
   }
 
-  public boolean getAutoDeleteFileOnExit() {
+  boolean getAutoDeleteFileOnExit() {
     return this.autoDeleteFileOnExit;
   }
 
-  public File getLogDump() {
+  File getLogDump() {
     return this.logDump;
   }
 
-  public String getCommandRunnerInterPreter() {
+  String getCommandRunnerInterPreter() {
     return this.commandRunnerInterPreter;
   }
 
-  public String getCommand() {
+  String getCommand() {
     return this.command;
   }
 
-  public File getCurrentDirectory() {
+  File getCurrentDirectory() {
     return this.currentDirectory;
   }
 }
