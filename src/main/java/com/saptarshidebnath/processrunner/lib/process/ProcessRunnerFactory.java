@@ -10,6 +10,8 @@ import static com.saptarshidebnath.processrunner.lib.utilities.Constants.FILE_PR
 
 /** Factory method to to run command or to get an instance of {@link ProcessRunner} */
 public class ProcessRunnerFactory {
+  /** Hidden constructor so that no body can create object of the same. */
+  private ProcessRunnerFactory() {}
   /**
    * Run a process synchronously and respond back with return code. Uses current directory as the
    * working directory. Create temporary file for json log dump. Files are auto deleted after
