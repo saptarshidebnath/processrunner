@@ -8,19 +8,10 @@ import com.saptarshidebnath.processrunner.lib.output.Output;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -154,29 +145,29 @@ class ProcessRunnerImpl implements ProcessRunner {
       throws JsonArrayReaderException, IOException {
     final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
         new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-    try (PrintWriter printWriter =
-        new PrintWriter(
-            new OutputStreamWriter(
-                new FileOutputStream(targetFile, true), Charset.defaultCharset()))) {
-      this.logger.info(
-          "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
-      Output output;
-      do {
-        output = readJsonArrayFromFile.readNext(Output.class);
-        if (output != null) {
-          final String currentOutputLine;
-          if (output.getOutputSourceType() == outputSourceType) {
-            currentOutputLine = output.getOutputText();
-            this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
-            printWriter.println(currentOutputLine);
+    try (FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true)) {
+      try (PrintWriter printWriter =
+          new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()))) {
+        this.logger.info(
+            "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
+        Output output;
+        do {
+          output = readJsonArrayFromFile.readNext(Output.class);
+          if (output != null) {
+            final String currentOutputLine;
+            if (output.getOutputSourceType() == outputSourceType) {
+              currentOutputLine = output.getOutputText();
+              this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
+              printWriter.println(currentOutputLine);
+            }
           }
-        }
-      } while (output != null);
+        } while (output != null);
 
-      this.logger.info(
-          outputSourceType.toString()
-              + " written completely to : "
-              + targetFile.getCanonicalPath());
+        this.logger.info(
+            outputSourceType.toString()
+                + " written completely to : "
+                + targetFile.getCanonicalPath());
+      }
     }
     return targetFile;
   }
