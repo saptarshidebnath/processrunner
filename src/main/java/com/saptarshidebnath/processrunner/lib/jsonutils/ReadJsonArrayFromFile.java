@@ -52,13 +52,11 @@ public class ReadJsonArrayFromFile<T> {
    *
    * @param clazz Takes the {@link Class} of the type for which the file needs to be read.
    * @return an object of type T
-   * @throws IOException Throws IO exception
    * @throws JsonArrayReaderException Throws {@link JsonArrayReaderException} if the reader is
    *     already closed. Need to create a new {@link ReadJsonArrayFromFile} object to read the array
    *     from file.
    */
-  public synchronized T readNext(final Class<T> clazz)
-      throws IOException, JsonArrayReaderException {
+  public synchronized T readNext(final Class<T> clazz) throws JsonArrayReaderException {
     T object = null;
     try {
 
