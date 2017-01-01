@@ -6,7 +6,7 @@ package com.saptarshidebnath.processrunner.lib.exception;
  * be able to get the cause from the {@link ProcessException} detailing exactly what triggered the
  * exception.
  */
-public class ProcessException extends Throwable {
+public class ProcessException extends Exception {
   public ProcessException(final Throwable throwable) {
     super(throwable);
   }
