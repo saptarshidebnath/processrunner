@@ -3,7 +3,7 @@ package com.saptarshidebnath.processrunner.lib.process;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
+import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.output.Output;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import org.apache.commons.lang3.SystemUtils;
@@ -44,16 +44,14 @@ public class ProcessRunnerImplFactoryTest {
   public void tearDown() throws Exception {}
 
   @Test
-  public void startProcess()
-      throws InterruptedException, ProcessConfigurationException, IOException {
+  public void startProcess() throws ProcessException {
     final int response =
         ProcessRunnerFactory.startProcess(getDefaultInterpreter(), getInterPreterVersion());
     assertThat("Validating process runner for simple process : ", response, is(0));
   }
 
   @Test
-  public void getProcessLessDetailed()
-      throws IOException, ProcessConfigurationException, InterruptedException {
+  public void getProcessLessDetailed() throws IOException, ProcessException, InterruptedException {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
             getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
@@ -118,8 +116,7 @@ public class ProcessRunnerImplFactoryTest {
   }
 
   @Test
-  public void getProcessMoreDetailed()
-      throws IOException, ProcessConfigurationException, InterruptedException {
+  public void getProcessMoreDetailed() throws IOException, ProcessException, InterruptedException {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
             getDefaultInterpreter(),
