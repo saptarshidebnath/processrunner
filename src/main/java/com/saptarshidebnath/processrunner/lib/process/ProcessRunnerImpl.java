@@ -24,11 +24,8 @@ class ProcessRunnerImpl implements ProcessRunner {
   private final ProcessConfiguration configuration;
   private final Runtime runTime;
   private final WriteJsonArrayToFile<Output> jsonArrayToOutputStream;
-  private final Logger logger;
+  private final Logger logger= Logger.getLogger(this.getClass().getCanonicalName());
 
-  {
-    this.logger = Logger.getLogger(this.getClass().getCanonicalName());
-  }
 
   /**
    * Constructor receiving the {@link ProcessConfiguration} to create the process runner.
