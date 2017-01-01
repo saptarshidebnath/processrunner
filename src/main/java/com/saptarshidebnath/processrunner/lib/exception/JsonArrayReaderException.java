@@ -16,6 +16,15 @@ public class JsonArrayReaderException extends Exception {
    * @param message Takes a String as input
    */
   public JsonArrayReaderException(final String message) {
-    super(message);
+    this(new Exception(message));
+  }
+
+  /**
+   * Create a {@link JsonArrayReaderException} with already existing exception.
+   *
+   * @param exception
+   */
+  public JsonArrayReaderException(final Exception exception) {
+    super(exception);
   }
 }

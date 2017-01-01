@@ -18,12 +18,8 @@ import java.nio.charset.Charset;
  */
 public class ReadJsonArrayFromFile<T> {
   private final Gson gson;
-  private boolean isFirstRead;
+  private boolean isFirstRead = true;
   private JsonReader jsonReader;
-
-  {
-    this.isFirstRead = true;
-  }
 
   /**
    * Constructor to read a Json Array File Object by Object
@@ -64,17 +60,22 @@ public class ReadJsonArrayFromFile<T> {
   public synchronized T readNext(final Class<T> clazz)
       throws IOException, JsonArrayReaderException {
     T object = null;
-    if (this.jsonReader != null) {
-      if (this.isFirstRead) {
-        this.jsonReader.beginArray();
-        this.isFirstRead = false;
+    try {
+
+      if (this.jsonReader != null) {
+        if (this.isFirstRead) {
+          this.jsonReader.beginArray();
+          this.isFirstRead = false;
+        }
+        if (this.jsonReader.hasNext()) {
+          object = this.gson.fromJson(this.jsonReader, clazz);
+        }
+      } else {
+        throw new JsonArrayReaderException(
+            "Json reader is already closed. Please create a new Object to read a new Json File");
       }
-      if (this.jsonReader.hasNext()) {
-        object = this.gson.fromJson(this.jsonReader, clazz);
-      }
-    } else {
-      throw new JsonArrayReaderException(
-          "Json reader is already closed. Please create a new Object to read a new Json File");
+    } catch (final Exception ex) {
+      throw new JsonArrayReaderException(ex);
     }
     return object;
   }
