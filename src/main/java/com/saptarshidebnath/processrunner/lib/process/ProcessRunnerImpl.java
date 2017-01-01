@@ -2,6 +2,7 @@ package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
+import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
 import com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile;
 import com.saptarshidebnath.processrunner.lib.output.Output;
@@ -24,8 +25,7 @@ class ProcessRunnerImpl implements ProcessRunner {
   private final ProcessConfiguration configuration;
   private final Runtime runTime;
   private final WriteJsonArrayToFile<Output> jsonArrayToOutputStream;
-  private final Logger logger= Logger.getLogger(this.getClass().getCanonicalName());
-
+  private final Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
   /**
    * Constructor receiving the {@link ProcessConfiguration} to create the process runner.
@@ -41,24 +41,28 @@ class ProcessRunnerImpl implements ProcessRunner {
   }
 
   @Override
-  public boolean search(final String regex) throws IOException, JsonArrayReaderException {
-    this.logger.info("Searching for regular expression :" + regex);
+  public boolean search(final String regex) throws ProcessException {
     boolean isMatching = false;
-    final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
-        new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-    Output output;
-    do {
-      output = readJsonArrayFromFile.readNext(Output.class);
-      if (output != null) {
-        isMatching = output.getOutputText().matches(regex);
+    try {
+      this.logger.info("Searching for regular expression :" + regex);
+      final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
+          new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
+      Output output;
+      do {
+        output = readJsonArrayFromFile.readNext(Output.class);
+        if (output != null) {
+          isMatching = output.getOutputText().matches(regex);
+        }
+      } while (output != null && !isMatching);
+      if (isMatching) {
+        this.logger.info("Regex \'" + regex + "\" is found");
+      } else {
+        this.logger.info("Regex \'" + regex + "\" NOT found");
       }
-    } while (output != null && !isMatching);
-    if (isMatching) {
-      this.logger.info("Regex \'" + regex + "\" is found");
-    } else {
-      this.logger.info("Regex \'" + regex + "\" NOT found");
+      readJsonArrayFromFile.closeJsonReader();
+    } catch (final Exception ex) {
+      throw new ProcessException(ex);
     }
-    readJsonArrayFromFile.closeJsonReader();
     return isMatching;
   }
 

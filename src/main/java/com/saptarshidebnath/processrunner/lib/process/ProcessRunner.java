@@ -1,6 +1,7 @@
 package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
+import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +17,7 @@ public interface ProcessRunner {
    * @return
    * @throws IOException
    */
-  boolean search(final String regex) throws IOException, JsonArrayReaderException;
+  boolean search(final String regex) throws ProcessException;
 
   /**
    * Triggers the process or command;
