@@ -1,14 +1,13 @@
 package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
-import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Future;
 
 /** Process Runner interface is the base interface to run any system process or shell script */
-public interface ProcessRunner extends Constants {
+public interface ProcessRunner {
 
   /**
    * Searches for the regular expression throughout the content of the log

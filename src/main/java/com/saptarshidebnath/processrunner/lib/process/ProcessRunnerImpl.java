@@ -96,8 +96,8 @@ class ProcessRunnerImpl implements ProcessRunner {
     this.logger.info("Capturing logs");
     this.jsonArrayToOutputStream.startJsonObject();
     final ExecutorService executor = Executors.newFixedThreadPool(2);
-    executor.execute(this.logData(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
-    executor.execute(this.logData(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
+    executor.execute(this.writeLogs(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
+    executor.execute(this.writeLogs(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
     executor.shutdown();
     this.logger.info("Waiting for the log streams to shutdown");
     executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -182,35 +182,47 @@ class ProcessRunnerImpl implements ProcessRunner {
   }
 
   /**
-   * Log a inputStream to the log dump as configured in {@link ProcessConfiguration}.
+   * Log a inputStream to the log dump as configured in {@link ProcessConfiguration}. Internally it
+   * calls {@link ProcessRunnerImpl#logData(InputStream, OutputSourceType)} to actually log the data
+   * and returns a {@link Runnable} reference to make it thread enabled.
    *
    * @param inputStreamToWrite : {@link InputStream} from which the content is being read and
    *     written to a File
    * @param outputSourceType {@link OutputSourceType} depicting the source of the output
    * @return {@link Runnable} instance
    */
-  private Runnable logData(
+  private Runnable writeLogs(
       final InputStream inputStreamToWrite, final OutputSourceType outputSourceType) {
-    return () -> {
-      try {
-        this.logger.info(
-            "Writing "
-                + outputSourceType.toString()
-                + " as jsonObject to "
-                + this.configuration.getLogDump().getCanonicalPath());
-        final Scanner scanner = new Scanner(inputStreamToWrite);
-        while (scanner.hasNext()) {
-          final String currentLine = scanner.nextLine();
-          this.logger.info(outputSourceType.toString() + " >> " + currentLine);
-          ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
-              new Output(outputSourceType, currentLine));
-        }
-      } catch (final IOException | JsonArrayWriterException ex) {
-        this.logger.log(
-            Level.SEVERE,
-            "Unable to write data to " + this.configuration.getLogDump().getAbsolutePath(),
-            ex);
+    return () -> logData(inputStreamToWrite, outputSourceType);
+  }
+
+  /**
+   * Log a inputStream to the log dump as configured in {@link ProcessConfiguration}.
+   *
+   * @param inputStreamToWrite : {@link InputStream} from which the content is being read and
+   *     written to a File
+   * @param outputSourceType {@link OutputSourceType} depicting the source of the output
+   */
+  private void logData(
+      final InputStream inputStreamToWrite, final OutputSourceType outputSourceType) {
+    try {
+      this.logger.info(
+          "Writing "
+              + outputSourceType.toString()
+              + " as jsonObject to "
+              + this.configuration.getLogDump().getCanonicalPath());
+      final Scanner scanner = new Scanner(inputStreamToWrite);
+      while (scanner.hasNext()) {
+        final String currentLine = scanner.nextLine();
+        this.logger.info(outputSourceType.toString() + " >> " + currentLine);
+        ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
+            new Output(outputSourceType, currentLine));
       }
-    };
+    } catch (final IOException | JsonArrayWriterException ex) {
+      this.logger.log(
+          Level.SEVERE,
+          "Unable to write data to " + this.configuration.getLogDump().getAbsolutePath(),
+          ex);
+    }
   }
 }
