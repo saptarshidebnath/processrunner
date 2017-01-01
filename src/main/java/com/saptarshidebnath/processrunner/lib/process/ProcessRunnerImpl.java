@@ -145,29 +145,32 @@ class ProcessRunnerImpl implements ProcessRunner {
       throws JsonArrayReaderException, IOException {
     final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
         new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-    try (FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true)) {
-      try (PrintWriter printWriter =
-          new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()))) {
-        this.logger.info(
-            "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
-        Output output;
-        do {
-          output = readJsonArrayFromFile.readNext(Output.class);
-          if (output != null) {
-            final String currentOutputLine;
-            if (output.getOutputSourceType() == outputSourceType) {
-              currentOutputLine = output.getOutputText();
-              this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
-              printWriter.println(currentOutputLine);
-            }
-          }
-        } while (output != null);
+    final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
+    final PrintWriter printWriter =
+        new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()));
+    try {
+      this.logger.info(
+          "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
+      Output output;
+      do {
+        output = readJsonArrayFromFile.readNext(Output.class);
+        final String currentOutputLine;
+        if (output != null && output.getOutputSourceType() == outputSourceType) {
+          currentOutputLine = output.getOutputText();
+          this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
+          printWriter.println(currentOutputLine);
+        }
+      } while (output != null);
 
-        this.logger.info(
-            outputSourceType.toString()
-                + " written completely to : "
-                + targetFile.getCanonicalPath());
-      }
+      this.logger.info(
+          outputSourceType.toString()
+              + " written completely to : "
+              + targetFile.getCanonicalPath());
+    } finally {
+      fileOutputStream.flush();
+      fileOutputStream.close();
+      printWriter.close();
+      printWriter.flush();
     }
     return targetFile;
   }
