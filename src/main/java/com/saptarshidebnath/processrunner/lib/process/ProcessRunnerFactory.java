@@ -100,4 +100,22 @@ public class ProcessRunnerFactory {
       throw new ProcessException(e);
     }
   }
+
+  /**
+   * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
+   * ProcessConfiguration}.
+   *
+   * @param configuration Takes a valid {@link ProcessConfiguration} object
+   * @return a reference of {@link ProcessRunner}
+   * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
+   *     have happened.
+   */
+  public static ProcessRunner getProcess(final ProcessConfiguration configuration)
+      throws ProcessException {
+    try {
+      return new ProcessRunnerImpl(configuration);
+    } catch (final Exception ex) {
+      throw new ProcessException(ex);
+    }
+  }
 }
