@@ -70,35 +70,41 @@ class ProcessRunnerImpl implements ProcessRunner {
    * Runs the process with the provided configuration in the same {@link Thread}.
    *
    * @return integer value depicting the process exit code
-   * @throws IOException If unable to work with File.
+   * @throws ProcessException Throws {@link ProcessException} to denote that some error have
+   *     occurred.
    * @throws InterruptedException If the thread operations are interrupted.
    */
   @Override
-  public Integer run() throws IOException, InterruptedException {
-    this.logger.info("Starting process");
-    final StringBuilder commandToExecute = new StringBuilder();
-    commandToExecute
-        .append(this.configuration.getCommandRunnerInterPreter())
-        .append(Constants.SPACE)
-        .append(this.configuration.getCommand());
-    this.logger.info("Executing command : " + commandToExecute.toString());
-    final Process currentProcess =
-        this.runTime.exec(
-            commandToExecute.toString(), null, this.configuration.getCurrentDirectory());
-    this.logger.info("Capturing logs");
-    this.jsonArrayToOutputStream.startJsonObject();
-    final ExecutorService executor = Executors.newFixedThreadPool(2);
-    executor.execute(this.writeLogs(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
-    executor.execute(this.writeLogs(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
-    executor.shutdown();
-    this.logger.info("Waiting for the log streams to shutdown");
-    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-    this.logger.info("Waiting for the process to terminate");
-    currentProcess.waitFor();
-    this.jsonArrayToOutputStream.endJsonObjectWrite();
-    this.jsonArrayToOutputStream.cleanup();
-    final int processExitValue = currentProcess.exitValue();
-    this.logger.info("Process exited with exit value : " + processExitValue);
+  public Integer run() throws ProcessException {
+    final int processExitValue;
+    try {
+      this.logger.info("Starting process");
+      final StringBuilder commandToExecute = new StringBuilder();
+      commandToExecute
+          .append(this.configuration.getCommandRunnerInterPreter())
+          .append(Constants.SPACE)
+          .append(this.configuration.getCommand());
+      this.logger.info("Executing command : " + commandToExecute.toString());
+      final Process currentProcess =
+          this.runTime.exec(
+              commandToExecute.toString(), null, this.configuration.getCurrentDirectory());
+      this.logger.info("Capturing logs");
+      this.jsonArrayToOutputStream.startJsonObject();
+      final ExecutorService executor = Executors.newFixedThreadPool(2);
+      executor.execute(this.writeLogs(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
+      executor.execute(this.writeLogs(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
+      executor.shutdown();
+      this.logger.info("Waiting for the log streams to shutdown");
+      executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+      this.logger.info("Waiting for the process to terminate");
+      currentProcess.waitFor();
+      this.jsonArrayToOutputStream.endJsonObjectWrite();
+      this.jsonArrayToOutputStream.cleanup();
+      processExitValue = currentProcess.exitValue();
+      this.logger.info("Process exited with exit value : " + processExitValue);
+    } catch (final Exception ex) {
+      throw new ProcessException(ex);
+    }
     return processExitValue;
   }
 

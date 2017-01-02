@@ -14,8 +14,9 @@ public interface ProcessRunner {
    * Searches for the regular expression throughout the content of the log
    *
    * @param regex : regular expression string to be searched throughout the content of the file.
-   * @return
-   * @throws IOException
+   * @return a {@link Boolean} value depicting if the regular expression have been found or not.
+   * @throws ProcessException Throws {@link ProcessException} to denote that there is an error. You
+   *     can get the cause by {@link ProcessException#getCause()}
    */
   boolean search(final String regex) throws ProcessException;
 
@@ -23,8 +24,10 @@ public interface ProcessRunner {
    * Triggers the process or command;
    *
    * @return the {@link Integer} exit code for the process
+   * @throws ProcessException Throws {@link ProcessException} to denote that there is an error. You
+   *     can get the cause by {@link ProcessException#getCause()}
    */
-  Integer run() throws IOException, InterruptedException;
+  Integer run() throws ProcessException;
 
   /**
    * Runs the process as a {@link java.util.concurrent.Callable} thread. The method returns a {@link
