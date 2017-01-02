@@ -152,19 +152,11 @@ class ProcessRunnerImpl implements ProcessRunner {
   private File writeLog(final File targetFile, final OutputSourceType outputSourceType)
       throws ProcessException {
 
-    final ReadJsonArrayFromFile<Output> readJsonArrayFromFile;
-    final FileOutputStream fileOutputStream;
-    final PrintWriter printWriter;
-    try {
-      readJsonArrayFromFile = new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-      fileOutputStream = new FileOutputStream(targetFile, true);
-      printWriter =
-          new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()));
-    } catch (final IOException e) {
-      throw new ProcessException(e);
-    }
-
-    try {
+    try (final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
+        final PrintWriter printWriter =
+            new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()))) {
+      final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
+          new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
       this.logger.info(
           "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
       Output output;
@@ -183,15 +175,6 @@ class ProcessRunnerImpl implements ProcessRunner {
               + targetFile.getCanonicalPath());
     } catch (final Exception e) {
       throw new ProcessException(e);
-    } finally {
-      try {
-        fileOutputStream.flush();
-        fileOutputStream.close();
-        printWriter.close();
-        printWriter.flush();
-      } catch (final IOException e) {
-        throw new ProcessException(e);
-      }
     }
     return targetFile;
   }
