@@ -75,6 +75,10 @@ public class WriteJsonArrayToFileTest {
         "Checking array contents",
         Arrays.asList(arrayOfDataReadFromTestFile),
         hasItems(this.arrayOfDataToWrite));
+    //
+    // This should'nt throw exception if clean up is already called
+    //
+    this.testObject.cleanup();
   }
 
   @Test(expected = JsonArrayWriterException.class)
