@@ -151,38 +151,47 @@ class ProcessRunnerImpl implements ProcessRunner {
    */
   private File writeLog(final File targetFile, final OutputSourceType outputSourceType)
       throws ProcessException {
-    try {
-      final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
-          new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-      final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
-      final PrintWriter printWriter =
-          new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()));
-      try {
-        this.logger.info(
-            "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
-        Output output;
-        do {
-          output = readJsonArrayFromFile.readNext(Output.class);
-          final String currentOutputLine;
-          if (output != null && output.getOutputSourceType() == outputSourceType) {
-            currentOutputLine = output.getOutputText();
-            this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
-            printWriter.println(currentOutputLine);
-          }
-        } while (output != null);
 
-        this.logger.info(
-            outputSourceType.toString()
-                + " written completely to : "
-                + targetFile.getCanonicalPath());
-      } finally {
+    final ReadJsonArrayFromFile<Output> readJsonArrayFromFile;
+    final FileOutputStream fileOutputStream;
+    final PrintWriter printWriter;
+    try {
+      readJsonArrayFromFile = new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
+      fileOutputStream = new FileOutputStream(targetFile, true);
+      printWriter =
+          new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()));
+    } catch (final IOException e) {
+      throw new ProcessException(e);
+    }
+
+    try {
+      this.logger.info(
+          "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
+      Output output;
+      do {
+        output = readJsonArrayFromFile.readNext(Output.class);
+        final String currentOutputLine;
+        if (output != null && output.getOutputSourceType() == outputSourceType) {
+          currentOutputLine = output.getOutputText();
+          this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
+          printWriter.println(currentOutputLine);
+        }
+      } while (output != null);
+      this.logger.info(
+          outputSourceType.toString()
+              + " written completely to : "
+              + targetFile.getCanonicalPath());
+    } catch (final Exception e) {
+      throw new ProcessException(e);
+    } finally {
+      try {
         fileOutputStream.flush();
         fileOutputStream.close();
         printWriter.close();
         printWriter.flush();
+      } catch (final IOException e) {
+        throw new ProcessException(e);
       }
-    } catch (final Exception ex) {
-      throw new ProcessException(ex);
     }
     return targetFile;
   }
