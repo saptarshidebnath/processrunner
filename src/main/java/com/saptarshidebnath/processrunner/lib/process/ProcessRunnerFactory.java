@@ -5,6 +5,7 @@ import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 
 import java.io.File;
+import java.util.concurrent.Future;
 
 import static com.saptarshidebnath.processrunner.lib.utilities.Constants.FILE_PREFIX_NAME_LOG_DUMP;
 
@@ -54,7 +55,7 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
-  public static ProcessRunner getProcess(
+  public static ProcessRunner startProcess(
       final String commandInterPreter, final String command, final File workingDirectory)
       throws ProcessException {
     try {
@@ -85,7 +86,7 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
-  public static ProcessRunner getProcess(
+  public static ProcessRunner startProcess(
       final String commandRunnerInterPreter,
       final String command,
       final File workingDirectory,
@@ -106,14 +107,36 @@ public class ProcessRunnerFactory {
    * ProcessConfiguration}.
    *
    * @param configuration Takes a valid {@link ProcessConfiguration} object
-   * @return a reference of {@link ProcessRunner}
+   * @return the exit code of the process as an {@link Integer} value from 0 255
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
-  public static ProcessRunner getProcess(final ProcessConfiguration configuration)
+  public static Integer startProcess(final ProcessConfiguration configuration)
       throws ProcessException {
     try {
-      return new ProcessRunnerImpl(configuration);
+      return new ProcessRunnerImpl(configuration).run();
+    } catch (final Exception ex) {
+      throw new ProcessException(ex);
+    }
+  }
+
+  /**
+   * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
+   * ProcessConfiguration}.
+   *
+   * @param configuration Takes a valid {@link ProcessConfiguration} object
+   * @param enableThreadedApproach Takes a flag {@link Boolean} variable doesn't matter if it is a
+   *     true or false
+   * @return a reference of {@link Future<Integer>} from where you can retrieve the Process's exitx`
+   *     value
+   * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
+   *     have happened.
+   */
+  public static Future<Integer> startProcess(
+      final ProcessConfiguration configuration, final boolean enableThreadedApproach)
+      throws ProcessException {
+    try {
+      return new ProcessRunnerImpl(configuration).run(enableThreadedApproach);
     } catch (final Exception ex) {
       throw new ProcessException(ex);
     }
