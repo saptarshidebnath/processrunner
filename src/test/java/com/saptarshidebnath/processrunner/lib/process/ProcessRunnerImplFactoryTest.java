@@ -55,6 +55,12 @@ public class ProcessRunnerImplFactoryTest {
     ProcessRunnerFactory.startProcess("", getInterPreterVersion());
   }
 
+  @Test(expected = ProcessException.class)
+  public void getProcessWithWrongParamets() throws ProcessException {
+    final ProcessRunner processRunner =
+        ProcessRunnerFactory.getProcess(getDefaultInterpreter(), "", Constants.DEFAULT_CURRENT_DIR);
+  }
+
   @Test
   public void getProcessLessDetailed() throws IOException, ProcessException, InterruptedException {
     final ProcessRunner processRunner =
