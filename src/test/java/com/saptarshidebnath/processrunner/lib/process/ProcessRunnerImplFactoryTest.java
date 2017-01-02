@@ -50,6 +50,11 @@ public class ProcessRunnerImplFactoryTest {
     assertThat("Validating process runner for simple process : ", response, is(0));
   }
 
+  @Test(expected = ProcessException.class)
+  public void startProcessWithWrongParmeters() throws ProcessException {
+    ProcessRunnerFactory.startProcess("", getInterPreterVersion());
+  }
+
   @Test
   public void getProcessLessDetailed() throws IOException, ProcessException, InterruptedException {
     final ProcessRunner processRunner =
@@ -139,8 +144,6 @@ public class ProcessRunnerImplFactoryTest {
         "Validating json log content : ",
         output.get(this.arryPosition).getOutputText(),
         startsWith(getInitialVersionComments()));
-    //TODO
-    //Add test case for sys file and sys error file creation.
     jsonLogDump.delete();
   }
 }
