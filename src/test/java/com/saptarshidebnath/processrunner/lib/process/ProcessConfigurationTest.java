@@ -14,7 +14,8 @@ import static org.hamcrest.Matchers.is;
 /** Created by saptarshi on 1/1/2017. */
 public class ProcessConfigurationTest {
   @Test
-  public void testObjectCreation() throws IOException, ProcessConfigurationException {
+  public void testObjectCreationWithCorrectValue()
+      throws IOException, ProcessConfigurationException {
     final String interpreter = "bash";
     final String command = "echo Saptarshi";
     final File tempFile =
@@ -40,5 +41,60 @@ public class ProcessConfigurationTest {
         "Validating process configuration json log file set for auto deletion : ",
         configuration.getAutoDeleteFileOnExit(),
         is(fileSetToBeAutoDeleted));
+  }
+
+  @Test(expected = ProcessConfigurationException.class)
+  public void testObjectCreationWithEmptyInterpreter()
+      throws IOException, ProcessConfigurationException {
+    final String interpreter = "";
+    final String command = "echo Saptarshi";
+    final File tempFile =
+        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
+    tempFile.deleteOnExit();
+    final boolean fileSetToBeAutoDeleted = true;
+    final ProcessConfiguration configuration =
+        new ProcessConfiguration(
+            interpreter, command, Constants.DEFAULT_CURRENT_DIR, tempFile, fileSetToBeAutoDeleted);
+  }
+
+  @Test(expected = ProcessConfigurationException.class)
+  public void testObjectCreationWithEmptyCommand()
+      throws IOException, ProcessConfigurationException {
+    final String interpreter = "bash";
+    final String command = "";
+    final File tempFile =
+        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
+    tempFile.deleteOnExit();
+    final boolean fileSetToBeAutoDeleted = true;
+    final ProcessConfiguration configuration =
+        new ProcessConfiguration(
+            interpreter, command, Constants.DEFAULT_CURRENT_DIR, tempFile, fileSetToBeAutoDeleted);
+  }
+
+  @Test(expected = ProcessConfigurationException.class)
+  public void testObjectCreationNonExistentCurrentDir()
+      throws IOException, ProcessConfigurationException {
+    final String interpreter = "bash";
+    final String command = "echo saptarshi";
+    final File tempFile =
+        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
+    tempFile.deleteOnExit();
+    final boolean fileSetToBeAutoDeleted = true;
+    final ProcessConfiguration configuration =
+        new ProcessConfiguration(
+            interpreter, command, new File("a:\\"), tempFile, fileSetToBeAutoDeleted);
+  }
+
+  @Test(expected = ProcessConfigurationException.class)
+  public void testObjectCreationCurrentDirSetAsFile()
+      throws IOException, ProcessConfigurationException {
+    final String interpreter = "bash";
+    final String command = "echo saptarshi";
+    final File tempFile =
+        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
+    tempFile.deleteOnExit();
+    final boolean fileSetToBeAutoDeleted = true;
+    final ProcessConfiguration configuration =
+        new ProcessConfiguration(interpreter, command, tempFile, tempFile, fileSetToBeAutoDeleted);
   }
 }

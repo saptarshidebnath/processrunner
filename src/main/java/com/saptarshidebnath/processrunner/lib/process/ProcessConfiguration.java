@@ -56,7 +56,7 @@ public class ProcessConfiguration {
     } else if (!currentDirectory.exists() || !currentDirectory.isDirectory()) {
       throw new ProcessConfigurationException(
           "Command's current directory is set '"
-              + currentDirectory.getCanonicalPath()
+              + currentDirectory.getAbsolutePath()
               + "'. Either the Directory doesn't exist or is not a directory at all");
     } else {
       this.logger.log(Level.INFO, "All parameters passed validation");
