@@ -56,9 +56,22 @@ public class ProcessRunnerImplFactoryTest {
   }
 
   @Test(expected = ProcessException.class)
-  public void getProcessWithWrongParamets() throws ProcessException {
+  public void getProcessWithLessParamsWrongParamets() throws ProcessException {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(getDefaultInterpreter(), "", Constants.DEFAULT_CURRENT_DIR);
+    processRunner.getJsonLogDump().delete();
+  }
+
+  @Test(expected = ProcessException.class)
+  public void getProcessMoreParamWrongParamets() throws ProcessException, IOException {
+    final ProcessRunner processRunner =
+        ProcessRunnerFactory.getProcess(
+            "",
+            getInterPreterVersion(),
+            Constants.DEFAULT_CURRENT_DIR,
+            File.createTempFile("temp-file-name", ".json"),
+            false);
+    processRunner.getJsonLogDump().delete();
   }
 
   @Test
