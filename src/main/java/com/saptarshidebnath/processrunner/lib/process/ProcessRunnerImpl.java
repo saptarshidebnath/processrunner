@@ -122,14 +122,14 @@ class ProcessRunnerImpl implements ProcessRunner {
   }
 
   @Override
-  public File saveSysOut(final File sysOut) throws IOException, JsonArrayReaderException {
-    this.logger.info("Saving sys out to " + sysOut.getCanonicalPath());
+  public File saveSysOut(final File sysOut) throws ProcessException {
+    this.logger.info("Saving sys out to " + sysOut.getAbsolutePath());
     return this.writeLog(sysOut, OutputSourceType.SYSOUT);
   }
 
   @Override
-  public File saveSysError(final File sysError) throws IOException, JsonArrayReaderException {
-    this.logger.info("Saving sys error to : " + sysError.getCanonicalPath());
+  public File saveSysError(final File sysError) throws ProcessException {
+    this.logger.info("Saving sys error to : " + sysError.getAbsolutePath());
     return this.writeLog(sysError, OutputSourceType.SYSERROR);
   }
 
@@ -144,40 +144,45 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @param targetFile : {@link File} object to where the program should write the log
    * @param outputSourceType : {@link OutputSourceType} to designate type of output
    * @return a {@link File} object
-   * @throws IOException If unable to log file.
+   * @throws ProcessException If unable to log file or unable to read Json array from {@link File}.
+   *     You can get the details from {@link ProcessException#getCause()}.
    * @throws JsonArrayReaderException If unable to read Json array {@link JsonArrayReaderException}
    *     from {@link File}
    */
   private File writeLog(final File targetFile, final OutputSourceType outputSourceType)
-      throws JsonArrayReaderException, IOException {
-    final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
-        new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-    final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
-    final PrintWriter printWriter =
-        new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()));
+      throws ProcessException {
     try {
-      this.logger.info(
-          "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
-      Output output;
-      do {
-        output = readJsonArrayFromFile.readNext(Output.class);
-        final String currentOutputLine;
-        if (output != null && output.getOutputSourceType() == outputSourceType) {
-          currentOutputLine = output.getOutputText();
-          this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
-          printWriter.println(currentOutputLine);
-        }
-      } while (output != null);
+      final ReadJsonArrayFromFile<Output> readJsonArrayFromFile =
+          new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
+      final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
+      final PrintWriter printWriter =
+          new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()));
+      try {
+        this.logger.info(
+            "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
+        Output output;
+        do {
+          output = readJsonArrayFromFile.readNext(Output.class);
+          final String currentOutputLine;
+          if (output != null && output.getOutputSourceType() == outputSourceType) {
+            currentOutputLine = output.getOutputText();
+            this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
+            printWriter.println(currentOutputLine);
+          }
+        } while (output != null);
 
-      this.logger.info(
-          outputSourceType.toString()
-              + " written completely to : "
-              + targetFile.getCanonicalPath());
-    } finally {
-      fileOutputStream.flush();
-      fileOutputStream.close();
-      printWriter.close();
-      printWriter.flush();
+        this.logger.info(
+            outputSourceType.toString()
+                + " written completely to : "
+                + targetFile.getCanonicalPath());
+      } finally {
+        fileOutputStream.flush();
+        fileOutputStream.close();
+        printWriter.close();
+        printWriter.flush();
+      }
+    } catch (final Exception ex) {
+      throw new ProcessException(ex);
     }
     return targetFile;
   }

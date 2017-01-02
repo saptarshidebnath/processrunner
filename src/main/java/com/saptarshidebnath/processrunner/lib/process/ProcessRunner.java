@@ -1,10 +1,8 @@
 package com.saptarshidebnath.processrunner.lib.process;
 
-import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.Future;
 
 /** Process Runner interface is the base interface to run any system process or shell script */
@@ -47,7 +45,7 @@ public interface ProcessRunner {
    * @param sysOut : {@link File} depicting where the sysout is going to stored
    * @return a {@link File}
    */
-  File saveSysOut(File sysOut) throws IOException, JsonArrayReaderException;
+  File saveSysOut(File sysOut) throws ProcessException;
 
   /**
    * Generate the syserror
@@ -55,7 +53,7 @@ public interface ProcessRunner {
    * @param sysError {@link File} depicting where the sys error is going to stored
    * @return
    */
-  File saveSysError(File sysError) throws IOException, JsonArrayReaderException;
+  File saveSysError(File sysError) throws ProcessException;
 
   /**
    * Returns a {@link File} reference to the log where the Json Log Data is dumped
