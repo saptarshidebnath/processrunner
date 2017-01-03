@@ -137,6 +137,21 @@ public class ProcessRunnerImplFactoryTest {
         is(false));
   }
 
+  @Test(expected = ProcessException.class)
+  public void searchContentBeforeRunningProcess()
+      throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
+          InterruptedException {
+
+    final ProcessRunner processRunner =
+        ProcessRunnerFactory.startProcess(
+            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
+
+    assertThat(
+        "Validating search result for content in the output in UNIX : ",
+        processRunner.search("Saptarshi"),
+        is(false));
+  }
+
   @Test
   public void startThreadedProcessWithProcessConfig()
       throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
