@@ -1,7 +1,6 @@
 package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
-import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
 import com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile;
@@ -216,7 +215,7 @@ class ProcessRunnerImpl implements ProcessRunner {
         ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
             new Output(outputSourceType, currentLine));
       }
-    } catch (final IOException | JsonArrayWriterException ex) {
+    } catch (final Exception ex) {
       this.logger.log(
           Level.SEVERE,
           "Unable to write data to " + this.configuration.getLogDump().getAbsolutePath(),

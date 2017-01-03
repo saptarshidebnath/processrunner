@@ -279,7 +279,8 @@ public class ProcessRunnerImplFactoryTest {
     final int response = processRunner.run();
     final File sysout = processRunner.saveSysOut(File.createTempFile("temp-file-sysout", ".json"));
     sysout.deleteOnExit();
-    final File syserr = processRunner.saveSysOut(File.createTempFile("temp-file-syserr", ".json"));
+    final File syserr =
+        processRunner.saveSysError(File.createTempFile("temp-file-syserr", ".json"));
     final File jsonLogDump = processRunner.getJsonLogDump();
     jsonLogDump.deleteOnExit();
     syserr.deleteOnExit();
