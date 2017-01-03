@@ -13,7 +13,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 
@@ -159,8 +162,6 @@ public class ProcessRunnerImplFactoryTest {
         "Validating json log content : ",
         output.get(this.arryPosition).getOutputText(),
         startsWith(getInitialVersionComments()));
-    //TODO
-    //Add test case for sys file and sys error file creation.
     jsonLogDump.delete();
   }
 
@@ -224,11 +225,82 @@ public class ProcessRunnerImplFactoryTest {
     final List<Output> output = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
     assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
     assertThat("Validating json log record number : ", output.size(), is(getVersionPutputSize()));
-
     assertThat(
         "Validating json log content : ",
         output.get(this.arryPosition).getOutputText(),
         startsWith(getInitialVersionComments()));
+    //TODO
+
     jsonLogDump.delete();
+  }
+
+  @Test
+  public void te() throws IOException, ProcessException, InterruptedException {
+    final File tempFile = File.createTempFile("temp-file-name", ".json");
+    tempFile.deleteOnExit();
+    ProcessRunner processRunner = null;
+    if (SystemUtils.IS_OS_WINDOWS) {
+      processRunner =
+          ProcessRunnerFactory.startProcess(
+              "cmd /c",
+              "test.bat",
+              new File(
+                  Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
+                      + File.separator
+                      + "src"
+                      + File.separator
+                      + "test"
+                      + File.separator
+                      + "scripts"
+                      + File.separator
+                      + "batch"),
+              tempFile,
+              true);
+    } else if (SystemUtils.IS_OS_LINUX) {
+      processRunner =
+          ProcessRunnerFactory.startProcess(
+              "bash",
+              "test.sh",
+              new File(
+                  Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
+                      + File.separator
+                      + "src"
+                      + File.separator
+                      + "test"
+                      + File.separator
+                      + "scripts"
+                      + File.separator
+                      + "shell"),
+              tempFile,
+              true);
+    }
+
+    final int response = processRunner.run();
+    final File sysout = processRunner.saveSysOut(File.createTempFile("temp-file-sysout", ".json"));
+    sysout.deleteOnExit();
+    final File syserr = processRunner.saveSysOut(File.createTempFile("temp-file-syserr", ".json"));
+    final File jsonLogDump = processRunner.getJsonLogDump();
+    jsonLogDump.deleteOnExit();
+    syserr.deleteOnExit();
+    assertThat("Validating process return code : ", response, is(0));
+    assertThat("Validating if JSON log dump is created : ", jsonLogDump.exists(), is(true));
+    final String jsonLogAsString =
+        new Scanner(jsonLogDump, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
+    final Type listTypeOuputArray = new TypeToken<List<Output>>() {}.getType();
+    final List<Output> output = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
+    assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
+    assertThat("Validating json log record number : ", output.size(), is(greaterThan(0)));
+    assertThat(
+        "Validating number of input on SYSERR : ", getFileLineNumber(syserr), is(greaterThan(0)));
+    assertThat(
+        "Validating number of input on SYSOUT : ", getFileLineNumber(sysout), is(greaterThan(0)));
+  }
+
+  private int getFileLineNumber(final File fileToCountLineNumber) throws IOException {
+    final LineNumberReader lnr = new LineNumberReader(new FileReader(fileToCountLineNumber));
+    lnr.skip(Long.MAX_VALUE);
+    final int lineNumber = lnr.getLineNumber() + 1; //Add 1 because line index starts at 0
+    lnr.close();
+    return lineNumber;
   }
 }
