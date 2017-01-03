@@ -5,11 +5,6 @@ package com.saptarshidebnath.processrunner.lib.exception;
  */
 public class JsonArrayReaderException extends Exception {
 
-  /** Default constructor with default message chained to the other constructor. */
-  public JsonArrayReaderException() {
-    this("Error in configuration");
-  }
-
   /**
    * The constructor accepting a string message.
    *
