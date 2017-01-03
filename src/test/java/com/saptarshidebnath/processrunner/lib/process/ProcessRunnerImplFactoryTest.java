@@ -95,6 +95,31 @@ public class ProcessRunnerImplFactoryTest {
   }
 
   @Test
+  public void searchContent()
+      throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
+          InterruptedException {
+
+    final ProcessRunner processRunner =
+        ProcessRunnerFactory.startProcess(
+            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
+
+    final int response = processRunner.run();
+    assertThat("Validating process return code : ", response, is(0));
+
+    if (SystemUtils.IS_OS_LINUX) {
+      assertThat(
+          "Validating search result for content in the output in UNIX : ",
+          processRunner.search(".*GNU.*"),
+          is(true));
+    } else if (SystemUtils.IS_OS_WINDOWS) {
+      assertThat(
+          "Validating search result for content in the output in Windows : ",
+          processRunner.search("Microsoft Windows.*"),
+          is(true));
+    }
+  }
+
+  @Test
   public void startThreadedProcessWithProcessConfig()
       throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
           InterruptedException {
