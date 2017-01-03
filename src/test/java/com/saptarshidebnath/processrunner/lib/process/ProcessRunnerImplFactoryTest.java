@@ -235,7 +235,8 @@ public class ProcessRunnerImplFactoryTest {
   }
 
   @Test
-  public void te() throws IOException, ProcessException, InterruptedException {
+  public void testSaveSysOutAndSaveSysError()
+      throws IOException, ProcessException, InterruptedException {
     final File tempFile = File.createTempFile("temp-file-name", ".json");
     tempFile.deleteOnExit();
     ProcessRunner processRunner = null;
