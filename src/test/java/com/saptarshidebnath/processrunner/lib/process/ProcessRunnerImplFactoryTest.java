@@ -120,6 +120,24 @@ public class ProcessRunnerImplFactoryTest {
   }
 
   @Test
+  public void searchContentNegativeTestCase()
+      throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
+          InterruptedException {
+
+    final ProcessRunner processRunner =
+        ProcessRunnerFactory.startProcess(
+            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
+
+    final int response = processRunner.run();
+    assertThat("Validating process return code : ", response, is(0));
+
+    assertThat(
+        "Validating search result for content in the output in UNIX : ",
+        processRunner.search("Saptarshi"),
+        is(false));
+  }
+
+  @Test
   public void startThreadedProcessWithProcessConfig()
       throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
           InterruptedException {
