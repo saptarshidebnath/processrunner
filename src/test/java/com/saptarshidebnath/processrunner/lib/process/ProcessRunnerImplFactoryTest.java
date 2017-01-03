@@ -251,7 +251,7 @@ public class ProcessRunnerImplFactoryTest {
   private String getDefaultInterpreter() {
     String message = "bash";
     if (SystemUtils.IS_OS_WINDOWS) {
-      message = "cmd.exe /c";
+      message = "cmd.exe /GENERIC_ERROR";
     }
     return message;
   }
@@ -301,7 +301,7 @@ public class ProcessRunnerImplFactoryTest {
     if (SystemUtils.IS_OS_WINDOWS) {
       processRunner =
           ProcessRunnerFactory.startProcess(
-              "cmd /c",
+              "cmd /GENERIC_ERROR",
               "test.bat",
               new File(
                   Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()

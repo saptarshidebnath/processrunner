@@ -1,5 +1,7 @@
 package com.saptarshidebnath.processrunner.lib.exception;
 
+import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+
 /**
  * Blanket exception to be used by the {@link
  * com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory} class. The Developer should
@@ -12,6 +14,6 @@ public class ProcessException extends Exception {
   }
 
   public ProcessException() {
-    this(new Exception("Generic error happened"));
+    this(new Exception(Constants.GENERIC_ERROR));
   }
 }
