@@ -4,19 +4,19 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /** Stores each line of output from the Process */
-public class Output {
+public class OutputRecord {
   private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private final long timeStamp;
   private final OutputSourceType outputSourceType;
   private final String outputText;
 
   /**
-   * Constructor to store the Output line by line
+   * Constructor to store the OutputRecord line by line
    *
    * @param outputSourceType {@link OutputSourceType}
    * @param outputText
    */
-  public Output(final OutputSourceType outputSourceType, final String outputText) {
+  public OutputRecord(final OutputSourceType outputSourceType, final String outputText) {
     this.timeStamp = getCurrentTime();
     this.outputSourceType = outputSourceType;
     this.outputText = outputText;

@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
-import com.saptarshidebnath.processrunner.lib.output.Output;
+import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
@@ -212,13 +212,14 @@ public class ProcessRunnerImplFactoryTest {
     assertThat("Validating if JSON log dump is created : ", jsonLogDump.exists(), is(true));
     final String jsonLogAsString =
         new Scanner(jsonLogDump, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
-    final Type listTypeOuputArray = new TypeToken<List<Output>>() {}.getType();
-    final List<Output> output = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
+    final Type listTypeOuputArray = new TypeToken<List<OutputRecord>>() {}.getType();
+    final List<OutputRecord> outputRecord = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
     assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
-    assertThat("Validating json log record number : ", output.size(), is(getVersionPutputSize()));
+    assertThat(
+        "Validating json log record number : ", outputRecord.size(), is(getVersionPutputSize()));
     assertThat(
         "Validating json log content : ",
-        output.get(this.arryPosition).getOutputText(),
+        outputRecord.get(this.arryPosition).getOutputText(),
         startsWith(getInitialVersionComments()));
     jsonLogDump.delete();
   }
@@ -279,13 +280,14 @@ public class ProcessRunnerImplFactoryTest {
     assertThat("Validating if JSON log dump is created : ", jsonLogDump.exists(), is(true));
     final String jsonLogAsString =
         new Scanner(jsonLogDump, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
-    final Type listTypeOuputArray = new TypeToken<List<Output>>() {}.getType();
-    final List<Output> output = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
+    final Type listTypeOuputArray = new TypeToken<List<OutputRecord>>() {}.getType();
+    final List<OutputRecord> outputRecord = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
     assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
-    assertThat("Validating json log record number : ", output.size(), is(getVersionPutputSize()));
+    assertThat(
+        "Validating json log record number : ", outputRecord.size(), is(getVersionPutputSize()));
     assertThat(
         "Validating json log content : ",
-        output.get(this.arryPosition).getOutputText(),
+        outputRecord.get(this.arryPosition).getOutputText(),
         startsWith(getInitialVersionComments()));
     //TODO
 
@@ -346,10 +348,10 @@ public class ProcessRunnerImplFactoryTest {
     assertThat("Validating if JSON log dump is created : ", jsonLogDump.exists(), is(true));
     final String jsonLogAsString =
         new Scanner(jsonLogDump, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
-    final Type listTypeOuputArray = new TypeToken<List<Output>>() {}.getType();
-    final List<Output> output = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
+    final Type listTypeOuputArray = new TypeToken<List<OutputRecord>>() {}.getType();
+    final List<OutputRecord> outputRecord = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
     assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
-    assertThat("Validating json log record number : ", output.size(), is(greaterThan(0)));
+    assertThat("Validating json log record number : ", outputRecord.size(), is(greaterThan(0)));
     assertThat(
         "Validating number of input on SYSERR : ", getFileLineNumber(syserr), is(greaterThan(0)));
     assertThat(
