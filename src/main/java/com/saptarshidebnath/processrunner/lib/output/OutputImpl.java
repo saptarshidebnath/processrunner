@@ -36,7 +36,7 @@ class OutputImpl implements Output {
   }
 
   @Override
-  public boolean search(final String regex) throws ProcessException {
+  public boolean searchMasterLog(final String regex) throws ProcessException {
     boolean isMatching = false;
     try {
       this.logger.info("Searching for regular expression :" + regex);

@@ -14,5 +14,5 @@ public interface Output {
 
   int getReturnCode();
 
-  boolean search(final String regex) throws ProcessException;
+  boolean searchMasterLog(final String regex) throws ProcessException;
 }

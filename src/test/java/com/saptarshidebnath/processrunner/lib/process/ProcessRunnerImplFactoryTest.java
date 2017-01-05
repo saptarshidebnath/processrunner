@@ -108,13 +108,13 @@ public class ProcessRunnerImplFactoryTest {
 
     if (SystemUtils.IS_OS_LINUX) {
       assertThat(
-          "Validating search result for content in the output in UNIX : ",
-          response.search(".*GNU.*"),
+          "Validating searchMasterLog result for content in the output in UNIX : ",
+          response.searchMasterLog(".*GNU.*"),
           is(true));
     } else if (SystemUtils.IS_OS_WINDOWS) {
       assertThat(
-          "Validating search result for content in the output in Windows : ",
-          response.search("Microsoft Windows.*"),
+          "Validating searchMasterLog result for content in the output in Windows : ",
+          response.searchMasterLog("Microsoft Windows.*"),
           is(true));
     }
   }
@@ -132,8 +132,8 @@ public class ProcessRunnerImplFactoryTest {
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
 
     assertThat(
-        "Validating search result for content in the output in UNIX : ",
-        response.search("Saptarshi"),
+        "Validating searchMasterLog result for content in the output in UNIX : ",
+        response.searchMasterLog("Saptarshi"),
         is(false));
   }
   /*
@@ -148,8 +148,8 @@ public class ProcessRunnerImplFactoryTest {
     final Output response = processRunner.run();
 
     assertThat(
-        "Validating search result for content in the output in UNIX : ",
-        response.search("Saptarshi"),
+        "Validating searchMasterLog result for content in the output in UNIX : ",
+        response.searchMasterLog("Saptarshi"),
         is(false));
   }*/
 
@@ -321,6 +321,69 @@ public class ProcessRunnerImplFactoryTest {
           ProcessRunnerFactory.startProcess(
               "bash",
               "test.sh",
+              new File(
+                  Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
+                      + File.separator
+                      + "src"
+                      + File.separator
+                      + "test"
+                      + File.separator
+                      + "scripts"
+                      + File.separator
+                      + "shell"),
+              tempFile,
+              true);
+    }
+
+    final Output response = processRunner.run();
+    final File sysout = response.saveSysOut(File.createTempFile("temp-file-sysout", ".json"));
+    sysout.deleteOnExit();
+    final File syserr = response.saveSysError(File.createTempFile("temp-file-syserr", ".json"));
+    final File masterLog = response.getMasterLog();
+    masterLog.deleteOnExit();
+    syserr.deleteOnExit();
+    assertThat("Validating process return code : ", response.getReturnCode(), is(0));
+    assertThat("Validating if JSON log dump is created : ", masterLog.exists(), is(true));
+    final String jsonLogAsString =
+        new Scanner(masterLog, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
+    final Type listTypeOuputArray = new TypeToken<List<OutputRecord>>() {}.getType();
+    final List<OutputRecord> outputRecord = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
+    assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
+    assertThat("Validating json log record number : ", outputRecord.size(), is(greaterThan(0)));
+    assertThat(
+        "Validating number of input on SYSERR : ", getFileLineNumber(syserr), is(greaterThan(0)));
+    assertThat(
+        "Validating number of input on SYSOUT : ", getFileLineNumber(sysout), is(greaterThan(0)));
+  }
+
+  @Test
+  public void testScriptWithLargeOutput()
+      throws IOException, ProcessException, InterruptedException {
+    final File tempFile = File.createTempFile("temp-file-name", ".json");
+    tempFile.deleteOnExit();
+    ProcessRunner processRunner = null;
+    if (SystemUtils.IS_OS_WINDOWS) {
+      processRunner =
+          ProcessRunnerFactory.startProcess(
+              "cmd /c",
+              "largefile.bat",
+              new File(
+                  Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
+                      + File.separator
+                      + "src"
+                      + File.separator
+                      + "test"
+                      + File.separator
+                      + "scripts"
+                      + File.separator
+                      + "batch"),
+              tempFile,
+              true);
+    } else if (SystemUtils.IS_OS_LINUX) {
+      processRunner =
+          ProcessRunnerFactory.startProcess(
+              "bash",
+              "largefile.sh",
               new File(
                   Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
                       + File.separator
