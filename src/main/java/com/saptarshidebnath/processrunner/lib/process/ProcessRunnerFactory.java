@@ -1,10 +1,12 @@
 package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+import com.saptarshidebnath.processrunner.lib.output.Output;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Future;
 
 import static com.saptarshidebnath.processrunner.lib.utilities.Constants.FILE_PREFIX_NAME_LOG_DUMP;
@@ -25,7 +27,7 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
-  public static int startProcess(final String commandInterPreter, final String command)
+  public static Output startProcess(final String commandInterPreter, final String command)
       throws ProcessException {
     try {
       return new ProcessRunnerImpl(
@@ -58,11 +60,23 @@ public class ProcessRunnerFactory {
   public static ProcessRunner startProcess(
       final String commandInterPreter, final String command, final File workingDirectory)
       throws ProcessException {
+
+    final File outputLogJsonFile;
+    try {
+      outputLogJsonFile = Utilities.createTempLogDump();
+    } catch (final IOException e) {
+      throw new ProcessException(e);
+    }
+
     try {
       return new ProcessRunnerImpl(
           new ProcessConfiguration(
-              commandInterPreter, command, workingDirectory, Utilities.createTempLogDump(), false));
+              commandInterPreter, command, workingDirectory, outputLogJsonFile, false));
     } catch (final Exception e) {
+      //
+      // Delete file on exit.
+      //
+      outputLogJsonFile.deleteOnExit();
       throw new ProcessException(e);
     }
   }
@@ -111,7 +125,7 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
-  public static Integer startProcess(final ProcessConfiguration configuration)
+  public static Output startProcess(final ProcessConfiguration configuration)
       throws ProcessException {
     try {
       return new ProcessRunnerImpl(configuration).run();
@@ -132,7 +146,7 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
-  public static Future<Integer> startProcess(
+  public static Future<Output> startProcess(
       final ProcessConfiguration configuration, final boolean enableThreadedApproach)
       throws ProcessException {
     try {

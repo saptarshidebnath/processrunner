@@ -2,14 +2,16 @@ package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
-import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
 import com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile;
+import com.saptarshidebnath.processrunner.lib.output.Output;
+import com.saptarshidebnath.processrunner.lib.output.OutputFactory;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Scanner;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -39,32 +41,6 @@ class ProcessRunnerImpl implements ProcessRunner {
     this.logger.log(Level.INFO, "Process Runner created");
   }
 
-  @Override
-  public boolean search(final String regex) throws ProcessException {
-    boolean isMatching = false;
-    try {
-      this.logger.info("Searching for regular expression :" + regex);
-      final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
-          new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-      OutputRecord outputRecord;
-      do {
-        outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
-        if (outputRecord != null) {
-          isMatching = outputRecord.getOutputText().matches(regex);
-        }
-      } while (outputRecord != null && !isMatching);
-      if (isMatching) {
-        this.logger.info("Regex \'" + regex + "\" is found");
-      } else {
-        this.logger.info("Regex \'" + regex + "\" NOT found");
-      }
-      readJsonArrayFromFile.closeJsonReader();
-    } catch (final Exception ex) {
-      throw new ProcessException(ex);
-    }
-    return isMatching;
-  }
-
   /**
    * Runs the process with the provided configuration in the same {@link Thread}.
    *
@@ -74,8 +50,8 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @throws InterruptedException If the thread operations are interrupted.
    */
   @Override
-  public Integer run() throws ProcessException {
-    final int processExitValue;
+  public Output run() throws ProcessException {
+    final Output output;
     try {
       this.logger.info("Starting process");
       final StringBuilder commandToExecute = new StringBuilder();
@@ -99,12 +75,13 @@ class ProcessRunnerImpl implements ProcessRunner {
       currentProcess.waitFor();
       this.jsonArrayToOutputStream.endJsonObjectWrite();
       this.jsonArrayToOutputStream.cleanup();
-      processExitValue = currentProcess.exitValue();
+      final int processExitValue = currentProcess.exitValue();
+      output = OutputFactory.createOutput(this.configuration.getLogDump(), processExitValue);
       this.logger.info("Process exited with exit value : " + processExitValue);
     } catch (final Exception ex) {
       throw new ProcessException(ex);
     }
-    return processExitValue;
+    return output;
   }
 
   /**
@@ -114,27 +91,10 @@ class ProcessRunnerImpl implements ProcessRunner {
    *     retrieved.
    */
   @Override
-  public Future<Integer> run(final boolean threadEnabledFlag) {
+  public Future<Output> run(final boolean threadEnabledFlag) {
     final ExecutorService executor = Executors.newSingleThreadExecutor();
-    final Callable<Integer> callable = this::run;
+    final Callable<Output> callable = this::run;
     return executor.submit(callable);
-  }
-
-  @Override
-  public File saveSysOut(final File sysOut) throws ProcessException {
-    this.logger.info("Saving sys out to " + sysOut.getAbsolutePath());
-    return this.writeLog(sysOut, OutputSourceType.SYSOUT);
-  }
-
-  @Override
-  public File saveSysError(final File sysError) throws ProcessException {
-    this.logger.info("Saving sys error to : " + sysError.getAbsolutePath());
-    return this.writeLog(sysError, OutputSourceType.SYSERROR);
-  }
-
-  @Override
-  public File getJsonLogDump() {
-    return this.configuration.getLogDump();
   }
 
   /**
@@ -148,35 +108,6 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @throws JsonArrayReaderException If unable to read Json array {@link JsonArrayReaderException}
    *     from {@link File}
    */
-  private File writeLog(final File targetFile, final OutputSourceType outputSourceType)
-      throws ProcessException {
-
-    try (final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
-        final PrintWriter printWriter =
-            new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()))) {
-      final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
-          new ReadJsonArrayFromFile<>(this.configuration.getLogDump());
-      this.logger.info(
-          "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
-      OutputRecord outputRecord;
-      do {
-        outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
-        final String currentOutputLine;
-        if (outputRecord != null && outputRecord.getOutputSourceType() == outputSourceType) {
-          currentOutputLine = outputRecord.getOutputText();
-          this.logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
-          printWriter.println(currentOutputLine);
-        }
-      } while (outputRecord != null);
-      this.logger.info(
-          outputSourceType.toString()
-              + " written completely to : "
-              + targetFile.getCanonicalPath());
-    } catch (final Exception e) {
-      throw new ProcessException(e);
-    }
-    return targetFile;
-  }
 
   /**
    * Log a inputStream to the log dump as configured in {@link ProcessConfiguration}. Internally it

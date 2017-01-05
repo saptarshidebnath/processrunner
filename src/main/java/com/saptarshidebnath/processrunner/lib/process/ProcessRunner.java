@@ -1,22 +1,12 @@
 package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+import com.saptarshidebnath.processrunner.lib.output.Output;
 
-import java.io.File;
 import java.util.concurrent.Future;
 
 /** Process Runner interface is the base interface to run any system process or shell script */
 public interface ProcessRunner {
-
-  /**
-   * Searches for the regular expression throughout the content of the log
-   *
-   * @param regex : regular expression string to be searched throughout the content of the file.
-   * @return a {@link Boolean} value depicting if the regular expression have been found or not.
-   * @throws ProcessException Throws {@link ProcessException} to denote that there is an error. You
-   *     can get the cause by {@link ProcessException#getCause()}
-   */
-  boolean search(final String regex) throws ProcessException;
 
   /**
    * Triggers the process or command;
@@ -25,7 +15,7 @@ public interface ProcessRunner {
    * @throws ProcessException Throws {@link ProcessException} to denote that there is an error. You
    *     can get the cause by {@link ProcessException#getCause()}
    */
-  Integer run() throws ProcessException;
+  Output run() throws ProcessException;
 
   /**
    * Runs the process as a {@link java.util.concurrent.Callable} thread. The method returns a {@link
@@ -37,28 +27,5 @@ public interface ProcessRunner {
    * @return A reference to the {@link Future<Integer>} from which the user can retrieve the method
    *     output.
    */
-  Future<Integer> run(final boolean threadEnabled);
-
-  /**
-   * Generate the sysout
-   *
-   * @param sysOut : {@link File} depicting where the sysout is going to stored
-   * @return a {@link File}
-   */
-  File saveSysOut(File sysOut) throws ProcessException;
-
-  /**
-   * Generate the syserror
-   *
-   * @param sysError {@link File} depicting where the sys error is going to stored
-   * @return
-   */
-  File saveSysError(File sysError) throws ProcessException;
-
-  /**
-   * Returns a {@link File} reference to the log where the Json Log Data is dumped
-   *
-   * @return
-   */
-  File getJsonLogDump();
+  Future<Output> run(final boolean threadEnabled);
 }

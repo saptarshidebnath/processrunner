@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+import com.saptarshidebnath.processrunner.lib.output.Output;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import org.apache.commons.lang3.SystemUtils;
@@ -51,9 +52,9 @@ public class ProcessRunnerImplFactoryTest {
 
   @Test
   public void startProcess() throws ProcessException {
-    final int response =
+    final Output response =
         ProcessRunnerFactory.startProcess(getDefaultInterpreter(), getInterPreterVersion());
-    assertThat("Validating process runner for simple process : ", response, is(0));
+    assertThat("Validating process runner for simple process : ", response.getReturnCode(), is(0));
   }
 
   @Test(expected = ProcessException.class)
@@ -66,7 +67,6 @@ public class ProcessRunnerImplFactoryTest {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.startProcess(
             getDefaultInterpreter(), "", Constants.DEFAULT_CURRENT_DIR);
-    processRunner.getJsonLogDump().delete();
   }
 
   @Test(expected = ProcessException.class)
@@ -90,8 +90,8 @@ public class ProcessRunnerImplFactoryTest {
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
             true);
-    final Integer response = ProcessRunnerFactory.startProcess(configuration);
-    assertThat("Validating process return code : ", response, is(0));
+    final Output response = ProcessRunnerFactory.startProcess(configuration);
+    assertThat("Validating process return code : ", response.getReturnCode(), is(0));
   }
 
   @Test
@@ -103,18 +103,18 @@ public class ProcessRunnerImplFactoryTest {
         ProcessRunnerFactory.startProcess(
             getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
 
-    final int response = processRunner.run();
-    assertThat("Validating process return code : ", response, is(0));
+    final Output response = processRunner.run();
+    assertThat("Validating process return code : ", response.getReturnCode(), is(0));
 
     if (SystemUtils.IS_OS_LINUX) {
       assertThat(
           "Validating search result for content in the output in UNIX : ",
-          processRunner.search(".*GNU.*"),
+          response.search(".*GNU.*"),
           is(true));
     } else if (SystemUtils.IS_OS_WINDOWS) {
       assertThat(
           "Validating search result for content in the output in Windows : ",
-          processRunner.search("Microsoft Windows.*"),
+          response.search("Microsoft Windows.*"),
           is(true));
     }
   }
@@ -128,15 +128,15 @@ public class ProcessRunnerImplFactoryTest {
         ProcessRunnerFactory.startProcess(
             getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
 
-    final int response = processRunner.run();
-    assertThat("Validating process return code : ", response, is(0));
+    final Output response = processRunner.run();
+    assertThat("Validating process return code : ", response.getReturnCode(), is(0));
 
     assertThat(
         "Validating search result for content in the output in UNIX : ",
-        processRunner.search("Saptarshi"),
+        response.search("Saptarshi"),
         is(false));
   }
-
+  /*
   @Test(expected = ProcessException.class)
   public void searchContentBeforeRunningProcess()
       throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
@@ -145,12 +145,13 @@ public class ProcessRunnerImplFactoryTest {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.startProcess(
             getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
+    final Output response = processRunner.run();
 
     assertThat(
         "Validating search result for content in the output in UNIX : ",
-        processRunner.search("Saptarshi"),
+        response.search("Saptarshi"),
         is(false));
-  }
+  }*/
 
   @Test
   public void startThreadedProcessWithProcessConfig()
@@ -165,8 +166,8 @@ public class ProcessRunnerImplFactoryTest {
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
             true);
-    final Future<Integer> response = ProcessRunnerFactory.startProcess(configuration, true);
-    assertThat("Validating process return code : ", response.get(), is(0));
+    final Future<Output> response = ProcessRunnerFactory.startProcess(configuration, true);
+    assertThat("Validating process return code : ", response.get().getReturnCode(), is(0));
   }
 
   @Test(expected = ProcessException.class)
@@ -206,12 +207,12 @@ public class ProcessRunnerImplFactoryTest {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.startProcess(
             getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
-    final int response = processRunner.run();
-    assertThat("Validating process return code : ", response, is(0));
-    final File jsonLogDump = processRunner.getJsonLogDump();
-    assertThat("Validating if JSON log dump is created : ", jsonLogDump.exists(), is(true));
+    final Output response = processRunner.run();
+    assertThat("Validating process return code : ", response.getReturnCode(), is(0));
+    final File masterLog = response.getMasterLog();
+    assertThat("Validating if JSON log dump is created : ", masterLog.exists(), is(true));
     final String jsonLogAsString =
-        new Scanner(jsonLogDump, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
+        new Scanner(masterLog, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
     final Type listTypeOuputArray = new TypeToken<List<OutputRecord>>() {}.getType();
     final List<OutputRecord> outputRecord = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
     assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
@@ -221,7 +222,7 @@ public class ProcessRunnerImplFactoryTest {
         "Validating json log content : ",
         outputRecord.get(this.arryPosition).getOutputText(),
         startsWith(getInitialVersionComments()));
-    jsonLogDump.delete();
+    masterLog.delete();
   }
 
   private boolean isJSONValid(final String jsonInString) {
@@ -274,12 +275,12 @@ public class ProcessRunnerImplFactoryTest {
             Constants.DEFAULT_CURRENT_DIR,
             File.createTempFile("temp-file-name", ".json"),
             false);
-    final int response = processRunner.run();
-    assertThat("Validating process return code : ", response, is(0));
-    final File jsonLogDump = processRunner.getJsonLogDump();
-    assertThat("Validating if JSON log dump is created : ", jsonLogDump.exists(), is(true));
+    final Output response = processRunner.run();
+    assertThat("Validating process return code : ", response.getReturnCode(), is(0));
+    final File masterLog = response.getMasterLog();
+    assertThat("Validating if JSON log dump is created : ", masterLog.exists(), is(true));
     final String jsonLogAsString =
-        new Scanner(jsonLogDump, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
+        new Scanner(masterLog, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
     final Type listTypeOuputArray = new TypeToken<List<OutputRecord>>() {}.getType();
     final List<OutputRecord> outputRecord = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
     assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
@@ -289,9 +290,7 @@ public class ProcessRunnerImplFactoryTest {
         "Validating json log content : ",
         outputRecord.get(this.arryPosition).getOutputText(),
         startsWith(getInitialVersionComments()));
-    //TODO
-
-    jsonLogDump.delete();
+    masterLog.delete();
   }
 
   @Test
@@ -336,18 +335,17 @@ public class ProcessRunnerImplFactoryTest {
               true);
     }
 
-    final int response = processRunner.run();
-    final File sysout = processRunner.saveSysOut(File.createTempFile("temp-file-sysout", ".json"));
+    final Output response = processRunner.run();
+    final File sysout = response.saveSysOut(File.createTempFile("temp-file-sysout", ".json"));
     sysout.deleteOnExit();
-    final File syserr =
-        processRunner.saveSysError(File.createTempFile("temp-file-syserr", ".json"));
-    final File jsonLogDump = processRunner.getJsonLogDump();
-    jsonLogDump.deleteOnExit();
+    final File syserr = response.saveSysError(File.createTempFile("temp-file-syserr", ".json"));
+    final File masterLog = response.getMasterLog();
+    masterLog.deleteOnExit();
     syserr.deleteOnExit();
-    assertThat("Validating process return code : ", response, is(0));
-    assertThat("Validating if JSON log dump is created : ", jsonLogDump.exists(), is(true));
+    assertThat("Validating process return code : ", response.getReturnCode(), is(0));
+    assertThat("Validating if JSON log dump is created : ", masterLog.exists(), is(true));
     final String jsonLogAsString =
-        new Scanner(jsonLogDump, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
+        new Scanner(masterLog, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
     final Type listTypeOuputArray = new TypeToken<List<OutputRecord>>() {}.getType();
     final List<OutputRecord> outputRecord = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
     assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
