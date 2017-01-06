@@ -1,7 +1,9 @@
 package com.saptarshidebnath.processrunner.lib.exception;
 
 /**
- * Basic exception denote that the {@link JsonArrayWriterException } is not configured correctly.
+ * Custom exception denote that the {@link
+ * com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile } is not configured
+ * correctly.
  */
 public class JsonArrayWriterException extends Exception {
 

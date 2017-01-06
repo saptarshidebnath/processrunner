@@ -1,7 +1,9 @@
 package com.saptarshidebnath.processrunner.lib.exception;
 
 /**
- * Basic exception denote that the {@link JsonArrayReaderException } is not configured correctly.
+ * Custom exception denote that the {@link
+ * com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile } is not configured
+ * correctly.
  */
 public class JsonArrayReaderException extends Exception {
 

@@ -35,8 +35,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jacoco.version>0.7.5.201505241946</jacoco.version>
-    <jacoco.code.coverage.line.min>0.1</jacoco.code.coverage.line.min>
-    <jacoco.code.coverage.branch.min>0.1</jacoco.code.coverage.branch.min>
+    <jacoco.code.coverage.line.min>0.70</jacoco.code.coverage.line.min>
+    <jacoco.code.coverage.branch.min>0.70</jacoco.code.coverage.branch.min>
   </properties>
 
   <dependencies>
@@ -122,7 +122,6 @@
             <configuration>
               <haltOnFailure>true</haltOnFailure>
               <rules>
-                <!-- All classes must have 80% line and branch coverage . Note we use 2 d.p so that we get can any check failure messages reported to 2 d.p  -->
                 <rule>
                   <element>BUNDLE</element>
                   <limits>
@@ -250,7 +249,16 @@
           <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
         </configuration>
       </plugin>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.4</version>
+        <configuration>
+          <show>private</show>
+          <detectLinks>true</detectLinks>
+          <nohelp>true</nohelp>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>

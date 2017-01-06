@@ -53,7 +53,7 @@ public class ProcessRunnerImplFactoryTest {
   @Test
   public void startProcess() throws ProcessException {
     final Output response =
-        ProcessRunnerFactory.startProcess(getDefaultInterpreter(), getInterPreterVersion(), false);
+        ProcessRunnerFactory.startProcess(getDefaultInterpreter(), getInterPreterVersion(), true);
     assertThat("Validating process runner for simple process : ", response.getReturnCode(), is(0));
   }
 
@@ -90,7 +90,7 @@ public class ProcessRunnerImplFactoryTest {
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
             true,
-            false);
+            true);
     final Output response = ProcessRunnerFactory.startProcess(configuration);
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
   }
