@@ -13,9 +13,9 @@ import java.nio.charset.Charset;
 
 /**
  * Write a json array to file one array element at a time. Class is type safe so that the array is
- * of single type only
+ * of single type only.
  *
- * @param <T>
+ * @param <T> Type safe the writer for a particular JsonClass.
  */
 public class WriteJsonArrayToFile<T> {
 
@@ -50,8 +50,8 @@ public class WriteJsonArrayToFile<T> {
    * Write a json object to the {@link File} configured. The library used {@link Gson} to convert
    * any object to json {@link String}.
    *
-   * @param object : Object of Type T to be written to the disk
-   * @throws IOException
+   * @param object : Object of Type T to be written to the disk.
+   * @throws IOException an {@link IOException} if there is an error writing the object to the disk.
    */
   public synchronized void writeJsonObject(final T object) throws JsonArrayWriterException {
     if (this.printWriter != null) {
@@ -68,7 +68,7 @@ public class WriteJsonArrayToFile<T> {
   /**
    * Ends the json object and actually writes the same to the disk.
    *
-   * @throws IOException
+   * @throws IOException an {@link IOException} if there is an error writing the object to the disk.
    */
   public synchronized void endJsonObjectWrite() {
     this.printWriter.write("]");
@@ -78,7 +78,7 @@ public class WriteJsonArrayToFile<T> {
   /**
    * Cleans up the Streams so that the lock on the {@link File} is released.
    *
-   * @throws IOException
+   * @throws IOException an {@link IOException} if there is an error writing the object to the disk.
    */
   public synchronized void cleanup() {
     if (this.printWriter != null) {
