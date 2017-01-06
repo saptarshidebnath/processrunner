@@ -17,10 +17,10 @@ public class ProcessConfiguration {
   private final String commandRunnerInterPreter;
   private final String command;
   private final File currentDirectory;
-  private final File logDump;
-
+  private final File masterLogFile;
   private final boolean autoDeleteFileOnExit;
   private final Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
+  private final boolean debug;
 
   /**
    * Most detailed constructor to set the {@link ProcessConfiguration}.
@@ -29,9 +29,10 @@ public class ProcessConfiguration {
    *     unix
    * @param command : set the actual {@link String} command to be executed
    * @param currentDirectory : sets the working directory in {@link File} format
-   * @param logDump : {@link File} where the log data will be stored.
+   * @param masterLogFile : {@link File} where the log data will be stored.
    * @param autoDeleteFileOnExit : set the flag to denote if the sysout and the syserror {@link
    *     File} going to be auto deleted on exit
+   * @param debug {@link Boolean} value setting if it should print the debug options or not
    * @throws ProcessConfigurationException : Exception thrown if configuration received is not at
    *     par.
    * @throws IOException : Exception thrown if there are any error while validating the {@link File}
@@ -41,8 +42,9 @@ public class ProcessConfiguration {
       final String commandRunnerInterPreter,
       final String command,
       final File currentDirectory,
-      final File logDump,
-      final boolean autoDeleteFileOnExit)
+      final File masterLogFile,
+      final boolean autoDeleteFileOnExit,
+      final boolean debug)
       throws ProcessConfigurationException, IOException {
 
     if (commandRunnerInterPreter.trim().length() == 0) {
@@ -65,11 +67,14 @@ public class ProcessConfiguration {
     this.command = command.trim();
     this.currentDirectory = currentDirectory;
     this.autoDeleteFileOnExit = autoDeleteFileOnExit;
-    this.logDump = logDump;
+    this.masterLogFile = masterLogFile;
+    this.debug = debug;
     if (this.autoDeleteFileOnExit) {
-      this.logDump.deleteOnExit();
+      this.masterLogFile.deleteOnExit();
     }
-    this.logger.log(Level.INFO, this.toString());
+    if (this.debug) {
+      this.logger.log(Level.INFO, this.toString());
+    }
   }
 
   @Override
@@ -87,8 +92,8 @@ public class ProcessConfiguration {
         + ", currentDirectory="
         + this.currentDirectory
         + NEW_LINE
-        + ", logDump="
-        + this.logDump
+        + ", masterLogFile="
+        + this.masterLogFile
         + NEW_LINE
         + ", autoDeleteFileOnExit="
         + this.autoDeleteFileOnExit
@@ -96,23 +101,27 @@ public class ProcessConfiguration {
         + '}';
   }
 
+  public boolean isDebug() {
+    return this.debug;
+  }
+
   boolean getAutoDeleteFileOnExit() {
     return this.autoDeleteFileOnExit;
   }
 
-  File getLogDump() {
-    return this.logDump;
+  public File getMasterLogFile() {
+    return this.masterLogFile;
   }
 
-  String getCommandRunnerInterPreter() {
+  public String getCommandRunnerInterPreter() {
     return this.commandRunnerInterPreter;
   }
 
-  String getCommand() {
+  public String getCommand() {
     return this.command;
   }
 
-  File getCurrentDirectory() {
+  public File getCurrentDirectory() {
     return this.currentDirectory;
   }
 }

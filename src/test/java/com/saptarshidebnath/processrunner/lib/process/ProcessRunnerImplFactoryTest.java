@@ -53,20 +53,20 @@ public class ProcessRunnerImplFactoryTest {
   @Test
   public void startProcess() throws ProcessException {
     final Output response =
-        ProcessRunnerFactory.startProcess(getDefaultInterpreter(), getInterPreterVersion());
+        ProcessRunnerFactory.startProcess(getDefaultInterpreter(), getInterPreterVersion(), false);
     assertThat("Validating process runner for simple process : ", response.getReturnCode(), is(0));
   }
 
   @Test(expected = ProcessException.class)
   public void startProcessWithWrongParmeters() throws ProcessException {
-    ProcessRunnerFactory.startProcess("", getInterPreterVersion());
+    ProcessRunnerFactory.startProcess("", getInterPreterVersion(), false);
   }
 
   @Test(expected = ProcessException.class)
   public void getProcessWithLessParamsWrongParamets() throws ProcessException {
     final ProcessRunner processRunner =
-        ProcessRunnerFactory.startProcess(
-            getDefaultInterpreter(), "", Constants.DEFAULT_CURRENT_DIR);
+        ProcessRunnerFactory.getProcess(
+            getDefaultInterpreter(), "", Constants.DEFAULT_CURRENT_DIR, false);
   }
 
   @Test(expected = ProcessException.class)
@@ -74,8 +74,8 @@ public class ProcessRunnerImplFactoryTest {
     final File tempFile = File.createTempFile("temp-file-name", ".json");
     tempFile.deleteOnExit();
     final ProcessRunner processRunner =
-        ProcessRunnerFactory.startProcess(
-            "", getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, tempFile, false);
+        ProcessRunnerFactory.getProcess(
+            "", getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, tempFile, false, false);
   }
 
   @Test
@@ -89,7 +89,8 @@ public class ProcessRunnerImplFactoryTest {
             getInterPreterVersion(),
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
-            true);
+            true,
+            false);
     final Output response = ProcessRunnerFactory.startProcess(configuration);
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
   }
@@ -100,8 +101,8 @@ public class ProcessRunnerImplFactoryTest {
           InterruptedException {
 
     final ProcessRunner processRunner =
-        ProcessRunnerFactory.startProcess(
-            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
+        ProcessRunnerFactory.getProcess(
+            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, false);
 
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
@@ -125,8 +126,8 @@ public class ProcessRunnerImplFactoryTest {
           InterruptedException {
 
     final ProcessRunner processRunner =
-        ProcessRunnerFactory.startProcess(
-            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
+        ProcessRunnerFactory.getProcess(
+            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, false);
 
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
@@ -143,7 +144,7 @@ public class ProcessRunnerImplFactoryTest {
           InterruptedException {
 
     final ProcessRunner processRunner =
-        ProcessRunnerFactory.startProcess(
+        ProcessRunnerFactory.getProcess(
             getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
     final Output response = processRunner.run();
 
@@ -165,7 +166,8 @@ public class ProcessRunnerImplFactoryTest {
             getInterPreterVersion(),
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
-            true);
+            true,
+            false);
     final Future<Output> response = ProcessRunnerFactory.startProcess(configuration, true);
     assertThat("Validating process return code : ", response.get().getReturnCode(), is(0));
   }
@@ -182,7 +184,8 @@ public class ProcessRunnerImplFactoryTest {
             getInterPreterVersion(),
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
-            true);
+            true,
+            false);
     ProcessRunnerFactory.startProcess(configuration);
   }
 
@@ -198,15 +201,16 @@ public class ProcessRunnerImplFactoryTest {
             getInterPreterVersion(),
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
-            true);
+            true,
+            false);
     ProcessRunnerFactory.startProcess(configuration, true);
   }
 
   @Test
   public void getProcessLessDetailed() throws IOException, ProcessException, InterruptedException {
     final ProcessRunner processRunner =
-        ProcessRunnerFactory.startProcess(
-            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
+        ProcessRunnerFactory.getProcess(
+            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, false);
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
     final File masterLog = response.getMasterLog();
@@ -269,11 +273,12 @@ public class ProcessRunnerImplFactoryTest {
   @Test
   public void getProcessMoreDetailed() throws IOException, ProcessException, InterruptedException {
     final ProcessRunner processRunner =
-        ProcessRunnerFactory.startProcess(
+        ProcessRunnerFactory.getProcess(
             getDefaultInterpreter(),
             getInterPreterVersion(),
             Constants.DEFAULT_CURRENT_DIR,
             File.createTempFile("temp-file-name", ".json"),
+            false,
             false);
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
@@ -301,7 +306,7 @@ public class ProcessRunnerImplFactoryTest {
     ProcessRunner processRunner = null;
     if (SystemUtils.IS_OS_WINDOWS) {
       processRunner =
-          ProcessRunnerFactory.startProcess(
+          ProcessRunnerFactory.getProcess(
               "cmd /c",
               "test.bat",
               new File(
@@ -315,10 +320,11 @@ public class ProcessRunnerImplFactoryTest {
                       + File.separator
                       + "batch"),
               tempFile,
-              true);
+              true,
+              false);
     } else if (SystemUtils.IS_OS_LINUX) {
       processRunner =
-          ProcessRunnerFactory.startProcess(
+          ProcessRunnerFactory.getProcess(
               "bash",
               "test.sh",
               new File(
@@ -332,7 +338,8 @@ public class ProcessRunnerImplFactoryTest {
                       + File.separator
                       + "shell"),
               tempFile,
-              true);
+              true,
+              false);
     }
 
     final Output response = processRunner.run();
@@ -364,7 +371,7 @@ public class ProcessRunnerImplFactoryTest {
     ProcessRunner processRunner = null;
     if (SystemUtils.IS_OS_WINDOWS) {
       processRunner =
-          ProcessRunnerFactory.startProcess(
+          ProcessRunnerFactory.getProcess(
               "cmd /c",
               "largefile.bat",
               new File(
@@ -378,10 +385,11 @@ public class ProcessRunnerImplFactoryTest {
                       + File.separator
                       + "batch"),
               tempFile,
-              true);
+              true,
+              false);
     } else if (SystemUtils.IS_OS_LINUX) {
       processRunner =
-          ProcessRunnerFactory.startProcess(
+          ProcessRunnerFactory.getProcess(
               "bash",
               "largefile.sh",
               new File(
@@ -395,7 +403,8 @@ public class ProcessRunnerImplFactoryTest {
                       + File.separator
                       + "shell"),
               tempFile,
-              true);
+              true,
+              false);
     }
 
     final Output response = processRunner.run();

@@ -37,8 +37,11 @@ class ProcessRunnerImpl implements ProcessRunner {
   ProcessRunnerImpl(final ProcessConfiguration configuration) throws IOException {
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
-    this.jsonArrayToOutputStream = new WriteJsonArrayToFile<>(this.configuration.getLogDump());
-    this.logger.log(Level.INFO, "Process Runner created");
+    this.jsonArrayToOutputStream =
+        new WriteJsonArrayToFile<>(this.configuration.getMasterLogFile());
+    if (this.configuration.isDebug()) {
+      this.logger.log(Level.INFO, "Process Runner created");
+    }
   }
 
   /**
@@ -53,31 +56,43 @@ class ProcessRunnerImpl implements ProcessRunner {
   public Output run() throws ProcessException {
     final Output output;
     try {
-      this.logger.info("Starting process");
+      if (this.configuration.isDebug()) {
+        this.logger.info("Starting process");
+      }
       final StringBuilder commandToExecute = new StringBuilder();
       commandToExecute
           .append(this.configuration.getCommandRunnerInterPreter())
           .append(Constants.SPACE)
           .append(this.configuration.getCommand());
-      this.logger.info("Executing command : " + commandToExecute.toString());
+      if (this.configuration.isDebug()) {
+        this.logger.info("Executing command : " + commandToExecute.toString());
+      }
       final Process currentProcess =
           this.runTime.exec(
               commandToExecute.toString(), null, this.configuration.getCurrentDirectory());
-      this.logger.info("Capturing logs");
+      if (this.configuration.isDebug()) {
+        this.logger.info("Capturing logs");
+      }
       this.jsonArrayToOutputStream.startJsonObject();
       final ExecutorService executor = Executors.newFixedThreadPool(2);
       executor.execute(this.writeLogs(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
       executor.execute(this.writeLogs(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
       executor.shutdown();
-      this.logger.info("Waiting for the log streams to shutdown");
+      if (this.configuration.isDebug()) {
+        this.logger.info("Waiting for the log streams to shutdown");
+      }
       executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      this.logger.info("Waiting for the process to terminate");
+      if (this.configuration.isDebug()) {
+        this.logger.info("Waiting for the process to terminate");
+      }
       currentProcess.waitFor();
       this.jsonArrayToOutputStream.endJsonObjectWrite();
       this.jsonArrayToOutputStream.cleanup();
       final int processExitValue = currentProcess.exitValue();
-      output = OutputFactory.createOutput(this.configuration.getLogDump(), processExitValue);
-      this.logger.info("Process exited with exit value : " + processExitValue);
+      output = OutputFactory.createOutput(this.configuration, processExitValue);
+      if (this.configuration.isDebug()) {
+        this.logger.info("Process exited with exit value : " + processExitValue);
+      }
     } catch (final Exception ex) {
       throw new ProcessException(ex);
     }
@@ -138,18 +153,20 @@ class ProcessRunnerImpl implements ProcessRunner {
           "Writing "
               + outputSourceType.toString()
               + " as jsonObject to "
-              + this.configuration.getLogDump().getCanonicalPath());
+              + this.configuration.getMasterLogFile().getCanonicalPath());
       final Scanner scanner = new Scanner(inputStreamToWrite);
       while (scanner.hasNext()) {
         final String currentLine = scanner.nextLine();
-        this.logger.info(outputSourceType.toString() + " >> " + currentLine);
+        if (this.configuration.isDebug()) {
+          this.logger.info(outputSourceType.toString() + " >> " + currentLine);
+        }
         ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
             new OutputRecord(outputSourceType, currentLine));
       }
     } catch (final Exception ex) {
       this.logger.log(
           Level.SEVERE,
-          "Unable to write data to " + this.configuration.getLogDump().getAbsolutePath(),
+          "Unable to write data to " + this.configuration.getMasterLogFile().getAbsolutePath(),
           ex);
     }
   }

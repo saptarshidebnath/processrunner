@@ -21,9 +21,15 @@ public class ProcessConfigurationTest {
     final File tempFile =
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     final boolean fileSetToBeAutoDeleted = true;
+    final boolean debugValueSet = true;
     final ProcessConfiguration configuration =
         new ProcessConfiguration(
-            interpreter, command, Constants.DEFAULT_CURRENT_DIR, tempFile, fileSetToBeAutoDeleted);
+            interpreter,
+            command,
+            Constants.DEFAULT_CURRENT_DIR,
+            tempFile,
+            fileSetToBeAutoDeleted,
+            debugValueSet);
     assertThat(
         "Validating process runner Interpreter : ",
         configuration.getCommandRunnerInterPreter(),
@@ -35,12 +41,16 @@ public class ProcessConfigurationTest {
         is(Constants.DEFAULT_CURRENT_DIR.getCanonicalPath()));
     assertThat(
         "Validating process configuration json log dump: ",
-        configuration.getLogDump().getCanonicalPath(),
+        configuration.getMasterLogFile().getCanonicalPath(),
         is(tempFile.getCanonicalPath()));
     assertThat(
         "Validating process configuration json log file set for auto deletion : ",
         configuration.getAutoDeleteFileOnExit(),
         is(fileSetToBeAutoDeleted));
+    assertThat(
+        "Validating process configuration debug value : ",
+        configuration.isDebug(),
+        is(debugValueSet));
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -51,10 +61,16 @@ public class ProcessConfigurationTest {
     final File tempFile =
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
+    final boolean debugValueSet = true;
     final boolean fileSetToBeAutoDeleted = true;
     final ProcessConfiguration configuration =
         new ProcessConfiguration(
-            interpreter, command, Constants.DEFAULT_CURRENT_DIR, tempFile, fileSetToBeAutoDeleted);
+            interpreter,
+            command,
+            Constants.DEFAULT_CURRENT_DIR,
+            tempFile,
+            fileSetToBeAutoDeleted,
+            debugValueSet);
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -65,10 +81,16 @@ public class ProcessConfigurationTest {
     final File tempFile =
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
+    final boolean debugValueSet = true;
     final boolean fileSetToBeAutoDeleted = true;
     final ProcessConfiguration configuration =
         new ProcessConfiguration(
-            interpreter, command, Constants.DEFAULT_CURRENT_DIR, tempFile, fileSetToBeAutoDeleted);
+            interpreter,
+            command,
+            Constants.DEFAULT_CURRENT_DIR,
+            tempFile,
+            fileSetToBeAutoDeleted,
+            debugValueSet);
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -79,10 +101,16 @@ public class ProcessConfigurationTest {
     final File tempFile =
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
+    final boolean debugValueSet = true;
     final boolean fileSetToBeAutoDeleted = true;
     final ProcessConfiguration configuration =
         new ProcessConfiguration(
-            interpreter, command, new File("a:\\"), tempFile, fileSetToBeAutoDeleted);
+            interpreter,
+            command,
+            new File("a:\\"),
+            tempFile,
+            fileSetToBeAutoDeleted,
+            debugValueSet);
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -94,7 +122,9 @@ public class ProcessConfigurationTest {
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     final boolean fileSetToBeAutoDeleted = true;
+    final boolean debugValueSet = true;
     final ProcessConfiguration configuration =
-        new ProcessConfiguration(interpreter, command, tempFile, tempFile, fileSetToBeAutoDeleted);
+        new ProcessConfiguration(
+            interpreter, command, tempFile, tempFile, fileSetToBeAutoDeleted, debugValueSet);
   }
 }

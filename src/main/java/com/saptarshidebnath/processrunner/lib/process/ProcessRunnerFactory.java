@@ -21,13 +21,15 @@ public class ProcessRunnerFactory {
    * execution.
    *
    * @param commandInterPreter : Command Interpreter to be used
-   * @param command : command to be executed
+   * @param command : command to be executed.
+   * @param debug {@link Boolean} value to enable or disable debug statements
    * @return the return code of the process. An {@link Integer} ranging from <strong>0 -
    *     255</strong>
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
-  public static Output startProcess(final String commandInterPreter, final String command)
+  public static Output startProcess(
+      final String commandInterPreter, final String command, final boolean debug)
       throws ProcessException {
     try {
       return new ProcessRunnerImpl(
@@ -36,7 +38,8 @@ public class ProcessRunnerFactory {
                   command,
                   Constants.DEFAULT_CURRENT_DIR,
                   File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON),
-                  true))
+                  true,
+                  debug))
           .run();
     } catch (final Exception e) {
       throw new ProcessException(e);
@@ -50,6 +53,7 @@ public class ProcessRunnerFactory {
    * @param commandInterPreter : The command interpreter
    * @param command : The command to be executed
    * @param workingDirectory : The working doriector as a {@link File} object
+   * @param debug {@link Boolean} value to enable or disable debug statements
    * @return a reference to the class {@link ProcessRunner} On which you can call {@link
    *     ProcessRunner#run()} to trigger the Process in synchronous manner. You can also all {@link
    *     ProcessRunner#run(boolean)} to run the Process asynchronously. Please see java doc for
@@ -57,8 +61,11 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
-  public static ProcessRunner startProcess(
-      final String commandInterPreter, final String command, final File workingDirectory)
+  public static ProcessRunner getProcess(
+      final String commandInterPreter,
+      final String command,
+      final File workingDirectory,
+      final boolean debug)
       throws ProcessException {
 
     final File outputLogJsonFile;
@@ -71,7 +78,7 @@ public class ProcessRunnerFactory {
     try {
       return new ProcessRunnerImpl(
           new ProcessConfiguration(
-              commandInterPreter, command, workingDirectory, outputLogJsonFile, false));
+              commandInterPreter, command, workingDirectory, outputLogJsonFile, false, debug));
     } catch (final Exception e) {
       //
       // Delete file on exit.
@@ -93,6 +100,7 @@ public class ProcessRunnerFactory {
    * @param logDump : {@link File} reference to the json log file where the logs will be stored.
    * @param autoDeleteFile {@link Boolean} object confiroming if the file need to be auto deleted at
    *     the end of the jvm exit
+   * @param debug {@link Boolean} value to enable or disable debug statements
    * @return a reference to the class {@link ProcessRunner} On which you can call {@link
    *     ProcessRunner#run()} to trigger the Process in synchronous manner. You can also all {@link
    *     ProcessRunner#run(boolean)} to run the Process asynchronously. Please see java doc for
@@ -100,17 +108,18 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
-  public static ProcessRunner startProcess(
+  public static ProcessRunner getProcess(
       final String commandRunnerInterPreter,
       final String command,
       final File workingDirectory,
       final File logDump,
-      final boolean autoDeleteFile)
+      final boolean autoDeleteFile,
+      final boolean debug)
       throws ProcessException {
     try {
       return new ProcessRunnerImpl(
           new ProcessConfiguration(
-              commandRunnerInterPreter, command, workingDirectory, logDump, autoDeleteFile));
+              commandRunnerInterPreter, command, workingDirectory, logDump, autoDeleteFile, debug));
     } catch (final Exception e) {
       throw new ProcessException(e);
     }
