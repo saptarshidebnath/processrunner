@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.saptarshidebnath.processrunner.lib.utilities.Constants.NEW_LINE;
-
 /**
  * The {@link ProcessConfiguration} object create a configuration to be consumed by the {@link
  * ProcessRunner} object
@@ -74,31 +72,20 @@ public class ProcessConfiguration {
     if (this.autoDeleteFileOnExit) {
       this.masterLogFile.deleteOnExit();
     }
-    this.logger.log(Level.INFO, this.toString());
+    this.logger.info(this.toString());
   }
 
   @Override
   public String toString() {
-    return "ProcessConfiguration{"
-        + NEW_LINE
-        + "commandRunnerInterPreter='"
-        + this.commandRunnerInterPreter
-        + '\''
-        + NEW_LINE
-        + ", command='"
-        + this.command
-        + '\''
-        + NEW_LINE
-        + ", currentDirectory="
-        + this.currentDirectory
-        + NEW_LINE
-        + ", masterLogFile="
-        + this.masterLogFile
-        + NEW_LINE
-        + ", autoDeleteFileOnExit="
-        + this.autoDeleteFileOnExit
-        + NEW_LINE
-        + '}';
+    final StringBuilder sb = new StringBuilder("ProcessConfiguration{");
+    sb.append("commandRunnerInterPreter='").append(this.commandRunnerInterPreter).append('\'');
+    sb.append(", command='").append(this.command).append('\'');
+    sb.append(", currentDirectory=").append(this.currentDirectory);
+    sb.append(", masterLogFile=").append(this.masterLogFile);
+    sb.append(", autoDeleteFileOnExit=").append(this.autoDeleteFileOnExit);
+    sb.append(", logLevel=").append(this.logLevel);
+    sb.append('}');
+    return sb.toString();
   }
 
   public Level getLogLevel() {
