@@ -65,7 +65,7 @@ class ProcessRunnerImpl implements ProcessRunner {
           .append(this.configuration.getCommandRunnerInterPreter())
           .append(Constants.SPACE)
           .append(this.configuration.getCommand());
-      this.logger.info("Executing command : " + commandToExecute.toString());
+      this.logger.log(Level.INFO, "Executing command : %s", commandToExecute.toString());
       final Process currentProcess =
           this.runTime.exec(
               commandToExecute.toString(), null, this.configuration.getCurrentDirectory());
@@ -83,7 +83,7 @@ class ProcessRunnerImpl implements ProcessRunner {
       this.jsonArrayToOutputStream.cleanup();
       final int processExitValue = currentProcess.exitValue();
       output = OutputFactory.createOutput(this.configuration, processExitValue);
-      this.logger.info("Process exited with exit value : " + processExitValue);
+      this.logger.log(Level.INFO, "Process exited with exit value : %s", processExitValue);
     } catch (final Exception ex) {
       throw new ProcessException(ex);
     }
@@ -140,15 +140,16 @@ class ProcessRunnerImpl implements ProcessRunner {
   private void logData(
       final InputStream inputStreamToWrite, final OutputSourceType outputSourceType) {
     try {
-      this.logger.info(
-          "Writing "
-              + outputSourceType.toString()
-              + " as jsonObject to "
-              + this.configuration.getMasterLogFile().getCanonicalPath());
+      this.logger.log(
+          Level.INFO,
+          String.format(
+              "Writing %s as jsonObject to %s",
+              outputSourceType.toString(),
+              this.configuration.getMasterLogFile().getCanonicalPath()));
       final Scanner scanner = new Scanner(inputStreamToWrite);
       while (scanner.hasNext()) {
         final String currentLine = scanner.nextLine();
-        this.logger.info(outputSourceType.toString() + " >> " + currentLine);
+        this.logger.info(String.format("%s >> %s", outputSourceType.toString(), currentLine));
         ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
             new OutputRecord(outputSourceType, currentLine));
       }

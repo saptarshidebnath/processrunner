@@ -72,7 +72,8 @@ public class ProcessConfiguration {
     if (this.autoDeleteFileOnExit) {
       this.masterLogFile.deleteOnExit();
     }
-    this.logger.info(this.toString());
+    final String currentConfiguration = toString();
+    this.logger.info(currentConfiguration);
   }
 
   @Override

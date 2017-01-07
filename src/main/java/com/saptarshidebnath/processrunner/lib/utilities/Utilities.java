@@ -36,22 +36,22 @@ public class Utilities {
       final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
           new ReadJsonArrayFromFile<>(configuration.getMasterLogFile());
       logger.info(
-          "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
+          String.format(
+              "Writing %s to : %s", outputSourceType.toString(), targetFile.getCanonicalPath()));
       OutputRecord outputRecord;
       do {
         outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
         final String currentOutputLine;
         if (outputRecord != null && outputRecord.getOutputSourceType() == outputSourceType) {
           currentOutputLine = outputRecord.getOutputText();
-
-          logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
+          logger.info(String.format("%s >> %s", outputSourceType.toString(), currentOutputLine));
           printWriter.println(currentOutputLine);
         }
       } while (outputRecord != null);
       logger.info(
-          outputSourceType.toString()
-              + " written completely to : "
-              + targetFile.getCanonicalPath());
+          String.format(
+              "%s written completely to : %s",
+              outputSourceType.toString(), targetFile.getCanonicalPath()));
     } catch (final Exception e) {
       throw new ProcessException(e);
     }

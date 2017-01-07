@@ -6,6 +6,7 @@ import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 
 import java.io.File;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class OutputImpl implements Output {
@@ -28,7 +29,7 @@ class OutputImpl implements Output {
 
   @Override
   public File saveSysError(final File sysError) throws ProcessException {
-    this.logger.info("Saving sys error to : " + sysError.getAbsolutePath());
+    this.logger.log(Level.INFO, "Saving sys error to : %s", sysError.getAbsolutePath());
     return Utilities.writeLog(this.configuration, sysError, OutputSourceType.SYSERROR);
   }
 
@@ -41,7 +42,7 @@ class OutputImpl implements Output {
   public boolean searchMasterLog(final String regex) throws ProcessException {
     boolean isMatching = false;
     try {
-      this.logger.info("Searching for regular expression :" + regex);
+      this.logger.log(Level.INFO, "Searching for regular expression : %s", regex);
       final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
           new ReadJsonArrayFromFile<>(this.getMasterLog());
       OutputRecord outputRecord;
@@ -52,9 +53,9 @@ class OutputImpl implements Output {
         }
       } while (outputRecord != null && !isMatching);
       if (isMatching) {
-        this.logger.info("Regex \'" + regex + "\" is found");
+        this.logger.log(Level.INFO, "Regex %s is found", regex);
       } else {
-        this.logger.info("Regex \'" + regex + "\" NOT found");
+        this.logger.log(Level.WARNING, "Regex %s is NOT found", regex);
       }
       readJsonArrayFromFile.closeJsonReader();
     } catch (final Exception ex) {
