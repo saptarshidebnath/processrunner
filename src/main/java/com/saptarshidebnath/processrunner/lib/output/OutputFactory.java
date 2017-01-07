@@ -6,6 +6,12 @@ import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
 public class OutputFactory {
   private OutputFactory() {}
 
+  /**
+   *
+   * @param configuration
+   * @param returnCode
+   * @return
+   */
   public static Output createOutput(
       final ProcessConfiguration configuration, final int returnCode) {
     return new OutputImpl(configuration, returnCode);
