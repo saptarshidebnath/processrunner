@@ -20,7 +20,7 @@ public class ProcessConfiguration {
   private final File masterLogFile;
   private final boolean autoDeleteFileOnExit;
   private final Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
-  private final boolean debug;
+  private final Level logLevel;
 
   /**
    * Most detailed constructor to set the {@link ProcessConfiguration}.
@@ -32,7 +32,8 @@ public class ProcessConfiguration {
    * @param masterLogFile : {@link File} where the log data will be stored.
    * @param autoDeleteFileOnExit : set the flag to denote if the sysout and the syserror {@link
    *     File} going to be auto deleted on exit
-   * @param debug {@link Boolean} value setting if it should print the debug options or not
+   * @param logLevel {@link Level} value setting for the minimum {@link Level} for printing debug
+   *     message.
    * @throws ProcessConfigurationException : Exception thrown if configuration received is not at
    *     par.
    * @throws IOException : Exception thrown if there are any error while validating the {@link File}
@@ -44,7 +45,7 @@ public class ProcessConfiguration {
       final File currentDirectory,
       final File masterLogFile,
       final boolean autoDeleteFileOnExit,
-      final boolean debug)
+      final Level logLevel)
       throws ProcessConfigurationException, IOException {
 
     if (commandRunnerInterPreter.trim().length() == 0) {
@@ -68,13 +69,12 @@ public class ProcessConfiguration {
     this.currentDirectory = currentDirectory;
     this.autoDeleteFileOnExit = autoDeleteFileOnExit;
     this.masterLogFile = masterLogFile;
-    this.debug = debug;
+    this.logLevel = logLevel;
+    this.logger.setLevel(logLevel);
     if (this.autoDeleteFileOnExit) {
       this.masterLogFile.deleteOnExit();
     }
-    if (this.debug) {
-      this.logger.log(Level.INFO, this.toString());
-    }
+    this.logger.log(Level.INFO, this.toString());
   }
 
   @Override
@@ -101,8 +101,8 @@ public class ProcessConfiguration {
         + '}';
   }
 
-  public boolean isDebug() {
-    return this.debug;
+  public Level getLogLevel() {
+    return this.logLevel;
   }
 
   boolean getAutoDeleteFileOnExit() {

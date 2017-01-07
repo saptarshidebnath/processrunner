@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import static com.saptarshidebnath.processrunner.lib.utilities.Constants.FILE_PREFIX_NAME_LOG_DUMP;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,7 +22,7 @@ public class ProcessConfigurationTest {
     final File tempFile =
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     final boolean fileSetToBeAutoDeleted = true;
-    final boolean debugValueSet = true;
+    final Level logLevel = Level.OFF;
     final ProcessConfiguration configuration =
         new ProcessConfiguration(
             interpreter,
@@ -29,7 +30,7 @@ public class ProcessConfigurationTest {
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
             fileSetToBeAutoDeleted,
-            debugValueSet);
+            logLevel);
     assertThat(
         "Validating process runner Interpreter : ",
         configuration.getCommandRunnerInterPreter(),
@@ -49,8 +50,8 @@ public class ProcessConfigurationTest {
         is(fileSetToBeAutoDeleted));
     assertThat(
         "Validating process configuration debug value : ",
-        configuration.isDebug(),
-        is(debugValueSet));
+        configuration.getLogLevel(),
+        is(logLevel));
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -61,16 +62,15 @@ public class ProcessConfigurationTest {
     final File tempFile =
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
-    final boolean debugValueSet = true;
+    final Level logLevel = Level.ALL;
     final boolean fileSetToBeAutoDeleted = true;
-    final ProcessConfiguration configuration =
-        new ProcessConfiguration(
-            interpreter,
-            command,
-            Constants.DEFAULT_CURRENT_DIR,
-            tempFile,
-            fileSetToBeAutoDeleted,
-            debugValueSet);
+    new ProcessConfiguration(
+        interpreter,
+        command,
+        Constants.DEFAULT_CURRENT_DIR,
+        tempFile,
+        fileSetToBeAutoDeleted,
+        logLevel);
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -81,16 +81,15 @@ public class ProcessConfigurationTest {
     final File tempFile =
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
-    final boolean debugValueSet = true;
+    final Level logLevel = Level.FINER;
     final boolean fileSetToBeAutoDeleted = true;
-    final ProcessConfiguration configuration =
-        new ProcessConfiguration(
-            interpreter,
-            command,
-            Constants.DEFAULT_CURRENT_DIR,
-            tempFile,
-            fileSetToBeAutoDeleted,
-            debugValueSet);
+    new ProcessConfiguration(
+        interpreter,
+        command,
+        Constants.DEFAULT_CURRENT_DIR,
+        tempFile,
+        fileSetToBeAutoDeleted,
+        logLevel);
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -101,16 +100,11 @@ public class ProcessConfigurationTest {
     final File tempFile =
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
-    final boolean debugValueSet = true;
+    final Level logLevel = Level.FINER;
     final boolean fileSetToBeAutoDeleted = true;
     final ProcessConfiguration configuration =
         new ProcessConfiguration(
-            interpreter,
-            command,
-            new File("a:\\"),
-            tempFile,
-            fileSetToBeAutoDeleted,
-            debugValueSet);
+            interpreter, command, new File("a:\\"), tempFile, fileSetToBeAutoDeleted, logLevel);
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -122,9 +116,8 @@ public class ProcessConfigurationTest {
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     final boolean fileSetToBeAutoDeleted = true;
-    final boolean debugValueSet = true;
-    final ProcessConfiguration configuration =
-        new ProcessConfiguration(
-            interpreter, command, tempFile, tempFile, fileSetToBeAutoDeleted, debugValueSet);
+    final Level logLevel = Level.FINEST;
+    new ProcessConfiguration(
+        interpreter, command, tempFile, tempFile, fileSetToBeAutoDeleted, logLevel);
   }
 }

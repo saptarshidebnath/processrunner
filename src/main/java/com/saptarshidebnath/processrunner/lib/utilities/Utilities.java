@@ -6,12 +6,16 @@ import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
 public class Utilities {
-  private static final Logger logger = Logger.getLogger(Utilities.class.getCanonicalName());
+
   /** Hidden Constructor. */
   private Utilities() {}
 
@@ -24,34 +28,30 @@ public class Utilities {
       final File targetFile,
       final OutputSourceType outputSourceType)
       throws ProcessException {
-
+    final Logger logger = Logger.getLogger(Utilities.class.getCanonicalName());
+    logger.setLevel(configuration.getLogLevel());
     try (final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
         final PrintWriter printWriter =
             new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()))) {
       final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
           new ReadJsonArrayFromFile<>(configuration.getMasterLogFile());
-      if (configuration.isDebug()) {
-        logger.info(
-            "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
-      }
+      logger.info(
+          "Writing " + outputSourceType.toString() + " to : " + targetFile.getCanonicalPath());
       OutputRecord outputRecord;
       do {
         outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
         final String currentOutputLine;
         if (outputRecord != null && outputRecord.getOutputSourceType() == outputSourceType) {
           currentOutputLine = outputRecord.getOutputText();
-          if (configuration.isDebug()) {
-            logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
-          }
+
+          logger.info(outputSourceType.toString() + " >> " + currentOutputLine);
           printWriter.println(currentOutputLine);
         }
       } while (outputRecord != null);
-      if (configuration.isDebug()) {
-        logger.info(
-            outputSourceType.toString()
-                + " written completely to : "
-                + targetFile.getCanonicalPath());
-      }
+      logger.info(
+          outputSourceType.toString()
+              + " written completely to : "
+              + targetFile.getCanonicalPath());
     } catch (final Exception e) {
       throw new ProcessException(e);
     }

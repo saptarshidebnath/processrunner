@@ -16,22 +16,19 @@ class OutputImpl implements Output {
   OutputImpl(final ProcessConfiguration configuration, final int returnCode) {
     this.configuration = configuration;
     this.logger = Logger.getLogger(this.getClass().getCanonicalName());
+    this.logger.setLevel(this.configuration.getLogLevel());
     this.returnCode = returnCode;
   }
 
   @Override
   public File saveSysOut(final File sysOut) throws ProcessException {
-    if (this.configuration.isDebug()) {
-      this.logger.info("Saving sys out to " + sysOut.getAbsolutePath());
-    }
+    this.logger.info("Saving sys out to " + sysOut.getAbsolutePath());
     return Utilities.writeLog(this.configuration, sysOut, OutputSourceType.SYSOUT);
   }
 
   @Override
   public File saveSysError(final File sysError) throws ProcessException {
-    if (this.configuration.isDebug()) {
-      this.logger.info("Saving sys error to : " + sysError.getAbsolutePath());
-    }
+    this.logger.info("Saving sys error to : " + sysError.getAbsolutePath());
     return Utilities.writeLog(this.configuration, sysError, OutputSourceType.SYSERROR);
   }
 
@@ -44,9 +41,7 @@ class OutputImpl implements Output {
   public boolean searchMasterLog(final String regex) throws ProcessException {
     boolean isMatching = false;
     try {
-      if (this.configuration.isDebug()) {
-        this.logger.info("Searching for regular expression :" + regex);
-      }
+      this.logger.info("Searching for regular expression :" + regex);
       final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
           new ReadJsonArrayFromFile<>(this.getMasterLog());
       OutputRecord outputRecord;
@@ -56,12 +51,10 @@ class OutputImpl implements Output {
           isMatching = outputRecord.getOutputText().matches(regex);
         }
       } while (outputRecord != null && !isMatching);
-      if (this.configuration.isDebug()) {
-        if (isMatching) {
-          this.logger.info("Regex \'" + regex + "\" is found");
-        } else {
-          this.logger.info("Regex \'" + regex + "\" NOT found");
-        }
+      if (isMatching) {
+        this.logger.info("Regex \'" + regex + "\" is found");
+      } else {
+        this.logger.info("Regex \'" + regex + "\" NOT found");
       }
       readJsonArrayFromFile.closeJsonReader();
     } catch (final Exception ex) {

@@ -13,7 +13,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,13 +39,12 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @throws IOException if Unable to work with the log files
    */
   ProcessRunnerImpl(final ProcessConfiguration configuration) throws IOException {
+    this.logger.setLevel(configuration.getLogLevel());
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
     this.jsonArrayToOutputStream =
         new WriteJsonArrayToFile<>(this.configuration.getMasterLogFile());
-    if (this.configuration.isDebug()) {
-      this.logger.log(Level.INFO, "Process Runner created");
-    }
+    this.logger.log(Level.INFO, "Process Runner created");
   }
 
   /**
@@ -56,43 +59,31 @@ class ProcessRunnerImpl implements ProcessRunner {
   public Output run() throws ProcessException {
     final Output output;
     try {
-      if (this.configuration.isDebug()) {
-        this.logger.info("Starting process");
-      }
+      this.logger.info("Starting process");
       final StringBuilder commandToExecute = new StringBuilder();
       commandToExecute
           .append(this.configuration.getCommandRunnerInterPreter())
           .append(Constants.SPACE)
           .append(this.configuration.getCommand());
-      if (this.configuration.isDebug()) {
-        this.logger.info("Executing command : " + commandToExecute.toString());
-      }
+      this.logger.info("Executing command : " + commandToExecute.toString());
       final Process currentProcess =
           this.runTime.exec(
               commandToExecute.toString(), null, this.configuration.getCurrentDirectory());
-      if (this.configuration.isDebug()) {
-        this.logger.info("Capturing logs");
-      }
+      this.logger.info("Capturing logs");
       this.jsonArrayToOutputStream.startJsonObject();
       final ExecutorService executor = Executors.newFixedThreadPool(2);
       executor.execute(this.writeLogs(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
       executor.execute(this.writeLogs(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
       executor.shutdown();
-      if (this.configuration.isDebug()) {
-        this.logger.info("Waiting for the log streams to shutdown");
-      }
+      this.logger.info("Waiting for the log streams to shutdown");
       executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-      if (this.configuration.isDebug()) {
-        this.logger.info("Waiting for the process to terminate");
-      }
+      this.logger.info("Waiting for the process to terminate");
       currentProcess.waitFor();
       this.jsonArrayToOutputStream.endJsonObjectWrite();
       this.jsonArrayToOutputStream.cleanup();
       final int processExitValue = currentProcess.exitValue();
       output = OutputFactory.createOutput(this.configuration, processExitValue);
-      if (this.configuration.isDebug()) {
-        this.logger.info("Process exited with exit value : " + processExitValue);
-      }
+      this.logger.info("Process exited with exit value : " + processExitValue);
     } catch (final Exception ex) {
       throw new ProcessException(ex);
     }
@@ -157,9 +148,7 @@ class ProcessRunnerImpl implements ProcessRunner {
       final Scanner scanner = new Scanner(inputStreamToWrite);
       while (scanner.hasNext()) {
         final String currentLine = scanner.nextLine();
-        if (this.configuration.isDebug()) {
-          this.logger.info(outputSourceType.toString() + " >> " + currentLine);
-        }
+        this.logger.info(outputSourceType.toString() + " >> " + currentLine);
         ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
             new OutputRecord(outputSourceType, currentLine));
       }

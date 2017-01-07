@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -53,29 +54,28 @@ public class ProcessRunnerImplFactoryTest {
   @Test
   public void startProcess() throws ProcessException {
     final Output response =
-        ProcessRunnerFactory.startProcess(getDefaultInterpreter(), getInterPreterVersion(), true);
+        ProcessRunnerFactory.startProcess(
+            getDefaultInterpreter(), getInterPreterVersion(), Level.ALL);
     assertThat("Validating process runner for simple process : ", response.getReturnCode(), is(0));
   }
 
   @Test(expected = ProcessException.class)
   public void startProcessWithWrongParmeters() throws ProcessException {
-    ProcessRunnerFactory.startProcess("", getInterPreterVersion(), false);
+    ProcessRunnerFactory.startProcess("", getInterPreterVersion(), Level.OFF);
   }
 
   @Test(expected = ProcessException.class)
   public void getProcessWithLessParamsWrongParamets() throws ProcessException {
-    final ProcessRunner processRunner =
-        ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(), "", Constants.DEFAULT_CURRENT_DIR, false);
+    ProcessRunnerFactory.getProcess(
+        getDefaultInterpreter(), "", Constants.DEFAULT_CURRENT_DIR, Level.OFF);
   }
 
   @Test(expected = ProcessException.class)
   public void getProcessMoreParamWrongParamets() throws ProcessException, IOException {
     final File tempFile = File.createTempFile("temp-file-name", ".json");
     tempFile.deleteOnExit();
-    final ProcessRunner processRunner =
-        ProcessRunnerFactory.getProcess(
-            "", getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, tempFile, false, false);
+    ProcessRunnerFactory.getProcess(
+        "", getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, tempFile, false, Level.ALL);
   }
 
   @Test
@@ -90,7 +90,7 @@ public class ProcessRunnerImplFactoryTest {
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
             true,
-            true);
+            Level.ALL);
     final Output response = ProcessRunnerFactory.startProcess(configuration);
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
   }
@@ -102,7 +102,10 @@ public class ProcessRunnerImplFactoryTest {
 
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, false);
+            getDefaultInterpreter(),
+            getInterPreterVersion(),
+            Constants.DEFAULT_CURRENT_DIR,
+            Level.SEVERE);
 
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
@@ -127,7 +130,10 @@ public class ProcessRunnerImplFactoryTest {
 
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, false);
+            getDefaultInterpreter(),
+            getInterPreterVersion(),
+            Constants.DEFAULT_CURRENT_DIR,
+            Level.SEVERE);
 
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
@@ -137,22 +143,6 @@ public class ProcessRunnerImplFactoryTest {
         response.searchMasterLog("Saptarshi"),
         is(false));
   }
-  /*
-  @Test(expected = ProcessException.class)
-  public void searchContentBeforeRunningProcess()
-      throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
-          InterruptedException {
-
-    final ProcessRunner processRunner =
-        ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR);
-    final Output response = processRunner.run();
-
-    assertThat(
-        "Validating searchMasterLog result for content in the output in UNIX : ",
-        response.searchMasterLog("Saptarshi"),
-        is(false));
-  }*/
 
   @Test
   public void startThreadedProcessWithProcessConfig()
@@ -167,7 +157,7 @@ public class ProcessRunnerImplFactoryTest {
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
             true,
-            false);
+            Level.SEVERE);
     final Future<Output> response = ProcessRunnerFactory.startProcess(configuration, true);
     assertThat("Validating process return code : ", response.get().getReturnCode(), is(0));
   }
@@ -185,7 +175,7 @@ public class ProcessRunnerImplFactoryTest {
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
             true,
-            false);
+            Level.SEVERE);
     ProcessRunnerFactory.startProcess(configuration);
   }
 
@@ -202,7 +192,7 @@ public class ProcessRunnerImplFactoryTest {
             Constants.DEFAULT_CURRENT_DIR,
             tempFile,
             true,
-            false);
+            Level.SEVERE);
     ProcessRunnerFactory.startProcess(configuration, true);
   }
 
@@ -210,7 +200,10 @@ public class ProcessRunnerImplFactoryTest {
   public void getProcessLessDetailed() throws IOException, ProcessException, InterruptedException {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(), getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, false);
+            getDefaultInterpreter(),
+            getInterPreterVersion(),
+            Constants.DEFAULT_CURRENT_DIR,
+            Level.SEVERE);
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
     final File masterLog = response.getMasterLog();
@@ -279,7 +272,7 @@ public class ProcessRunnerImplFactoryTest {
             Constants.DEFAULT_CURRENT_DIR,
             File.createTempFile("temp-file-name", ".json"),
             false,
-            false);
+            Level.SEVERE);
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
     final File masterLog = response.getMasterLog();
@@ -321,7 +314,7 @@ public class ProcessRunnerImplFactoryTest {
                       + "batch"),
               tempFile,
               true,
-              false);
+              Level.SEVERE);
     } else if (SystemUtils.IS_OS_LINUX) {
       processRunner =
           ProcessRunnerFactory.getProcess(
@@ -339,7 +332,7 @@ public class ProcessRunnerImplFactoryTest {
                       + "shell"),
               tempFile,
               true,
-              false);
+              Level.SEVERE);
     }
 
     final Output response = processRunner.run();
@@ -386,7 +379,7 @@ public class ProcessRunnerImplFactoryTest {
                       + "batch"),
               tempFile,
               true,
-              false);
+              Level.SEVERE);
     } else if (SystemUtils.IS_OS_LINUX) {
       processRunner =
           ProcessRunnerFactory.getProcess(
@@ -404,7 +397,7 @@ public class ProcessRunnerImplFactoryTest {
                       + "shell"),
               tempFile,
               true,
-              false);
+              Level.SEVERE);
     }
 
     final Output response = processRunner.run();
