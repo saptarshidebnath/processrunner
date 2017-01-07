@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Utilities {
@@ -35,23 +36,28 @@ public class Utilities {
             new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()))) {
       final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
           new ReadJsonArrayFromFile<>(configuration.getMasterLogFile());
-      logger.info(
-          String.format(
-              "Writing %s to : %s", outputSourceType.toString(), targetFile.getCanonicalPath()));
+      logger.log(
+          Level.INFO,
+          "Writing {0} to : {1}",
+          new Object[] {outputSourceType.toString(), targetFile.getCanonicalPath()});
       OutputRecord outputRecord;
       do {
         outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
         final String currentOutputLine;
         if (outputRecord != null && outputRecord.getOutputSourceType() == outputSourceType) {
           currentOutputLine = outputRecord.getOutputText();
-          logger.info(String.format("%s >> %s", outputSourceType.toString(), currentOutputLine));
+          logger.log(
+              Level.INFO,
+              "{0} >> {1}",
+              new Object[] {outputSourceType.toString(), currentOutputLine});
           printWriter.println(currentOutputLine);
         }
       } while (outputRecord != null);
-      logger.info(
-          String.format(
-              "%s written completely to : %s",
-              outputSourceType.toString(), targetFile.getCanonicalPath()));
+
+      logger.log(
+          Level.INFO,
+          "{0} written completely to : {1}",
+          new Object[] {outputSourceType.toString(), targetFile.getCanonicalPath()});
     } catch (final Exception e) {
       throw new ProcessException(e);
     }

@@ -142,14 +142,15 @@ class ProcessRunnerImpl implements ProcessRunner {
     try {
       this.logger.log(
           Level.INFO,
-          String.format(
-              "Writing %s as jsonObject to %s",
-              outputSourceType.toString(),
-              this.configuration.getMasterLogFile().getCanonicalPath()));
+          "Writing {0} as jsonObject to {1}",
+          new Object[] {
+            outputSourceType.toString(), this.configuration.getMasterLogFile().getCanonicalPath()
+          });
       final Scanner scanner = new Scanner(inputStreamToWrite);
       while (scanner.hasNext()) {
         final String currentLine = scanner.nextLine();
-        this.logger.info(String.format("%s >> %s", outputSourceType.toString(), currentLine));
+        this.logger.log(
+            Level.INFO, "{0} >> {1}", new Object[] {outputSourceType.toString(), currentLine});
         ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
             new OutputRecord(outputSourceType, currentLine));
       }
