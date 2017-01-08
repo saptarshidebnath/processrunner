@@ -72,7 +72,8 @@ public class ProcessRunnerImplFactoryTest {
 
   @Test(expected = ProcessException.class)
   public void getProcessMoreParamWrongParamets() throws ProcessException, IOException {
-    final File tempFile = File.createTempFile("temp-file-name", ".json");
+    final File tempFile =
+        File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     ProcessRunnerFactory.getProcess(
         "", getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, tempFile, false, Level.ALL);
@@ -81,7 +82,8 @@ public class ProcessRunnerImplFactoryTest {
   @Test
   public void startProcessWithProcessConfig()
       throws ProcessException, IOException, ProcessConfigurationException {
-    final File tempFile = File.createTempFile("temp", ".json");
+    final File tempFile =
+        File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     final ProcessConfiguration configuration =
         new ProcessConfiguration(
@@ -148,7 +150,8 @@ public class ProcessRunnerImplFactoryTest {
   public void startThreadedProcessWithProcessConfig()
       throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
           InterruptedException {
-    final File tempFile = File.createTempFile("temp", ".json");
+    final File tempFile =
+        File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     final ProcessConfiguration configuration =
         new ProcessConfiguration(
@@ -165,7 +168,8 @@ public class ProcessRunnerImplFactoryTest {
   @Test(expected = ProcessException.class)
   public void startProcessWithProcessConfigWithWrongParams()
       throws ProcessException, IOException, ProcessConfigurationException {
-    final File tempFile = File.createTempFile("temp", ".json");
+    final File tempFile =
+        File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.setReadOnly();
     tempFile.deleteOnExit();
     final ProcessConfiguration configuration =
@@ -182,7 +186,8 @@ public class ProcessRunnerImplFactoryTest {
   @Test(expected = ProcessException.class)
   public void startThreadedProcessWithProcessConfigWithWrongParams()
       throws ProcessException, IOException, ProcessConfigurationException {
-    final File tempFile = File.createTempFile("temp", ".json");
+    final File tempFile =
+        File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.setReadOnly();
     tempFile.deleteOnExit();
     final ProcessConfiguration configuration =
@@ -270,7 +275,7 @@ public class ProcessRunnerImplFactoryTest {
             getDefaultInterpreter(),
             getInterPreterVersion(),
             Constants.DEFAULT_CURRENT_DIR,
-            File.createTempFile("temp-file-name", ".json"),
+            File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON),
             false,
             Level.SEVERE);
     final Output response = processRunner.run();
@@ -291,10 +296,33 @@ public class ProcessRunnerImplFactoryTest {
     masterLog.delete();
   }
 
+  @Test(expected = ProcessException.class)
+  public void validateUtilitiesClassWriteLogHandlesFileExceptionProperlyOrNot()
+      throws IOException, ProcessException, InterruptedException {
+    final ProcessRunner processRunner =
+        ProcessRunnerFactory.getProcess(
+            getDefaultInterpreter(),
+            getInterPreterVersion(),
+            Constants.DEFAULT_CURRENT_DIR,
+            File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON),
+            false,
+            Level.SEVERE);
+    final Output response = processRunner.run();
+
+    final File sysout =
+        response.saveSysOut(
+            File.createTempFile(
+                Constants.FILE_PREFIX_NAME_LOG_DUMP + "-sysout", Constants.FILE_SUFFIX_JSON));
+    sysout.deleteOnExit();
+    sysout.setReadOnly();
+    response.saveSysOut(sysout);
+  }
+
   @Test
   public void testSaveSysOutAndSaveSysError()
       throws IOException, ProcessException, InterruptedException {
-    final File tempFile = File.createTempFile("temp-file-name", ".json");
+    final File tempFile =
+        File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     ProcessRunner processRunner = null;
     if (SystemUtils.IS_OS_WINDOWS) {
@@ -336,9 +364,15 @@ public class ProcessRunnerImplFactoryTest {
     }
 
     final Output response = processRunner.run();
-    final File sysout = response.saveSysOut(File.createTempFile("temp-file-sysout", ".json"));
+    final File sysout =
+        response.saveSysOut(
+            File.createTempFile(
+                Constants.FILE_PREFIX_NAME_LOG_DUMP + "-sysout", Constants.FILE_SUFFIX_JSON));
     sysout.deleteOnExit();
-    final File syserr = response.saveSysError(File.createTempFile("temp-file-syserr", ".json"));
+    final File syserr =
+        response.saveSysError(
+            File.createTempFile(
+                Constants.FILE_PREFIX_NAME_LOG_DUMP + "-syserr", Constants.FILE_SUFFIX_JSON));
     final File masterLog = response.getMasterLog();
     masterLog.deleteOnExit();
     syserr.deleteOnExit();
@@ -359,7 +393,8 @@ public class ProcessRunnerImplFactoryTest {
   @Test
   public void testScriptWithLargeOutput()
       throws IOException, ProcessException, InterruptedException {
-    final File tempFile = File.createTempFile("temp-file-name", ".json");
+    final File tempFile =
+        File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     ProcessRunner processRunner = null;
     if (SystemUtils.IS_OS_WINDOWS) {

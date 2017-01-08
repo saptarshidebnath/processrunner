@@ -1,7 +1,7 @@
 package com.saptarshidebnath.processrunner.lib.exception;
 
 /**
- * Custom exception denote that the {@link
+ * Custom {@link Exception} denote that the {@link
  * com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile } is not configured
  * correctly.
  */

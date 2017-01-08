@@ -3,7 +3,7 @@ package com.saptarshidebnath.processrunner.lib.exception;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
 /**
- * Blanket exception to be used by the {@link
+ * Blanket custom {@link Exception} to be used by the {@link
  * com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory} class and all public facing
  * methods for this ProcessRunner library. The Developer should be able to get the cause from the
  * {@link ProcessException#getCause()} detailing exactly what triggered the exception.

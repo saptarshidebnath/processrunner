@@ -1,7 +1,7 @@
 package com.saptarshidebnath.processrunner.lib.exception;
 
 /**
- * Custom exception denote that the {@link
+ * Custom {@link Exception} denote that the {@link
  * com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile } is not configured
  * correctly.
  */
@@ -17,9 +17,9 @@ public class JsonArrayReaderException extends Exception {
   }
 
   /**
-   * Create a {@link JsonArrayReaderException} with already existing exception.
+   * {@link JsonArrayReaderException} wrapper for already existing exception.
    *
-   * @param exception
+   * @param exception Consumes a object of {@link Exception}
    */
   public JsonArrayReaderException(final Exception exception) {
     super(exception);

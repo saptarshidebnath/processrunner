@@ -12,6 +12,8 @@ import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -155,10 +157,14 @@ class ProcessRunnerImpl implements ProcessRunner {
             new OutputRecord(outputSourceType, currentLine));
       }
     } catch (final Exception ex) {
+      final StringWriter sw = new StringWriter();
+      ex.printStackTrace(new PrintWriter(sw));
+      final String exceptionDetails = sw.toString();
       this.logger.log(
           Level.SEVERE,
-          "Unable to write data to " + this.configuration.getMasterLogFile().getAbsolutePath(),
-          ex);
+          "Unable to write data to {0}",
+          new Object[] {this.configuration.getMasterLogFile().getAbsolutePath()});
+      this.logger.log(Level.SEVERE, "{0}", new Object[] {sw.toString()});
     }
   }
 }

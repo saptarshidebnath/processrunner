@@ -23,13 +23,14 @@ class OutputImpl implements Output {
 
   @Override
   public File saveSysOut(final File sysOut) throws ProcessException {
-    this.logger.info("Saving sys out to " + sysOut.getAbsolutePath());
+    this.logger.log(Level.INFO, "Saving sys out to {0}", new Object[] {sysOut.getAbsolutePath()});
     return Utilities.writeLog(this.configuration, sysOut, OutputSourceType.SYSOUT);
   }
 
   @Override
   public File saveSysError(final File sysError) throws ProcessException {
-    this.logger.log(Level.INFO, "Saving sys error to : %s", sysError.getAbsolutePath());
+    this.logger.log(
+        Level.INFO, "Saving sys error to : {0}", new Object[] {sysError.getAbsolutePath()});
     return Utilities.writeLog(this.configuration, sysError, OutputSourceType.SYSERROR);
   }
 
@@ -42,7 +43,7 @@ class OutputImpl implements Output {
   public boolean searchMasterLog(final String regex) throws ProcessException {
     boolean isMatching = false;
     try {
-      this.logger.log(Level.INFO, "Searching for regular expression : %s", regex);
+      this.logger.log(Level.INFO, "Searching for regular expression : {0}", new Object[] {regex});
       final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
           new ReadJsonArrayFromFile<>(this.getMasterLog());
       OutputRecord outputRecord;
@@ -53,9 +54,9 @@ class OutputImpl implements Output {
         }
       } while (outputRecord != null && !isMatching);
       if (isMatching) {
-        this.logger.log(Level.INFO, "Regex %s is found", regex);
+        this.logger.log(Level.INFO, "Regex {0} is found", new Object[] {regex});
       } else {
-        this.logger.log(Level.WARNING, "Regex %s is NOT found", regex);
+        this.logger.log(Level.WARNING, "Regex {0} is NOT found", new Object[] {regex});
       }
       readJsonArrayFromFile.closeJsonReader();
     } catch (final Exception ex) {
