@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 
 /**
  * Write a json array to file one array element at a time. Class is type safe so that the array is
- * of single type only.
+ * of single object type only.
  *
  * @param <T> Type safe the writer for a particular JsonClass.
  */
@@ -24,10 +24,10 @@ public class WriteJsonArrayToFile<T> {
   private volatile Boolean firstElement = true;
 
   /**
-   * Constructor with the target file in mind.
+   * Constructor with the target {@link File} where the array needs to be written.
    *
-   * @param targetFile : {@link File} reference where the content is going to be saved
-   * @throws IOException When the target file could not be opened for the {@link File}
+   * @param targetFile : {@link File} reference where the content is going to be saved.
+   * @throws IOException When the target file could not be opened for the {@link File}.
    */
   public WriteJsonArrayToFile(final File targetFile) throws IOException {
     this.printWriter =
@@ -38,7 +38,7 @@ public class WriteJsonArrayToFile<T> {
   }
 
   /**
-   * This method doesn't modify the {@link File} configured in teh constructor. It just marks that
+   * This method doesn't modify the {@link File} configured in the constructor. It just marks that
    * the beginning of a object by a flag. Actual start will be written when the {@link
    * WriteJsonArrayToFile#writeJsonObject(Object)} is called.
    */
