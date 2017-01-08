@@ -1,3 +1,28 @@
+/*
+ *
+ * MIT License
+ *
+ * Copyright (c) [2016] [Saptarshi Debnath]
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.saptarshidebnath.processrunner.lib.jsonutils;
 
 import com.google.gson.Gson;
@@ -51,7 +76,8 @@ public class WriteJsonArrayToFile<T> {
    * any object to json {@link String}.
    *
    * @param object : Object of Type T to be written to the disk.
-   * @throws IOException an {@link IOException} if there is an error writing the object to the disk.
+   * @throws JsonArrayWriterException an {@link JsonArrayWriterException} if there is an error
+   *     writing the object to the disk.
    */
   public synchronized void writeJsonObject(final T object) throws JsonArrayWriterException {
     if (this.printWriter != null) {
@@ -65,21 +91,13 @@ public class WriteJsonArrayToFile<T> {
     }
   }
 
-  /**
-   * Ends the json object and actually writes the same to the disk.
-   *
-   * @throws IOException an {@link IOException} if there is an error writing the object to the disk.
-   */
+  /** Ends the json object and actually writes the same to the disk. */
   public synchronized void endJsonObjectWrite() {
     this.printWriter.write("]");
     this.printWriter.flush();
   }
 
-  /**
-   * Cleans up the Streams so that the lock on the {@link File} is released.
-   *
-   * @throws IOException an {@link IOException} if there is an error writing the object to the disk.
-   */
+  /** Cleans up the Streams so that the lock on the {@link File} is released. */
   public synchronized void cleanup() {
     if (this.printWriter != null) {
       this.printWriter.close();
