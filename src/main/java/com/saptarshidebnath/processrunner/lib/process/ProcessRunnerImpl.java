@@ -159,11 +159,11 @@ class ProcessRunnerImpl implements ProcessRunner {
     } catch (final Exception ex) {
       final StringWriter sw = new StringWriter();
       ex.printStackTrace(new PrintWriter(sw));
-      final String exceptionDetails = sw.toString();
       this.logger.log(
           Level.SEVERE,
           "Unable to write data to {0}",
           new Object[] {this.configuration.getMasterLogFile().getAbsolutePath()});
+      this.logger.log(Level.SEVERE, "Cause : {0}", ex);
       this.logger.log(Level.SEVERE, "{0}", new Object[] {sw.toString()});
     }
   }
