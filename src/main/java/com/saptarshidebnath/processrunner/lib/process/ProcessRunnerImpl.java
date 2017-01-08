@@ -23,6 +23,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.saptarshidebnath.processrunner.lib.utilities.Constants.LOGGER_THREAD_COUNT;
+import static com.saptarshidebnath.processrunner.lib.utilities.Constants.PROCESS_RUNNER_THREAD_GROUP;
+
 /**
  * Implementation of the {@link ProcessRunner} interface. Gives a solid body to the {@link
  * ProcessRunner}.
@@ -67,13 +70,20 @@ class ProcessRunnerImpl implements ProcessRunner {
           .append(this.configuration.getCommandRunnerInterPreter())
           .append(Constants.SPACE)
           .append(this.configuration.getCommand());
-      this.logger.log(Level.INFO, "Executing command : %s", commandToExecute.toString());
+      this.logger.log(Level.INFO, "Executing command : {0}", commandToExecute.toString());
       final Process currentProcess =
           this.runTime.exec(
               commandToExecute.toString(), null, this.configuration.getCurrentDirectory());
       this.logger.info("Capturing logs");
       this.jsonArrayToOutputStream.startJsonObject();
-      final ExecutorService executor = Executors.newFixedThreadPool(2);
+      final ExecutorService executor =
+          Executors.newFixedThreadPool(
+              LOGGER_THREAD_COUNT,
+              runnable ->
+                  new Thread(
+                      PROCESS_RUNNER_THREAD_GROUP,
+                      runnable,
+                      ProcessRunnerImpl.this.configuration.toString() + " >> log-handlers"));
       executor.execute(this.writeLogs(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
       executor.execute(this.writeLogs(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
       executor.shutdown();
@@ -85,7 +95,7 @@ class ProcessRunnerImpl implements ProcessRunner {
       this.jsonArrayToOutputStream.cleanup();
       final int processExitValue = currentProcess.exitValue();
       output = OutputFactory.createOutput(this.configuration, processExitValue);
-      this.logger.log(Level.INFO, "Process exited with exit value : %s", processExitValue);
+      this.logger.log(Level.INFO, "Process exited with exit value : {0}", processExitValue);
     } catch (final Exception ex) {
       throw new ProcessException(ex);
     }
@@ -100,7 +110,13 @@ class ProcessRunnerImpl implements ProcessRunner {
    */
   @Override
   public Future<Output> run(final boolean threadEnabledFlag) {
-    final ExecutorService executor = Executors.newSingleThreadExecutor();
+    final ExecutorService executor =
+        Executors.newSingleThreadExecutor(
+            runnable ->
+                new Thread(
+                    PROCESS_RUNNER_THREAD_GROUP,
+                    runnable,
+                    ProcessRunnerImpl.this.configuration.toString() + " >> process-runner"));
     final Callable<Output> callable = this::run;
     return executor.submit(callable);
   }

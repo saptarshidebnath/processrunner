@@ -20,10 +20,26 @@ public class Utilities {
   /** Hidden Constructor. */
   private Utilities() {}
 
+  /**
+   * Creates a temporary {@link File}.
+   *
+   * @return a reference to {@link File}
+   * @throws IOException if there are any issues creating the {@link File}
+   */
   public static File createTempLogDump() throws IOException {
     return File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
   }
 
+  /**
+   * Write a log content from the {@link ProcessConfiguration#masterLogFile} to new {@link File} as
+   * per provided {@link ProcessConfiguration} for a particular {@link OutputSourceType}.
+   *
+   * @param configuration accepts a {@link ProcessConfiguration}
+   * @param targetFile accepts a target {@link File}.
+   * @param outputSourceType Accepts the {@link OutputSourceType} which need to be printed only.
+   * @return a {@link File} reference to the newly written log {@link File}.
+   * @throws ProcessException in case of any exception.
+   */
   public static File writeLog(
       final ProcessConfiguration configuration,
       final File targetFile,

@@ -14,19 +14,18 @@ import static com.saptarshidebnath.processrunner.lib.utilities.Constants.FILE_PR
 
 /** Factory method to to run command or to get an instance of {@link ProcessRunner} */
 public class ProcessRunnerFactory {
-  /** Hidden constructor so that no body can create object of the same. */
+  /** Hidden constructor so that no body can create object of the class. */
   private ProcessRunnerFactory() {}
   /**
-   * Run a process synchronously and respond back with return code. Uses current directory as the
-   * working directory. Create temporary file for json log dump. Files are auto deleted after
-   * execution.
+   * Run a <strong>process synchronously</strong> and respond back with return a reference to {@link
+   * Output}. Uses current directory as the working directory. Create temporary file for json
+   * formatted master log. Master log File is auto deleted after execution.
    *
-   * @param commandInterPreter : Command Interpreter to be used
+   * @param commandInterPreter : Command Interpreter to be used.
    * @param command : command to be executed.
    * @param logLevel {@link Level} value setting for the minimum {@link Level} for printing debug
    *     message.
-   * @return the return code of the process. An {@link Integer} ranging from <strong>0 -
-   *     255</strong>
+   * @return a reference to {@link Output}
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
@@ -49,15 +48,17 @@ public class ProcessRunnerFactory {
   }
 
   /**
-   * Creates a process with bare basic parameters. Supplies default {@link File} for log dump. Auto
-   * deletion of file is set to false.
+   * Creates a process with bare basic parameters. Supplies default {@link File} for json formatted
+   * Master Log File. The Master log file is kept in the system and is upon the user to delete /
+   * move / keep the same. To get the details of the Master Log File please use {@link
+   * ProcessConfiguration#getMasterLogFile()}.
    *
-   * @param commandInterPreter : The command interpreter
-   * @param command : The command to be executed
-   * @param workingDirectory : The working doriector as a {@link File} object
+   * @param commandInterPreter : The command interpreter.
+   * @param command : The command to be executed.
+   * @param workingDirectory : The working doriector as a {@link File} object.
    * @param logLevel {@link Level} value setting for the minimum {@link Level} for printing debug
    *     message.
-   * @return a reference to the class {@link ProcessRunner} On which you can call {@link
+   * @return a reference to the class {@link ProcessRunner} on which you can call {@link
    *     ProcessRunner#run()} to trigger the Process in synchronous manner. You can also all {@link
    *     ProcessRunner#run(boolean)} to run the Process asynchronously. Please see java doc for
    *     {@link ProcessRunner#run(boolean)} for more details.
@@ -70,7 +71,6 @@ public class ProcessRunnerFactory {
       final File workingDirectory,
       final Level logLevel)
       throws ProcessException {
-
     final File outputLogJsonFile;
     try {
       outputLogJsonFile = Utilities.createTempLogDump();
@@ -92,12 +92,12 @@ public class ProcessRunnerFactory {
   }
 
   /**
-   * Creates a ProcessRunner with all the required parameters
+   * Creates a ProcessRunner with all the required parameters.
    *
    * @param commandRunnerInterPreter : {@link String} value with the command interpreter to be used
    *     example "/bin/bash"
    * @param command : {@link String} value for the process we are going to run. Can be a shell
-   *     script or a batch file also
+   *     script or a batch file also.
    * @param workingDirectory : {@link File} reference to the working directory from where it should
    *     be executing
    * @param logDump : {@link File} reference to the json log file where the logs will be stored.
@@ -136,10 +136,10 @@ public class ProcessRunnerFactory {
 
   /**
    * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
-   * ProcessConfiguration}.
+   * ProcessConfiguration}. The process is then <strong>triggered in a synchronously</strong>.
    *
-   * @param configuration Takes a valid {@link ProcessConfiguration} object
-   * @return the exit code of the process as an {@link Integer} value from 0 255
+   * @param configuration Takes a valid {@link ProcessConfiguration} object.
+   * @return a reference to {@link Output}
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
@@ -154,13 +154,13 @@ public class ProcessRunnerFactory {
 
   /**
    * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
-   * ProcessConfiguration}.
+   * ProcessConfiguration}. The process is then <strong>triggered asynchronously</strong>.
    *
    * @param configuration Takes a valid {@link ProcessConfiguration} object
    * @param enableThreadedApproach Takes a flag {@link Boolean} variable doesn't matter if it is a
    *     true or false
-   * @return a reference of {@link Future<Integer>} from where you can retrieve the Process's exitx`
-   *     value
+   * @return a reference of {@link Future<Output>} from where you can retrieve the {@link Output} of
+   *     the process.
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */

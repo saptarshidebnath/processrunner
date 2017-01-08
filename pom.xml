@@ -249,7 +249,7 @@
           <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
         </configuration>
       </plugin>
-      <!--<plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.4</version>
@@ -258,7 +258,7 @@
           <detectLinks>true</detectLinks>
           <nohelp>true</nohelp>
         </configuration>
-      </plugin>-->
+      </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>

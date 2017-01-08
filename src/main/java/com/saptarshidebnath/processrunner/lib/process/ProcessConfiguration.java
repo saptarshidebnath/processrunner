@@ -21,7 +21,7 @@ public class ProcessConfiguration {
   private final Level logLevel;
 
   /**
-   * Most detailed constructor to set the {@link ProcessConfiguration}.
+   * Constructor to set the configureation to be consumed by {@link ProcessRunner}.
    *
    * @param commandRunnerInterPreter : sets the {@link String} command interpreter like /bin/bash in
    *     unix
@@ -76,6 +76,12 @@ public class ProcessConfiguration {
     this.logger.info(currentConfiguration);
   }
 
+  /**
+   * Returns the {@link ProcessConfiguration} as {@link String}. This is mostly used for debug
+   * purposes.
+   *
+   * @return a {@link String}
+   */
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("ProcessConfiguration{");
@@ -89,26 +95,57 @@ public class ProcessConfiguration {
     return sb.toString();
   }
 
+  /**
+   * Getter for the current {@link Level} set for the configuration.
+   *
+   * @return the current {@link Level}
+   */
   public Level getLogLevel() {
     return this.logLevel;
   }
 
+  /**
+   * Getter for flag if {@link ProcessConfiguration#getMasterLogFile()} is going to auto deleted or
+   * not.
+   *
+   * @return a {@link Boolean} value depicting the same.
+   */
   boolean getAutoDeleteFileOnExit() {
     return this.autoDeleteFileOnExit;
   }
 
+  /**
+   * A {@link File} reference for the masterLogFile.
+   *
+   * @return a {@link File} reference where master logs need to be considered.
+   */
   public File getMasterLogFile() {
     return this.masterLogFile;
   }
 
+  /**
+   * Get the currently configured command interpreter.
+   *
+   * @return a {@link String} value.
+   */
   public String getCommandRunnerInterPreter() {
     return this.commandRunnerInterPreter;
   }
 
+  /**
+   * Get the command / process to be executed.
+   *
+   * @return a {@link String} value
+   */
   public String getCommand() {
     return this.command;
   }
 
+  /**
+   * Get the currently configured current directory.
+   *
+   * @return a {@link File} reference where the current working directory is.
+   */
   public File getCurrentDirectory() {
     return this.currentDirectory;
   }

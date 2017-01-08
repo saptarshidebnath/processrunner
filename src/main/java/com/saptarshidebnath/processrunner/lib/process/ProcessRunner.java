@@ -9,17 +9,18 @@ import java.util.concurrent.Future;
 public interface ProcessRunner {
 
   /**
-   * Triggers the process or command;
+   * Triggers the process or command.
    *
-   * @return the {@link Integer} exit code for the process
+   * @return the {@link Integer} exit code for the process.
    * @throws ProcessException Throws {@link ProcessException} to denote that there is an error. You
    *     can get the cause by {@link ProcessException#getCause()}
    */
   Output run() throws ProcessException;
 
   /**
-   * Runs the process as a {@link java.util.concurrent.Callable} thread. The method returns a {@link
-   * Future} reference from which the response of the method can be rtrived.
+   * Runs the process as a {@link java.util.concurrent.Callable} {@link Thread} with default
+   * priority. The method returns a {@link Future} reference from which the response of the method
+   * can be retrieved.
    *
    * @param threadEnabled The {@link Boolean} input is a flag input. The value of the passed
    *     parameter doesnt matter. The process will run thread enabled even if you pass {@link
