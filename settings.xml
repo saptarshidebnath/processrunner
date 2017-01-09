@@ -35,5 +35,9 @@
       <id>gpg.passphrase</id>
       <passphrase>{Ka2GRXl0wJYHfqH6Os9oZQaHckX19TtM+C8qLOeS6bU=}</passphrase>
     </server>
+    <server>
+      <id>github</id>
+      <password>{1rQBTUjdGUcHwrrYZ9/dinlWPv3KFafjW864/5mat37Kl2ya3YwREzhO0Ye3IWbulPCObMEyyXwVNX/nBoh5pQ==}</password>
+    </server>
   </servers>
 </settings>

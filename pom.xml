@@ -48,7 +48,7 @@
   <developers>
     <developer>
       <name>Saptarshi Debnath</name>
-      <email>saptarshi.devnath at gmail.com</email>
+      <email>saptarshi.devnath@gmail.com</email>
     </developer>
   </developers>
   <licenses>
@@ -96,6 +96,22 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>com.github.github</groupId>
+        <artifactId>site-maven-plugin</artifactId>
+        <version>0.12</version>
+        <configuration>
+          <message>Creating site for ${project.version}</message>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>site</phase>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -217,6 +233,7 @@
       <id>release</id>
       <build>
         <plugins>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
