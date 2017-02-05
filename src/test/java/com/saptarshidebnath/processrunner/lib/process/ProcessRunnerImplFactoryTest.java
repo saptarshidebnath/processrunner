@@ -34,8 +34,6 @@ import com.saptarshidebnath.processrunner.lib.output.Output;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import org.apache.commons.lang3.SystemUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -61,7 +59,7 @@ public class ProcessRunnerImplFactoryTest {
   private final Gson gson;
   private final int arryPosition;
 
-  {
+  public ProcessRunnerImplFactoryTest() {
     this.gson = new GsonBuilder().setPrettyPrinting().create();
     if (SystemUtils.IS_OS_WINDOWS) {
       this.arryPosition = 1;
@@ -69,12 +67,6 @@ public class ProcessRunnerImplFactoryTest {
       this.arryPosition = 0;
     }
   }
-
-  @Before
-  public void setUp() throws Exception {}
-
-  @After
-  public void tearDown() throws Exception {}
 
   @Test
   public void startProcess() throws ProcessException {

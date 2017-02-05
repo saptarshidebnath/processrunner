@@ -130,6 +130,10 @@ public class ProcessConfigurationTest {
     final ProcessConfiguration configuration =
         new ProcessConfiguration(
             interpreter, command, new File("a:\\"), tempFile, fileSetToBeAutoDeleted, logLevel);
+    //
+    // Un reachable step.
+    //
+    configuration.getMasterLogFile();
   }
 
   @Test(expected = ProcessConfigurationException.class)

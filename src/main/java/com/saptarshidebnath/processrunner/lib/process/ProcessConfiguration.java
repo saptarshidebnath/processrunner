@@ -135,7 +135,7 @@ public class ProcessConfiguration {
    *
    * @return a {@link Boolean} value depicting the same.
    */
-  boolean getAutoDeleteFileOnExit() {
+  public boolean getAutoDeleteFileOnExit() {
     return this.autoDeleteFileOnExit;
   }
 

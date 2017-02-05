@@ -53,7 +53,7 @@ public class ReadJsonArrayFromFileTest {
   private ReadJsonArrayFromFile<String> testObject;
   private File testFile;
 
-  {
+  public ReadJsonArrayFromFileTest() {
     this.dataArrayToWrite = new String[] {"1", "2", "3", "4", "5"};
     this.jsonContent = new GsonBuilder().create().toJson(this.dataArrayToWrite);
     this.logger = Logger.getLogger(this.getClass().getCanonicalName());
