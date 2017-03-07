@@ -1,0 +1,18 @@
+# <center>__${project.name}__</center>
+
+<center>__**${project.description}**__</center>
+
+
+[![Build Status](https://travis-ci.org/saptarshidebnath/processrunner.svg?branch=master)](https://travis-ci.org/saptarshidebnath/processrunner) [![codecov](https://codecov.io/gh/saptarshidebnath/processrunner/branch/master/graph/badge.svg)](https://codecov.io/gh/saptarshidebnath/processrunner) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.saptarshidebnath.utilities/ProcessRunner/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.saptarshidebnath.utilities/ProcessRunner) [![SonarQube Coverage](https://img.shields.io/sonar/http/sonar.qatools.ru/ru.yandex.qatools.allure:allure-core/coverage.svg)](https://sonarqube.com/dashboard?id=com.saptarshidebnath.utilities%3AProcessRunner) [![SonarQube Tech Debt](https://img.shields.io/sonar/http/sonar.qatools.ru/ru.yandex.qatools.allure:allure-core/tech_debt.svg)](https://sonarqube.com/dashboard?id=com.saptarshidebnath.utilities%3AProcessRunner)
+
+***Process Runner*** is java based library to **execute system process or scripts [shell scripts, batch file, python scripts, ruby scripts etc] from inside your java program**.
+
+**${project.name}** supports :
+   - Adhoc way to run a system process.
+   - Building up configuration for a process that will be executed later.
+   - The process can be executed in a serial fashion or in a multi threaded pattern depending upon the developer.
+   - Both Sysout and Syserror of the Process executed are stored in a json file as a master log file. After the execution is complete, the developer can extract only the sysout or the syserror as per his or her wish.
+   - Very low memory footprint as the output of the process is not stored in the memory but is directly dumped to a file.
+   - Supports basic line by line scanning of the output for a specific regular expression pattern. The searching option is very basic and in reality reads the whole output file line by line to search for a specific pattern.
+
+Please see the tutorial for added information on how to use the library.

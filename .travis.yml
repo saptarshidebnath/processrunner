@@ -1,20 +1,24 @@
 language: java
 jdk:
-- oraclejdk8
+  - oraclejdk8
 before_install:
-- mvn --version
+  - mvn --version
+#  - curl -sL https://github.com/jpm4j/jpm4j.installers/raw/master/dist/biz.aQute.jpm.run.jar >jpm4j.jar
+#  - java -jar jpm4j.jar -u init
+#  - ~/jpm/bin/jpm install com.codacy:codacy-coverage-reporter:assembly
 install:
-- mvn clean install -U -Dmaven.test.skip=test -B -V -q -T 2C -C
+  - mvn clean install -U -Dmaven.test.skip=test -B -V -q -T 2C -C
 addons:
   sonarqube:
     token:
       secure: OtoU8vQ44xScvoR43wL5Ziho1Lv3yVTx6uJDZNd6VTW1NDxBs0ou6I1gI6kPii6HMF44iHE72UbOs3q2FZ2btcHA2HF/R3bhX4ied/u4AtqYvseNWyrxmUJc8rcy4JOh8LcnywYgDFufTnxLIeMPimFc9EuSBVu4jP5pknFo0bKKv+rKuwRjOtwWZPyJLhv+Ow8dJVYs8sZkoL7xs6mD0w+3R2sq7oy3xPNuiWl66jgxum2914E3JkP6mRv2hCMlXvXLtnaxK8TkuxcDeurG4HOjhhWMAkfa7TuTVH0rWQ0ztCACzv4b3Lc0+ijtv39PwSJQP3eoO2ntfgsdCTCXrPcYvf29NgdhSqAIM3LJkDj66eNOTPvPNS4ov7J4OTrTR4Kk4N8mRZ0lI3p6GZA351LhhA1/WSHm8qXNRvbKtmEKU+gAov3IRICuWh4Ylw1/a8aGyKsIFEb4q5yw8bItidjRxfufLka97MwhQ6LcjIH+bi9cQMz5pxqjkxCuTVmMaoS6d32ufhM9i1UfW8opTIdAf0sdG+NjdAdSlbJTTC4gJYrM3gA+QeUyROYJUoTXCxrBA7H9XmdMx1wKyqz6Z16i637eimd7xoBgeqwSBZRG9OTI1UE4jABGRmGujORnW9fujsVFwfgPdgsr2KhZd74ZuM6qNwXCoDGtl6biFD4=
 script:
-- mvn test -e verify -B sonar:sonar
+  - mvn test -e verify -B sonar:sonar
 after_success:
-- bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash)
+#  - ~/jpm/bin/codacy-coverage-reporter -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
 os:
-- linux
+  - linux
 cache:
   directories:
   - "$HOME/.m2/repository"
@@ -22,4 +26,3 @@ cache:
 branches:
   only:
   - master
-  - rel

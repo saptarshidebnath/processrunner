@@ -1,0 +1,14 @@
+ <build>
+        <plugins>
+            <plugin>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>${project.artifactId}</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <releaseGoals>
+                        <releaseGoal>install</releaseGoal>
+                    </releaseGoals>
+                </configuration>
+            </plugin>
+        </plugins>
+ </build>
