@@ -1,7 +1,3 @@
----
-title: Process Runner, A Java based command and script runner.
-layout: post
----
 theme: jekyll-theme-cayman
 markdown: kramdown
 kramdown:
