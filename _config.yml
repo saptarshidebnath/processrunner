@@ -1,7 +1,4 @@
----
-layout: post
-title: Process Runner, a java based process and script runner.
----
+name: Process Runner, a java based process and script runner.
 theme: jekyll-theme-cayman
 markdown: kramdown
 kramdown:
