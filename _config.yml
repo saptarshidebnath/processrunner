@@ -1,7 +1,7 @@
 ---
 title: Process Runner, A Java based command and script runner.
 ---
-theme: jekyll-theme-cayman
+theme: jekyll-theme-slate
 markdown: kramdown
 kramdown:
   input: GFM # Enable GitHub Flavored Markdown (fenced code blocks)
