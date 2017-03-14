@@ -30,6 +30,10 @@ Voilla, you just ran a windows command uisng the command interface.
 
 ## Understanding ProcessRunner
 To understand processrunner, you need to understand working principles of the following classes :-
-1. [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java)
+1. [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java), a immutable class which represents the configuration to be used by (processrunner)[http://code.saptarshidebnath.com/processrunner/].
+1. [ProcessRunner](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java)
 1. [ProcessRunnerFactory](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunnerFactory.java)
 1. [Output](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/output/Output.java)
+
+1. ### [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) : The [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) class depicts the configuration which is used by the library to trigger a command or script.
+You don't need to create a [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) class instance. One is created for you when you use the Factory class [ProcessRunnerFactory](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunnerFactory.java). We are going to see more of [ProcessRunnerFactory](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunnerFactory.java) later.
