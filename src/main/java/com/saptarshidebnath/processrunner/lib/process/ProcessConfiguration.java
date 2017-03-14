@@ -70,7 +70,8 @@ public class ProcessConfiguration {
       final boolean autoDeleteFileOnExit,
       final Level logLevel)
       throws ProcessConfigurationException, IOException {
-
+    this.logLevel = logLevel;
+    this.logger.setLevel(logLevel);
     if (commandRunnerInterPreter.trim().length() == 0) {
       throw new ProcessConfigurationException(
           "Command Runner Interpreter is set '"
@@ -92,8 +93,6 @@ public class ProcessConfiguration {
     this.currentDirectory = currentDirectory;
     this.autoDeleteFileOnExit = autoDeleteFileOnExit;
     this.masterLogFile = masterLogFile;
-    this.logLevel = logLevel;
-    this.logger.setLevel(logLevel);
     if (this.autoDeleteFileOnExit) {
       this.masterLogFile.deleteOnExit();
     }
