@@ -7,4 +7,4 @@ kramdown:
 highlighter: rouge
 timezone: America/New_York
 google_analytics: UA-47766602-3
-exclude: README.md
+exclude: [README.md]
