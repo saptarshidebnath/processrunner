@@ -1,8 +1,7 @@
-## processrunner
 
 [![Build Status](https://travis-ci.org/saptarshidebnath/processrunner.svg?branch=master)](https://travis-ci.org/saptarshidebnath/processrunner) [![codecov](https://codecov.io/gh/saptarshidebnath/processrunner/branch/master/graph/badge.svg)](https://codecov.io/gh/saptarshidebnath/processrunner) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.saptarshidebnath.utilities/ProcessRunner/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.saptarshidebnath.utilities/ProcessRunner) [![SonarQube Coverage](https://img.shields.io/sonar/http/sonar.qatools.ru/ru.yandex.qatools.allure:allure-core/coverage.svg)](https://sonarqube.com/dashboard?id=com.saptarshidebnath.utilities%3AProcessRunner) [![SonarQube Tech Debt](https://img.shields.io/sonar/http/sonar.qatools.ru/ru.yandex.qatools.allure:allure-core/tech_debt.svg)](https://sonarqube.com/dashboard?id=com.saptarshidebnath.utilities%3AProcessRunner)
 
-***Process Runner*** is java based library using which one can **execute system process or scripts [shell scripts, batch file, python scripts, ruby scripts etc] from inside your java program**.
+***Process Runner*** is java based **thread enabled** library using which one can **execute system process or scripts [shell scripts, batch file, python scripts, ruby scripts etc] from inside your java program**.
 
 ## Mini Tutorial
 Using the library is very easy. You can **start executiing os commands / scripts in litterally a single line of code** as follows :
@@ -35,11 +34,11 @@ To understand processrunner, you need to understand working principles of the fo
 1. [ProcessRunner](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) : Runner interface.
 1. [Output](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/output/Output.java) : Results.
 
-## Please find the details as follows :-
+Please find the details as follows :-
 
-1. [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) : The [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) class depicts the configuration which is used by the library to trigger a command or script.
-[ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) class instance is consumed by the [ProcessRunnerFactory](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunnerFactory.java) to create a instance of [ProcessRunner](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) class. We are going to discuss about the details below.
-To create a [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) you can use the following example.
+1. [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) : The `ProcesConfiguration` class depicts the configuration which is used by the library to trigger a command or script.
+`ProcesConfiguration` class instance is consumed by the `ProcessRunnerFactory` to create a instance of `ProcessRunner` class. We are going to discuss about the details below.
+To create a `ProcesConfiguration` you can use the following example.
     
     ``` java
     import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
@@ -61,4 +60,111 @@ To create a [ProcesConfiguration](https://github.com/saptarshidebnath/processrun
     } catch (ProcessConfigurationException | IOException e) {
       e.printStackTrace();
     }
-    ``` 
+    ```
+1. [ProcessRunnerFactory](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/comThe/saptarshidebnath/processrunner/lib/process/ProcessRunnerFactory.java) : The factory is the generator class to create an instance of `ProcessRunner`. The `ProcessRunnerFactory` have multiple methods facilating different kind of scenarion. The `ProcessRunnerFactory` methods can be broadly classified in 2 overloaded types. Both of them are detailed below.
+    1. **ProcessRunnerFactory.startProcess(...)** : The idea behind these methods is to start a process or command immediately. Some uses re usable `ProcessConfiguration` class object and some just creates the configuration dynamically from the provided confiuration. Please find all the details about the methods below.
+        1. **Output ProcessRunnerFactory.startProcess(String, String, Level)** : This method is used for running a system command / script on a adhoc basis. This is the most basic implementation there is. 
+            * Runs in the same thread.
+            * Paramters are :-
+                1. Interpreter as `String`. Ex : python, bash, cmd.exe
+                1. Command or script file name with relative path as `String`. Ex : "echo My name is Saptarshi Debnath."
+                1. Minimum `Level` for ProcessRunner to start logging in console. Ex : Level.INFO.
+            * Returns a refernce to `OutPut` class.
+        
+            Please see the below code snippet for more details :-
+
+            ``` java
+            import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+            import com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory;
+
+            ...
+
+            try {
+                Output output = ProcessRunnerFactory.startProcess("cmd.exe /c", 
+                                                  "echo GNU is not unix", 
+                                                  Level.WARNING);
+            } catch (ProcessException e) {
+                e.printStackTrace();
+            }
+
+            ``` 
+        1. **Output ProcessRunnerFactory.startProcess(ProcessConfiguration)** : This method is suitable for starting a process with a pre configured `ProcessConfiguration` object.
+            * Runs in the same thread.
+            * Parameter is :-
+                1. configuration details as `ProcessConfiguration`
+            * Returns a refernce to `OutPut` class.
+
+            Please see the below code snippet for more details.
+
+            ``` java
+            import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
+            import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+            import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
+            import com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory;
+            import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+
+            ...
+
+            try {
+                //
+                // A ProcessConfiguration POJO is configured.
+                //
+                ProcessConfiguration processConfiguration =
+                      new ProcessConfiguration(
+                          "cmd.exe /c",
+                          "echo GNU is not unix",
+                          Constants.DEFAULT_CURRENT_DIR,
+                          File.createTempFile("temp-file", ".json"),
+                          false,
+                          Level.WARNING);
+
+                //
+                // ProcessConfiguration POJO is being passed to 
+                // ProcessRunnerFactory to start a process.
+                //
+
+                Output output = ProcessRunnerFactory.startProcess(processConfiguration);
+
+                } catch (ProcessConfigurationException | IOException | ProcessException e) {
+                  e.printStackTrace();
+                }
+
+            ```
+
+        1. **Future\<OutPut\> ProcessRunnerFactory.startProcess(ProcessConfiguration, boolean)** : This method is suitable for starting a process with a pre configured `ProcessConfiguration` in its own `Thread`. I am going to strongly advice, to use this particular method to trigger a process when you even suspect that process is going to be a long running one or is going to generate a ton of console outputs.
+            * ***Runs in a seperate thread***.
+            * Parameters are :-
+                1. configration details as `ProcessConfiguration`
+                1. `true` or `false` as a `boolean` flag. Doesn't matter if its `true` or `false`. Anything `boolean` or `Boolean` will do.
+            * Returns a refernce to `Future<OutPut>` class.
+
+
+            Please see the below code snippet for more details.
+            
+            ``` java
+            import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
+            import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+            import com.saptarshidebnath.processrunner.lib.output.Output;
+            import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
+            import com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory;
+            import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+
+            ...
+
+            try {
+                ProcessConfiguration processConfiguration =
+                    new ProcessConfiguration(
+                      "cmd.exe /c",
+                      "echo GNU is not unix",
+                      Constants.DEFAULT_CURRENT_DIR,
+                      File.createTempFile("temp-file", ".json"),
+                      false,
+                      Level.WARNING);
+                Future<Output> outputFuture = ProcessRunnerFactory.startProcess(processConfiguration,true);
+                Output outPut = outputFuture.get();
+            } catch (ProcessConfigurationException | IOException | ProcessException | InterruptedException | ExecutionExceptione) {
+              e.printStackTrace();
+            }
+            ```
+
+    1. `ProcessRunnerFactory.getProcess(...)` : creates 
