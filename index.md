@@ -28,7 +28,22 @@ Using the library is very easy. You can **start executiing os commands / scripts
 Voilla, you just ran a windows command uisng the command interface.
 
 ## Understanding ProcessRunner library
-To understand processrunner, you need to understand working principles of the following classes :-
+
+[processrunner](http://code.saptarshidebnath.com/processrunner/) is a java based library primarily available in [maven](https://maven.apache.org/). It should work correctly in Apache Builder, Apache Ivy, Groovy grape, Gradle/Grails, Scala SBT, Leiningen. Or if you choose to manually download the jar and put in the class path [You are kidding me right ? If not do check out maven and other great build and dependency management tools.] that will work too. I would recomend to use the JRE version 1.8 or higher.
+
+**Some of the features of the ProcessRunner library are:-**
+
+1. Written in java, so can be used by any JVM based languages.
+1. Both Sysout and Syserror are captured using seperate `Thread`s and immediately siphoned to the disk as a `JSON` file. Each and evey output from both the sources are timestamped and classified by their source when being dumped to the secondary storage. This result in low JVM memory overhead at the cost of relatively high disk activity. The aproach has been tested on scripts which generates hundereds of mega byte of log output on execution and it runs correctly.
+1. The process execution can be executed as part of the main `Thread` or in a seperate `Thread` just by passing a boolean variable.
+1. Have helper methods to:-
+    1. Seperate SYSOUT and SYSERROR
+    1. Search master log file for regular expression pattern.
+    1. Get master log file in json format.
+    1. Get reurn code.
+
+
+**To understand processrunner, you need to understand working principles of the following classes :-**
 1. [ProcesConfiguration](#process-configuration-details) : Configuration POJO.
 1. [ProcessRunnerFactory](#process-runner-factory-details) : Factory class for [ProcessRunner](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) instance creation.
 1. [ProcessRunner](#process-runner-details) : Runner interface.
