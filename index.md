@@ -135,7 +135,7 @@ To create a `ProcesConfiguration` you can use the following example.
             * ***Runs in a seperate thread***.
             * Parameters are :-
                 1. configration details as `ProcessConfiguration`
-                1. `true` or `false` as a `boolean` flag. Doesn't matter if its `true` or `false`. Anything `boolean` or `Boolean` will do.
+                1. `true` or `false` as a `boolean`. Doesn't matter if its `true` or `false`. Anything `boolean` or `Boolean` will do. It is just a marker for Thread based implementation.
             * Returns a refernce to `Future<OutPut>` class.
 
 
@@ -167,4 +167,75 @@ To create a `ProcesConfiguration` you can use the following example.
             }
             ```
 
-    1. `ProcessRunnerFactory.getProcess(...)` : creates 
+    1. `ProcessRunnerFactory.getProcess(...)` : There are 2 sets of methods whose primary goal is to create a `ProcessRunner` class instance. On the `ProcessRunner` instance the overloaded methods `ProcessRunner.run()` to start the process. Both of them are detailed below :-
+        1. **ProcessRunner ProcessRunnerFactory.getProcess(String, String, File, Level)** : This methods cretes a instance of `ProcessConfiguration` and instatiate a `ProcessRunner` instance with the same. The same `ProcessRunner` is returned from this method. The developer is supposed to start the oveloaded `ProcessRunner.run()` method to actually start the process.
+            * Doesn't start the process.
+            * Creates a master log file in the tempoarary directory.
+            * Parameters are :-
+                1. Command entrpreter as `String`.
+                1. Command / Script to run as `String`.
+                1. The working directory of the Script as `File`
+                1. Minimum `Log` `Level`
+            * Returns a reference to `ProcessRunner` interface.
+            * The log file is **not marked for auto deletion**. The user have to decide if he wants to delete or keep the file.
+
+            Please see the below code snippet for more details :-
+
+            ``` java
+            import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+            import com.saptarshidebnath.processrunner.lib.process.ProcessRunner;
+            import com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory;
+            import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+            
+            ...
+
+            try {
+              ProcessRunner processRunner =
+                  ProcessRunnerFactory.getProcess(
+                      "cmd.exe /c", "echo GNU is not unix.", Constants.DEFAULT_CURRENT_DIR, Level.INFO);
+             //
+             // Trigger the process that have been just configured.
+             //
+              Output output = processRunner.run();
+            } catch (ProcessException e) {
+              e.printStackTrace();
+            }
+            ```
+        1.  **ProcessRunner ProcessRunnerFactory.getProcess(String, String, File, File, Boolean, Level)** : This process is exactly similar to the above option, except you have much more choice to set where the log `File` should be set and if the master log file is going to be auto deleted on system exit.
+            * Doesn't start the process.
+            * Most detailed builder of `ProcessRunner`.
+            * Parameters are :-
+                1. Command entrpreter as `String`.
+                1. Command / Script to run as `String`.
+                1. The working directory of the Script as `File`.
+                1. Master log file location as `File`.
+                1. `true` or `false` as `Boolean` marker to denote if master log file is going to be auto deleted or not on jvm exit.
+                1. Minimum `Log` `Level`.
+            * Returns a reference of Future<Output>.
+
+            Please see the below code snippet for more details :-
+
+            ``` java
+            import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+            import com.saptarshidebnath.processrunner.lib.output.Output;
+            import com.saptarshidebnath.processrunner.lib.process.ProcessRunner;
+            import com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory;
+            import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+            
+            ...
+
+            try {
+              ProcessRunner processRunner =
+                  ProcessRunnerFactory.getProcess(
+                      "cmd.exe /c",
+                      "echo GNU is not unix",
+                      Constants.DEFAULT_CURRENT_DIR,
+                      File.createTempFile("master-log", ".json"),
+                      false,
+                      Level.WARNING);
+              Future<Output> outputFuture = processRunner.run(true);
+              Output output = outputFuture.get();
+            } catch (ProcessException | IOException | InterruptedException | ExecutionException e) {
+              e.printStackTrace();
+            }
+            ```
