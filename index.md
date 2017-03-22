@@ -29,14 +29,14 @@ Voilla, you just ran a windows command uisng the command interface.
 
 ## Understanding ProcessRunner library
 To understand processrunner, you need to understand working principles of the following classes :-
-1. [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) : Configuration POJO.
-1. [ProcessRunnerFactory](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunnerFactory.java) : Factory class for [ProcessRunner](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) instance creation.
-1. [ProcessRunner](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) : Runner interface.
-1. [Output](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/output/Output.java) : Results.
+1. [ProcesConfiguration](#process-configuration-details) : Configuration POJO.
+1. [ProcessRunnerFactory](#process-runner-factory-details) : Factory class for [ProcessRunner](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) instance creation.
+1. [ProcessRunner](#process-runner-details) : Runner interface.
+1. [Output](#output-details) : Results.
 
 Please find the details as follows :-
 
-1. [ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) : The `ProcesConfiguration` class depicts the configuration which is used by the library to trigger a command or script.
+1. <a name="process-configuration-details"></a>[ProcesConfiguration](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessConfiguration.java) : The `ProcesConfiguration` class depicts the configuration which is used by the library to trigger a command or script.
 `ProcesConfiguration` class instance is consumed by the `ProcessRunnerFactory` to create a instance of `ProcessRunner` class. We are going to discuss about the details below.
 To create a `ProcesConfiguration` you can use the following example.
     
@@ -61,7 +61,9 @@ To create a `ProcesConfiguration` you can use the following example.
       e.printStackTrace();
     }
     ```
-1. [ProcessRunnerFactory](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/comThe/saptarshidebnath/processrunner/lib/process/ProcessRunnerFactory.java) : The factory is the generator class to create an instance of `ProcessRunner`. The `ProcessRunnerFactory` have multiple methods facilating different kind of scenarion. The `ProcessRunnerFactory` methods can be broadly classified in 2 overloaded types. Both of them are detailed below.
+
+
+1. <a name="process-runner-factory-details"></a>[ProcessRunnerFactory](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/comThe/saptarshidebnath/processrunner/lib/process/ProcessRunnerFactory.java) : The factory is the generator class to create an instance of `ProcessRunner`. The `ProcessRunnerFactory` have multiple methods facilating different kind of scenarion. The `ProcessRunnerFactory` methods can be broadly classified in 2 overloaded types. Both of them are detailed below.
     1. **ProcessRunnerFactory.startProcess(...)** : The idea behind these methods is to start a process or command immediately. Some uses re usable `ProcessConfiguration` class object and some just creates the configuration dynamically from the provided confiuration. Please find all the details about the methods below.
         1. **Output ProcessRunnerFactory.startProcess(String, String, Level)** : This method is used for running a system command / script on a adhoc basis. This is the most basic implementation there is. 
             * Runs in the same thread.
@@ -178,7 +180,8 @@ To create a `ProcesConfiguration` you can use the following example.
                 1. Minimum `Log` `Level`
             * Returns a reference to `ProcessRunner` interface.
             * The log file is **not marked for auto deletion**. The user have to decide if he wants to delete or keep the file.
-
+            <a name="code-process-runner-samethread"></a>
+            
             Please see the below code snippet for more details :-
 
             ``` java
@@ -212,6 +215,7 @@ To create a `ProcesConfiguration` you can use the following example.
                 1. `true` or `false` as `Boolean` marker to denote if master log file is going to be auto deleted or not on jvm exit.
                 1. Minimum `Log` `Level`.
             * Returns a reference of Future<Output>.
+            <a name="code-process-runner-diff-thread"></a>
 
             Please see the below code snippet for more details :-
 
@@ -239,3 +243,75 @@ To create a `ProcesConfiguration` you can use the following example.
               e.printStackTrace();
             }
             ```
+
+1. <a name="process-runner-details"></a>[ProcessRunner](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/process/ProcessRunner.java) : The `ProcessRunner` is a interface which provides the guide line for running the process or script. You will see the `ProcessRunner` instance when you use the overloaded `ProcessRunnerFactory.getProcess(...)` methods. The overloaded method `ProcessRunnerFactory.startProcess(...)` internally uses the method to start the process. The 2 primary method of the `ProcessRunner` class are as follows :-
+    1. **Output ProcessRunner.run()** : This is one of the 2 methods. It starts the execution in same thread.
+        * It runs in the same thread.
+        * Returns a reference to the `Output` class.
+        * No input is neccessary, it pulls the configuration from the already provided `ProcessConfiguration`.
+        For implementation details please [checkout documents form ProcessRunnerFactory here](#code-process-runner-samethread).
+
+    1. **Future\<Output\> run(boolean)** : It is almost similar to the other method. Only this method runs in a seperate thread.
+        * Runs in a seperate thread.
+        * Returns a reference to the `Future<Output>` class.
+        * No input is neccessary, it pulls the configuration from the already provided `ProcessConfiguration`.
+        For implementation details please [checkout documents form ProcessRunnerFactory here](#code-process-runner-diff-thread).
+
+1. <a name="output-details"></a> [Output](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/output/Output.java) : The `Output` is an interface, whose sole job is to return values regarding the process execution. The `Output` instance is only available after the process have executed successfully. *As of now, the console outputs are not streamed LIVE*. The methods available in the `Output` class are :-
+    * **File Output.getMasterLog()** : Returns a `File` reference to the Master Log file. The master log file is a json file as an array of the json implementation of the class [OutputRecord](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/output/OutputRecord.java).
+    
+        ``` javascript
+        [
+            {
+                "timeStamp" : interger,
+                "outputSourceType" : "SYSOUT/SYSERR"
+                "outputText" : "String"
+            }
+        ]
+        ```
+
+       Please refer [OutputRecord](https://github.com/saptarshidebnath/processrunner/blob/master/src/main/java/com/saptarshidebnath/processrunner/lib/output/OutputRecord.java) foor more details on the json structure.
+
+    * **int Output.getReturnCode()** : Returns the exit code of the process / script that was just ran. Please note that if a set of command is executed, the exit code returned will be that of the last command only.
+
+    * **File Output.saveSysError(File) / File Output.saveSysOut(File)** : These 2 functions extracts the sysout and syserror from the master log file and creates a new `File` with the target `File` reference provided. This function reads the master log file and picks correct output depending upon the source. This is an IO intensive operation.
+
+    * **boolean Output.searchMasterLog(String regex)** : This is a very basic implemtnation of a searching `String` regular expression in the output. It reads and checks for a match of the regular expression line by line. The method returns true after finding the first match.
+
+    **A implemnation example for `Output` class is as follows** :-
+
+    ``` java
+    import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+    import com.saptarshidebnath.processrunner.lib.output.Output;
+    import com.saptarshidebnath.processrunner.lib.process.ProcessRunner;
+    import com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory;
+    import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+    import java.io.File;
+    import java.io.IOException;
+    import java.util.concurrent.ExecutionException;
+    import java.util.concurrent.Future;
+    import java.util.logging.Level;
+    
+    ...
+
+    try {
+          ProcessRunner processRunner =
+              ProcessRunnerFactory.getProcess(
+                  "cmd.exe /c",
+                  "echo GNU is not unix",
+                  Constants.DEFAULT_CURRENT_DIR,
+                  File.createTempFile("master-log", ".json"),
+                  false,
+                  Level.WARNING);
+          Future<Output> outputFuture = processRunner.run(true);
+          Output output = outputFuture.get();
+          File masterLog = output.getMasterLog();
+          File sysout = output.saveSysOut(File.createTempFile("sysout",".txt"));
+          File syserr = output.saveSysError(File.createTempFile("syserror",".txt"));
+          int returnCode = output.getReturnCode();
+          boolean isSaptarshiPresent = output.searchMasterLog(".*Saptarshi.*");
+
+    } catch (ProcessException | IOException | InterruptedException | ExecutionException e) {
+          e.printStackTrace();
+    }
+    ```
