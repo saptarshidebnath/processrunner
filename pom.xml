@@ -33,13 +33,16 @@
   <packaging>jar</packaging>
 
   <name>ProcessRunner</name>
-  <url>https://github.com/saptarshidebnath/processrunner</url>
+  <url>http://code.saptarshidebnath.com/processrunner/</url>
   <scm>
     <url>https://github.com/saptarshidebnath/processrunner</url>
     <connection>scm:git:git@github.com:saptarshidebnath/processrunner.git</connection>
   </scm>
   <description>A java based library to trigger system processes or commands</description>
   <inceptionYear>2016</inceptionYear>
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/danielflower/multi-module-maven-release-plugin/issues</url>
@@ -51,6 +54,7 @@
   <developers>
     <developer>
       <name>Saptarshi Debnath</name>
+      <url>http://saptarshidebnath.com</url>
       <email>saptarshi.devnath@gmail.com</email>
       <timezone>-5</timezone>
       <roles>
