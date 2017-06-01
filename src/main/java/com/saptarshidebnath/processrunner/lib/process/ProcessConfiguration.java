@@ -29,6 +29,7 @@ import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationExce
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +45,7 @@ public class ProcessConfiguration {
   private final boolean autoDeleteFileOnExit;
   private final Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
   private final Level logLevel;
+  private final PrintStream printStream;
 
   /**
    * Constructor to set the configureation to be consumed by {@link ProcessRunner}.
@@ -69,6 +71,44 @@ public class ProcessConfiguration {
       final File masterLogFile,
       final boolean autoDeleteFileOnExit,
       final Level logLevel)
+      throws ProcessConfigurationException, IOException {
+    this(
+        commandRunnerInterPreter,
+        command,
+        currentDirectory,
+        masterLogFile,
+        autoDeleteFileOnExit,
+        logLevel,
+        null);
+  }
+
+  /**
+   * Constructor to set the configureation to be consumed by {@link ProcessRunner}.
+   *
+   * @param commandRunnerInterPreter : sets the {@link String} command interpreter like /bin/bash in
+   *     unix
+   * @param command : set the actual {@link String} command to be executed
+   * @param currentDirectory : sets the working directory in {@link File} format
+   * @param masterLogFile : {@link File} where the log data will be stored.
+   * @param autoDeleteFileOnExit : set the flag to denote if the sysout and the syserror {@link
+   *     File} going to be auto deleted on exit
+   * @param logLevel {@link Level} value setting for the minimum {@link Level} for printing debug
+   *     message.
+   * @param printStream is a an Object of {@link PrintStream} to which the output of the code can be
+   *     streamed at runtime. An example of @{@link PrintStream} object is {@link System#out}
+   * @throws ProcessConfigurationException : Exception thrown if configuration received is not at
+   *     par.
+   * @throws IOException : Exception thrown if there are any error while validating the {@link File}
+   *     objects
+   */
+  public ProcessConfiguration(
+      final String commandRunnerInterPreter,
+      final String command,
+      final File currentDirectory,
+      final File masterLogFile,
+      final boolean autoDeleteFileOnExit,
+      final Level logLevel,
+      final PrintStream printStream)
       throws ProcessConfigurationException, IOException {
     this.logLevel = logLevel;
     this.logger.setLevel(logLevel);
@@ -98,6 +138,7 @@ public class ProcessConfiguration {
     }
     final String currentConfiguration = toString();
     this.logger.info(currentConfiguration);
+    this.printStream = printStream;
   }
 
   /**
@@ -172,5 +213,14 @@ public class ProcessConfiguration {
    */
   public File getCurrentDirectory() {
     return this.currentDirectory;
+  }
+
+  /**
+   * Returns the print writer to stream executed code
+   *
+   * @return {@link PrintStream} reference where the command output will be streamed on the fly.
+   */
+  public PrintStream getPrintStream() {
+    return this.printStream;
   }
 }

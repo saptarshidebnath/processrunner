@@ -34,17 +34,9 @@ import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -108,6 +100,9 @@ class ProcessRunnerImpl implements ProcessRunner {
                       PROCESS_RUNNER_THREAD_GROUP,
                       runnable,
                       ProcessRunnerImpl.this.configuration.toString() + " >> log-handlers"));
+      if (configuration.getPrintStream() != null) {
+        configuration.getPrintStream().println("Streaming log output");
+      }
       executor.execute(this.writeLogs(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
       executor.execute(this.writeLogs(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
       executor.shutdown();
@@ -189,10 +184,14 @@ class ProcessRunnerImpl implements ProcessRunner {
             outputSourceType.toString(), this.configuration.getMasterLogFile().getCanonicalPath()
           });
       final Scanner scanner = new Scanner(inputStreamToWrite);
+      PrintStream printStream = configuration.getPrintStream();
       while (scanner.hasNext()) {
         final String currentLine = scanner.nextLine();
-        this.logger.log(
-            Level.INFO, "{0} >> {1}", new Object[] {outputSourceType.toString(), currentLine});
+        //        this.logger.log(
+        //            Level.INFO, "{0} >> {1}", new Object[] {outputSourceType.toString(), currentLine});
+        if (printStream != null) {
+          printStream.println(outputSourceType.toString() + " >> " + currentLine);
+        }
         ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
             new OutputRecord(outputSourceType, currentLine));
       }

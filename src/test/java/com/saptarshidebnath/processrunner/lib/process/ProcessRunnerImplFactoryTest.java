@@ -33,15 +33,14 @@ import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.output.Output;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.LineNumberReader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
@@ -242,6 +241,27 @@ public class ProcessRunnerImplFactoryTest {
         outputRecord.get(this.arryPosition).getOutputText(),
         startsWith(getInitialVersionComments()));
     masterLog.delete();
+  }
+
+  @Test
+  public void streamingOutput()
+      throws ProcessException, IOException, ProcessConfigurationException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    PrintStream ps = new PrintStream(baos);
+    final Output response =
+        ProcessRunnerFactory.startProcess(
+            new ProcessConfiguration(
+                getDefaultInterpreter(),
+                getInterPreterVersion(),
+                Constants.DEFAULT_CURRENT_DIR,
+                Utilities.createTempLogDump(),
+                true,
+                Level.INFO,
+                ps));
+    String outputString =
+        baos.toString(StandardCharsets.UTF_8.toString()).split(Constants.NEW_LINE)[2].substring(10);
+    assertThat(
+        "Validating json log content : ", outputString, startsWith(getInitialVersionComments()));
   }
 
   private boolean isJSONValid(final String jsonInString) {
