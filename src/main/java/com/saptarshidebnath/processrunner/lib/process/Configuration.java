@@ -66,7 +66,7 @@ public class Configuration {
    * @throws IOException : Exception thrown if there are any error while validating the {@link File}
    *     objects
    */
-  public Configuration(
+  Configuration(
       final String interpreter,
       final String command,
       final Path workingDir,

@@ -65,7 +65,7 @@ public class ConfigurationBuilder {
     if (interpreter.trim().length() == 0) {
       throw new ProcessConfigurationException(
           Utilities.joinString(
-              "Command Runner Interpreter is set '",
+              "Command ProcessRunnerImple Interpreter is set '",
               interpreter,
               "'. Need a valid command runner interpreter as /bin/bash in unix"));
     } else if (command.trim().length() == 0) {
@@ -183,7 +183,7 @@ public class ConfigurationBuilder {
                 .stream()
                 .map(e -> e + Constants.SPACE)
                 .collect(Collectors.joining(Constants.SPACE)));
-    Configuration processsConfiguration =
+    Configuration config =
         new Configuration(
             interpreter,
             commandWithParam,
@@ -194,9 +194,8 @@ public class ConfigurationBuilder {
             printStream);
     this.logger.log(
         Level.INFO,
-        Utilities.joinString(
-            "ProcesssConfiguration created.", Constants.NEW_LINE, processsConfiguration.toString()));
-    return processsConfiguration;
+        Utilities.joinString("Configuration created.", Constants.NEW_LINE, config.toString()));
+    return config;
   }
 
   @Override

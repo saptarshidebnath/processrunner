@@ -54,6 +54,7 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
+  @Deprecated
   public static Output startProcess(
       final String commandInterPreter, final String command, final Level logLevel)
       throws ProcessException {
@@ -90,6 +91,7 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
+  @Deprecated
   public static ProcessRunner getProcess(
       final String commandInterPreter,
       final String command,
@@ -137,6 +139,7 @@ public class ProcessRunnerFactory {
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
    */
+  @Deprecated
   public static ProcessRunner getProcess(
       final String commandRunnerInterPreter,
       final String command,
@@ -176,6 +179,7 @@ public class ProcessRunnerFactory {
       throw new ProcessException(ex);
     }
   }
+
 
   /**
    * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link

@@ -115,7 +115,7 @@ public class ProcessConfiguration {
     this.logger.setLevel(logLevel);
     if (commandRunnerInterPreter.trim().length() == 0) {
       throw new ProcessConfigurationException(
-          "Command Runner Interpreter is set '"
+          "Command ProcessRunnerImple Interpreter is set '"
               + commandRunnerInterPreter
               + "'. Need a valid command runner interpreter as /bin/bash in unix");
     } else if (command.trim().length() == 0) {

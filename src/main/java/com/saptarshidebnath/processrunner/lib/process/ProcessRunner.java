@@ -30,7 +30,7 @@ import com.saptarshidebnath.processrunner.lib.output.Output;
 
 import java.util.concurrent.Future;
 
-/** Process Runner interface is the base interface to run any system process or shell script */
+/** Process ProcessRunnerImple interface is the base interface to run any system process or shell script */
 public interface ProcessRunner {
 
   /**

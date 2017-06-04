@@ -25,10 +25,13 @@
 
 package com.saptarshidebnath.processrunner.lib.utilities;
 
+import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
+import com.saptarshidebnath.processrunner.lib.process.Configuration;
+import com.saptarshidebnath.processrunner.lib.process.ConfigurationBuilder;
 import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
 
 import java.io.*;
@@ -64,8 +67,27 @@ public class Utilities {
    * @return a {@link File} reference to the newly written log {@link File}.
    * @throws ProcessException in case of any exception.
    */
+  @Deprecated
   public static File writeLog(
       final ProcessConfiguration configuration,
+      final File targetFile,
+      final OutputSourceType outputSourceType)
+      throws ProcessException, ProcessConfigurationException, IOException {
+    return writeLog(convertConfig(configuration), targetFile, outputSourceType);
+  }
+
+  /**
+   * Write a log content from the {@link Configuration#masterLogFile} to new {@link File} as per
+   * provided {@link Configuration} for a particular {@link OutputSourceType}.
+   *
+   * @param configuration accepts a {@link Configuration}
+   * @param targetFile accepts a target {@link File}.
+   * @param outputSourceType Accepts the {@link OutputSourceType} which need to be printed only.
+   * @return a {@link File} reference to the newly written log {@link File}.
+   * @throws ProcessException in case of any exception.
+   */
+  public static File writeLog(
+      final Configuration configuration,
       final File targetFile,
       final OutputSourceType outputSourceType)
       throws ProcessException {
@@ -110,5 +132,42 @@ public class Utilities {
 
   public static String joinString(List<String> stringList) {
     return stringList.stream().collect(Collectors.joining(Constants.EMPTY_STRING));
+  }
+
+  public static Configuration convertConfig(ProcessConfiguration configuration)
+      throws ProcessConfigurationException, IOException {
+    return new ConfigurationBuilder(
+            configuration.getCommand(), configuration.getCommandRunnerInterPreter())
+        .setLogLevel(configuration.getLogLevel())
+        .setMasterLogFile(configuration.getMasterLogFile(), configuration.getAutoDeleteFileOnExit())
+        .setStramingDestination(configuration.getPrintStream())
+        .setWorkigDir(configuration.getCurrentDirectory().toPath())
+        .build();
+  }
+
+  public static boolean searchFile(Logger logger, File fileToRead, final String regex)
+      throws ProcessException {
+    boolean isMatching = false;
+    try {
+      logger.log(Level.INFO, "Searching for regular expression : {0}", new Object[] {regex});
+      final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
+          new ReadJsonArrayFromFile<>(fileToRead);
+      OutputRecord outputRecord;
+      do {
+        outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
+        if (outputRecord != null) {
+          isMatching = outputRecord.getOutputText().matches(regex);
+        }
+      } while (outputRecord != null && !isMatching);
+      if (isMatching) {
+        logger.log(Level.INFO, "Regex {0} is found", new Object[] {regex});
+      } else {
+        logger.log(Level.WARNING, "Regex {0} is NOT found", new Object[] {regex});
+      }
+      readJsonArrayFromFile.closeJsonReader();
+    } catch (final Exception ex) {
+      throw new ProcessException(ex);
+    }
+    return isMatching;
   }
 }

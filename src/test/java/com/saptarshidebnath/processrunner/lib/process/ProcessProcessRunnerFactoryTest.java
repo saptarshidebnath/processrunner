@@ -53,12 +53,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 
 /** Created by saptarshi on 12/22/2016. */
-public class ProcessRunnerImplFactoryTest {
+public class ProcessProcessRunnerFactoryTest {
 
   private final Gson gson;
   private final int arryPosition;
 
-  public ProcessRunnerImplFactoryTest() {
+  public ProcessProcessRunnerFactoryTest() {
     this.gson = new GsonBuilder().setPrettyPrinting().create();
     if (SystemUtils.IS_OS_WINDOWS) {
       this.arryPosition = 1;

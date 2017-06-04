@@ -26,6 +26,7 @@
 package com.saptarshidebnath.processrunner.lib.output;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 
@@ -34,19 +35,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Default Implementation of {@link Output} */
-@Deprecated
-class OutputImpl implements Output {
-  private final ProcessConfiguration configuration;
+class OutputImple implements Output {
+  private final Configuration configuration;
   private final Logger logger;
   private final int returnCode;
 
   /**
-   * Accepts {@link ProcessConfiguration} and retunr code to create a {@link Output} object.
+   * Accepts {@link Configuration} and return code to create a {@link Output} object.
    *
-   * @param configuration a valid {@link ProcessConfiguration} object.
+   * @param configuration a valid {@link Configuration} object.
    * @param returnCode a {@link Integer} value typically ranging from 0 - 255
    */
-  OutputImpl(final ProcessConfiguration configuration, final int returnCode) {
+  OutputImple(final Configuration configuration, final int returnCode) {
     this.configuration = configuration;
     this.logger = Logger.getLogger(this.getClass().getCanonicalName());
     this.logger.setLevel(this.configuration.getLogLevel());
@@ -119,6 +119,7 @@ class OutputImpl implements Output {
    */
   @Override
   public boolean searchMasterLog(final String regex) throws ProcessException {
+    boolean isMatching = false;
     return Utilities.searchFile(this.logger, this.getMasterLog(), regex);
   }
 
