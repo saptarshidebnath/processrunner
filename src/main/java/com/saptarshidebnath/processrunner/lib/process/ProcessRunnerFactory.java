@@ -181,7 +181,7 @@ public class ProcessRunnerFactory {
    * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
    * ProcessConfiguration}. The process is then <strong>triggered asynchronously</strong>.
    *
-   * @param configuration Takes a valid {@link ProcessConfiguration} object
+   * @param processsConfiguration Takes a valid {@link ProcessConfiguration} object
    * @param enableThreadedApproach Takes a flag {@link Boolean} variable doesn't matter if it is a
    *     true or false
    * @return a reference of {@link Future} of type {@link Output} from where you can retrieve the
@@ -190,10 +190,10 @@ public class ProcessRunnerFactory {
    *     have happened.
    */
   public static Future<Output> startProcess(
-      final ProcessConfiguration configuration, final boolean enableThreadedApproach)
+      final ProcessConfiguration processsConfiguration, final boolean enableThreadedApproach)
       throws ProcessException {
     try {
-      return new ProcessRunnerImpl(configuration).run(enableThreadedApproach);
+      return new ProcessRunnerImpl(processsConfiguration).run(enableThreadedApproach);
     } catch (final Exception ex) {
       throw new ProcessException(ex);
     }

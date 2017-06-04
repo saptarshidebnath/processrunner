@@ -101,7 +101,7 @@ public class ProcessRunnerImplFactoryTest {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
-    final ProcessConfiguration configuration =
+    final ProcessConfiguration ProcessConfiguration =
         new ProcessConfiguration(
             getDefaultInterpreter(),
             getInterPreterVersion(),
@@ -109,7 +109,7 @@ public class ProcessRunnerImplFactoryTest {
             tempFile,
             true,
             Level.ALL);
-    final Output response = ProcessRunnerFactory.startProcess(configuration);
+    final Output response = ProcessRunnerFactory.startProcess(ProcessConfiguration);
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
   }
 
@@ -169,7 +169,7 @@ public class ProcessRunnerImplFactoryTest {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
-    final ProcessConfiguration configuration =
+    final ProcessConfiguration ProcessConfiguration =
         new ProcessConfiguration(
             getDefaultInterpreter(),
             getInterPreterVersion(),
@@ -177,7 +177,7 @@ public class ProcessRunnerImplFactoryTest {
             tempFile,
             true,
             Level.SEVERE);
-    final Future<Output> response = ProcessRunnerFactory.startProcess(configuration, true);
+    final Future<Output> response = ProcessRunnerFactory.startProcess(ProcessConfiguration, true);
     assertThat("Validating process return code : ", response.get().getReturnCode(), is(0));
   }
 
@@ -188,7 +188,7 @@ public class ProcessRunnerImplFactoryTest {
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.setReadOnly();
     tempFile.deleteOnExit();
-    final ProcessConfiguration configuration =
+    final ProcessConfiguration ProcessConfiguration =
         new ProcessConfiguration(
             getDefaultInterpreter(),
             getInterPreterVersion(),
@@ -196,7 +196,7 @@ public class ProcessRunnerImplFactoryTest {
             tempFile,
             true,
             Level.SEVERE);
-    ProcessRunnerFactory.startProcess(configuration);
+    ProcessRunnerFactory.startProcess(ProcessConfiguration);
   }
 
   @Test(expected = ProcessException.class)
@@ -206,7 +206,7 @@ public class ProcessRunnerImplFactoryTest {
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.setReadOnly();
     tempFile.deleteOnExit();
-    final ProcessConfiguration configuration =
+    final ProcessConfiguration ProcessConfiguration =
         new ProcessConfiguration(
             getDefaultInterpreter(),
             getInterPreterVersion(),
@@ -214,7 +214,7 @@ public class ProcessRunnerImplFactoryTest {
             tempFile,
             true,
             Level.SEVERE);
-    ProcessRunnerFactory.startProcess(configuration, true);
+    ProcessRunnerFactory.startProcess(ProcessConfiguration, true);
   }
 
   @Test

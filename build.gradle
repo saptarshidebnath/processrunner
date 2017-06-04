@@ -1,6 +1,18 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        //Needed only for SNAPSHOT versions
+        //maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+    dependencies {
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.8.0"
+    }
+}
+
 apply plugin: 'java'
 apply plugin: 'signing'
 apply plugin: 'maven'
+apply plugin: 'io.codearte.nexus-staging'
 
 group = 'com.saptarshidebnath.utilities'
 archivesBaseName = 'ProcessRunner'
@@ -91,6 +103,16 @@ uploadArchives {
     }
 }
 
+nexusStaging {
+    numberOfRetries = 20
+    delayBetweenRetriesInMillis = 3000
+}
+
+//
+// For uploading to nexus and releasing
 //
 // Built from the tutorial http://jedicoder.blogspot.com/2011/11/automated-gradle-project-deployment-to.html
+//
+//
+// https://github.com/Codearte/gradle-nexus-staging-plugin/
 //

@@ -9,7 +9,7 @@
 
 **${project.name}** supports :
    - Adhoc way to run a system process.
-   - Building up configuration for a process that will be executed later.
+   - Building up processsConfiguration for a process that will be executed later.
    - The process can be executed in a serial fashion or in a multi threaded pattern depending upon the developer.
    - Both Sysout and Syserror of the Process executed are stored in a json file as a master log file. After the execution is complete, the developer can extract only the sysout or the syserror as per his or her wish.
    - Very low memory footprint as the output of the process is not stored in the memory but is directly dumped to a file.

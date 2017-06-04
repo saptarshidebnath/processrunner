@@ -33,8 +33,11 @@ import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Utilities {
 
@@ -99,5 +102,13 @@ public class Utilities {
       throw new ProcessException(e);
     }
     return targetFile;
+  }
+
+  public static String joinString(String... stringArray) {
+    return joinString(Arrays.asList(stringArray));
+  }
+
+  public static String joinString(List<String> stringList) {
+    return stringList.stream().collect(Collectors.joining(Constants.EMPTY_STRING));
   }
 }

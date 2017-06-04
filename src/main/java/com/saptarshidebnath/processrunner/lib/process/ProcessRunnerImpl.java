@@ -55,9 +55,9 @@ class ProcessRunnerImpl implements ProcessRunner {
   private final Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
   /**
-   * Constructor receiving the {@link ProcessConfiguration} to create the process runner.
+   * Constructor receiving the {@link ProcesssConfiguration} to create the process runner.
    *
-   * @param configuration a valid object of {@link ProcessConfiguration}
+   * @param configuration a valid object of {@link ProcesssConfiguration}
    * @throws IOException if Unable to work with the log files
    */
   ProcessRunnerImpl(final ProcessConfiguration configuration) throws IOException {
@@ -153,7 +153,7 @@ class ProcessRunnerImpl implements ProcessRunner {
    */
 
   /**
-   * Log a inputStream to the log dump as configured in {@link ProcessConfiguration}. Internally it
+   * Log a inputStream to the log dump as configured in {@link ProcesssConfiguration}. Internally it
    * calls {@link ProcessRunnerImpl#logData(InputStream, OutputSourceType)} to actually log the data
    * and returns a {@link Runnable} reference to make it thread enabled.
    *
@@ -168,7 +168,7 @@ class ProcessRunnerImpl implements ProcessRunner {
   }
 
   /**
-   * Log a inputStream to the log dump as configured in {@link ProcessConfiguration}.
+   * Log a inputStream to the log dump as configured in {@link ProcesssConfiguration}.
    *
    * @param inputStreamToWrite : {@link InputStream} from which the content is being read and
    *     written to a File

@@ -30,66 +30,30 @@ import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationExce
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * The {@link ProcessConfiguration} object create a configuration to be consumed by the {@link
+ * The {@link Configuration} object create a configuration to be consumed by the {@link
  * ProcessRunner} object
  */
-@Deprecated
-public class ProcessConfiguration {
-  private final String commandRunnerInterPreter;
+public class Configuration {
+  private final String interpreter;
   private final String command;
-  private final File currentDirectory;
+  private final Path workingDir;
   private final File masterLogFile;
   private final boolean autoDeleteFileOnExit;
-  private final Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
+  private final Logger logger;
   private final Level logLevel;
   private final PrintStream printStream;
 
   /**
    * Constructor to set the configureation to be consumed by {@link ProcessRunner}.
    *
-   * @param commandRunnerInterPreter : sets the {@link String} command interpreter like /bin/bash in
-   *     unix
+   * @param interpreter : sets the {@link String} command interpreter like /bin/bash in unix
    * @param command : set the actual {@link String} command to be executed
-   * @param currentDirectory : sets the working directory in {@link File} format
-   * @param masterLogFile : {@link File} where the log data will be stored.
-   * @param autoDeleteFileOnExit : set the flag to denote if the sysout and the syserror {@link
-   *     File} going to be auto deleted on exit
-   * @param logLevel {@link Level} value setting for the minimum {@link Level} for printing debug
-   *     message.
-   * @throws ProcessConfigurationException : Exception thrown if configuration received is not at
-   *     par.
-   * @throws IOException : Exception thrown if there are any error while validating the {@link File}
-   *     objects
-   */
-  public ProcessConfiguration(
-      final String commandRunnerInterPreter,
-      final String command,
-      final File currentDirectory,
-      final File masterLogFile,
-      final boolean autoDeleteFileOnExit,
-      final Level logLevel)
-      throws ProcessConfigurationException, IOException {
-    this(
-        commandRunnerInterPreter,
-        command,
-        currentDirectory,
-        masterLogFile,
-        autoDeleteFileOnExit,
-        logLevel,
-        null);
-  }
-
-  /**
-   * Constructor to set the configureation to be consumed by {@link ProcessRunner}.
-   *
-   * @param commandRunnerInterPreter : sets the {@link String} command interpreter like /bin/bash in
-   *     unix
-   * @param command : set the actual {@link String} command to be executed
-   * @param currentDirectory : sets the working directory in {@link File} format
+   * @param workingDir : sets the working directory in {@link File} format
    * @param masterLogFile : {@link File} where the log data will be stored.
    * @param autoDeleteFileOnExit : set the flag to denote if the sysout and the syserror {@link
    *     File} going to be auto deleted on exit
@@ -102,36 +66,21 @@ public class ProcessConfiguration {
    * @throws IOException : Exception thrown if there are any error while validating the {@link File}
    *     objects
    */
-  public ProcessConfiguration(
-      final String commandRunnerInterPreter,
+  public Configuration(
+      final String interpreter,
       final String command,
-      final File currentDirectory,
+      final Path workingDir,
       final File masterLogFile,
       final boolean autoDeleteFileOnExit,
       final Level logLevel,
       final PrintStream printStream)
       throws ProcessConfigurationException, IOException {
     this.logLevel = logLevel;
+    logger = Logger.getLogger(this.getClass().getCanonicalName());
     this.logger.setLevel(logLevel);
-    if (commandRunnerInterPreter.trim().length() == 0) {
-      throw new ProcessConfigurationException(
-          "Command Runner Interpreter is set '"
-              + commandRunnerInterPreter
-              + "'. Need a valid command runner interpreter as /bin/bash in unix");
-    } else if (command.trim().length() == 0) {
-      throw new ProcessConfigurationException(
-          "Command is set '" + command + "'. Need a valid command like 'echo Hello World'");
-    } else if (!currentDirectory.exists() || !currentDirectory.isDirectory()) {
-      throw new ProcessConfigurationException(
-          "Command's current directory is set '"
-              + currentDirectory.getAbsolutePath()
-              + "'. Either the Directory doesn't exist or is not a directory at all");
-    } else {
-      this.logger.log(Level.INFO, "All parameters passed validation");
-    }
-    this.commandRunnerInterPreter = commandRunnerInterPreter.trim();
+    this.interpreter = interpreter.trim();
     this.command = command.trim();
-    this.currentDirectory = currentDirectory;
+    this.workingDir = workingDir;
     this.autoDeleteFileOnExit = autoDeleteFileOnExit;
     this.masterLogFile = masterLogFile;
     if (this.autoDeleteFileOnExit) {
@@ -142,21 +91,16 @@ public class ProcessConfiguration {
     this.printStream = printStream;
   }
 
-  /**
-   * Returns the {@link ProcessConfiguration} as {@link String}. This is mostly used for debug
-   * purposes.
-   *
-   * @return a {@link String}
-   */
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("ProcessConfiguration{");
-    sb.append("commandRunnerInterPreter='").append(this.commandRunnerInterPreter).append('\'');
-    sb.append(", command='").append(this.command).append('\'');
-    sb.append(", currentDirectory=").append(this.currentDirectory);
-    sb.append(", masterLogFile=").append(this.masterLogFile);
-    sb.append(", autoDeleteFileOnExit=").append(this.autoDeleteFileOnExit);
-    sb.append(", logLevel=").append(this.logLevel);
+    final StringBuilder sb = new StringBuilder("Configuration{");
+    sb.append("interpreter='").append(interpreter).append('\'');
+    sb.append(", command='").append(command).append('\'');
+    sb.append(", workingDir=").append(workingDir);
+    sb.append(", masterLogFile=").append(masterLogFile);
+    sb.append(", autoDeleteFileOnExit=").append(autoDeleteFileOnExit);
+    sb.append(", logLevel=").append(logLevel);
+    sb.append(", printStream=").append(printStream);
     sb.append('}');
     return sb.toString();
   }
@@ -171,8 +115,7 @@ public class ProcessConfiguration {
   }
 
   /**
-   * Getter for flag if {@link ProcessConfiguration#getMasterLogFile()} is going to auto deleted or
-   * not.
+   * Getter for flag if {@link Configuration#getMasterLogFile()} is going to auto deleted or not.
    *
    * @return a {@link Boolean} value depicting the same.
    */
@@ -194,8 +137,8 @@ public class ProcessConfiguration {
    *
    * @return a {@link String} value.
    */
-  public String getCommandRunnerInterPreter() {
-    return this.commandRunnerInterPreter;
+  public String getInterpreter() {
+    return this.interpreter;
   }
 
   /**
@@ -210,10 +153,10 @@ public class ProcessConfiguration {
   /**
    * Get the currently configured current directory.
    *
-   * @return a {@link File} reference where the current working directory is.
+   * @return a {@link Path} reference where the current working directory is.
    */
-  public File getCurrentDirectory() {
-    return this.currentDirectory;
+  public Path getWorkingDir() {
+    return this.workingDir;
   }
 
   /**
