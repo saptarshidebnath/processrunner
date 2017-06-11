@@ -253,7 +253,7 @@ public class ProcessProcessRunnerFactoryTest {
         baos.toString(StandardCharsets.UTF_8.toString()).split(Constants.NEW_LINE)[2].substring(10);
     assertThat(
         "Validating streaming log content : ",
-        outputString,
+        baos.toString(),
         startsWith(getInitialVersionComments()));
     //assertThat("Validating streaming log content : ", outputString, is(""));
   }
