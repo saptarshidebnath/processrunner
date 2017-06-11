@@ -251,9 +251,11 @@ public class ProcessProcessRunnerFactoryTest {
                 .build());
     String outputString =
         baos.toString(StandardCharsets.UTF_8.toString()).split(Constants.NEW_LINE)[2].substring(10);
-    //assertThat(
-    //    "Validating streaming log content : ", outputString, startsWith(getInitialVersionComments()));
-    assertThat("Validating streaming log content : ", outputString, is(""));
+    assertThat(
+        "Validating streaming log content : ",
+        outputString,
+        startsWith(getInitialVersionComments()));
+    //assertThat("Validating streaming log content : ", outputString, is(""));
   }
 
   private boolean isJSONValid(final String jsonInString) {
