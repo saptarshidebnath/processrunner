@@ -48,17 +48,16 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 
 /** Created by saptarshi on 12/22/2016. */
-public class ProcessRunnerImplFactoryTest {
+public class ProcessProcessRunnerFactoryTest {
 
   private final Gson gson;
   private final int arryPosition;
 
-  public ProcessRunnerImplFactoryTest() {
+  public ProcessProcessRunnerFactoryTest() {
     this.gson = new GsonBuilder().setPrettyPrinting().create();
     if (SystemUtils.IS_OS_WINDOWS) {
       this.arryPosition = 1;
@@ -68,48 +67,58 @@ public class ProcessRunnerImplFactoryTest {
   }
 
   @Test
-  public void startProcess() throws ProcessException {
+  public void startProcess()
+      throws ProcessConfigurationException, IOException, InterruptedException, ProcessException {
     final Output response =
         ProcessRunnerFactory.startProcess(
-            getDefaultInterpreter(), getInterPreterVersion(), Level.ALL);
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setLogLevel(Level.ALL)
+                .build());
     assertThat("Validating process runner for simple process : ", response.getReturnCode(), is(0));
   }
 
-  @Test(expected = ProcessException.class)
-  public void startProcessWithWrongParmeters() throws ProcessException {
-    ProcessRunnerFactory.startProcess("", getInterPreterVersion(), Level.OFF);
+  @Test(expected = ProcessConfigurationException.class)
+  public void startProcessWithWrongParmeters()
+      throws ProcessConfigurationException, IOException, InterruptedException, ProcessException {
+    ProcessRunnerFactory.startProcess(
+        new ConfigurationBuilder("", getInterPreterVersion()).setLogLevel(Level.OFF).build());
   }
 
-  @Test(expected = ProcessException.class)
-  public void getProcessWithLessParamsWrongParamets() throws ProcessException {
-    ProcessRunnerFactory.getProcess(
-        getDefaultInterpreter(), "", Constants.DEFAULT_CURRENT_DIR, Level.OFF);
+  @Test(expected = ProcessConfigurationException.class)
+  public void getProcessWithLessParamsWrongParamets()
+      throws ProcessException, ProcessConfigurationException, IOException {
+    Configuration configuration = new ConfigurationBuilder(getDefaultInterpreter(), "").build();
   }
 
-  @Test(expected = ProcessException.class)
-  public void getProcessMoreParamWrongParamets() throws ProcessException, IOException {
+  @Test(expected = ProcessConfigurationException.class)
+  public void getProcessMoreParamWrongParamets()
+      throws IOException, ProcessConfigurationException, InterruptedException, ProcessException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
-    ProcessRunnerFactory.getProcess(
-        "", getInterPreterVersion(), Constants.DEFAULT_CURRENT_DIR, tempFile, false, Level.ALL);
+
+    ProcessRunnerFactory.startProcess(
+        new ConfigurationBuilder("", getInterPreterVersion())
+            .setLogLevel(Level.ALL)
+            .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+            .setMasterLogFile(tempFile, false)
+            .build());
   }
 
   @Test
   public void startProcessWithProcessConfig()
-      throws ProcessException, IOException, ProcessConfigurationException {
+      throws IOException, ProcessConfigurationException, InterruptedException, ProcessException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
-    final ProcessConfiguration configuration =
-        new ProcessConfiguration(
-            getDefaultInterpreter(),
-            getInterPreterVersion(),
-            Constants.DEFAULT_CURRENT_DIR,
-            tempFile,
-            true,
-            Level.ALL);
-    final Output response = ProcessRunnerFactory.startProcess(configuration);
+
+    final Output response =
+        ProcessRunnerFactory.startProcess(
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                .setMasterLogFile(tempFile, true)
+                .setLogLevel(Level.ALL)
+                .build());
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
   }
 
@@ -118,14 +127,13 @@ public class ProcessRunnerImplFactoryTest {
       throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
           InterruptedException {
 
-    final ProcessRunner processRunner =
-        ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(),
-            getInterPreterVersion(),
-            Constants.DEFAULT_CURRENT_DIR,
-            Level.SEVERE);
-
-    final Output response = processRunner.run();
+    final Output response =
+        ProcessRunnerFactory.startProcess(
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                .setMasterLogFile(Utilities.createTempLogDump(), true)
+                .setLogLevel(Level.SEVERE)
+                .build());
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
 
     if (SystemUtils.IS_OS_LINUX) {
@@ -148,10 +156,11 @@ public class ProcessRunnerImplFactoryTest {
 
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(),
-            getInterPreterVersion(),
-            Constants.DEFAULT_CURRENT_DIR,
-            Level.SEVERE);
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                .setMasterLogFile(Utilities.createTempLogDump(), true)
+                .setLogLevel(Level.SEVERE)
+                .build());
 
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
@@ -169,95 +178,77 @@ public class ProcessRunnerImplFactoryTest {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
-    final ProcessConfiguration configuration =
-        new ProcessConfiguration(
-            getDefaultInterpreter(),
-            getInterPreterVersion(),
-            Constants.DEFAULT_CURRENT_DIR,
-            tempFile,
-            true,
-            Level.SEVERE);
-    final Future<Output> response = ProcessRunnerFactory.startProcess(configuration, true);
+
+    final Future<Output> response =
+        ProcessRunnerFactory.startAsyncProcess(
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                .setMasterLogFile(tempFile, true)
+                .setLogLevel(Level.SEVERE)
+                .build());
     assertThat("Validating process return code : ", response.get().getReturnCode(), is(0));
   }
 
-  @Test(expected = ProcessException.class)
+  @Test(expected = FileNotFoundException.class)
   public void startProcessWithProcessConfigWithWrongParams()
-      throws ProcessException, IOException, ProcessConfigurationException {
+      throws IOException, ProcessConfigurationException, InterruptedException, ProcessException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.setReadOnly();
     tempFile.deleteOnExit();
-    final ProcessConfiguration configuration =
-        new ProcessConfiguration(
-            getDefaultInterpreter(),
-            getInterPreterVersion(),
-            Constants.DEFAULT_CURRENT_DIR,
-            tempFile,
-            true,
-            Level.SEVERE);
-    ProcessRunnerFactory.startProcess(configuration);
+
+    ProcessRunnerFactory.startProcess(
+        new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+            .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+            .setMasterLogFile(tempFile, true)
+            .setLogLevel(Level.SEVERE)
+            .build());
   }
 
-  @Test(expected = ProcessException.class)
+  @Test(expected = FileNotFoundException.class)
   public void startThreadedProcessWithProcessConfigWithWrongParams()
       throws ProcessException, IOException, ProcessConfigurationException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.setReadOnly();
     tempFile.deleteOnExit();
-    final ProcessConfiguration configuration =
-        new ProcessConfiguration(
-            getDefaultInterpreter(),
-            getInterPreterVersion(),
-            Constants.DEFAULT_CURRENT_DIR,
-            tempFile,
-            true,
-            Level.SEVERE);
-    ProcessRunnerFactory.startProcess(configuration, true);
+
+    ProcessRunnerFactory.startAsyncProcess(
+        new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+            .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+            .setMasterLogFile(tempFile, true)
+            .setLogLevel(Level.SEVERE)
+            .build());
   }
 
   @Test
-  public void getProcessLessDetailed() throws IOException, ProcessException, InterruptedException {
+  public void getProcessLessDetailed()
+      throws IOException, ProcessException, InterruptedException, ProcessConfigurationException {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(),
-            getInterPreterVersion(),
-            Constants.DEFAULT_CURRENT_DIR,
-            Level.SEVERE);
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                .setLogLevel(Level.SEVERE)
+                .build());
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
-    final File masterLog = response.getMasterLog();
-    assertThat("Validating if JSON log dump is created : ", masterLog.exists(), is(true));
-    final String jsonLogAsString =
-        new Scanner(masterLog, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
-    final Type listTypeOuputArray = new TypeToken<List<OutputRecord>>() {}.getType();
-    final List<OutputRecord> outputRecord = this.gson.fromJson(jsonLogAsString, listTypeOuputArray);
-    assertThat("Is the jsonLogAsString a valid json : ", isJSONValid(jsonLogAsString), is(true));
-    assertThat(
-        "Validating json log record number : ", outputRecord.size(), is(getVersionPutputSize()));
-    assertThat(
-        "Validating json log content : ",
-        outputRecord.get(this.arryPosition).getOutputText(),
-        startsWith(getInitialVersionComments()));
-    masterLog.delete();
+    final File masterLog = response.getMasterLogAsJson();
+    assertThat("Validating if JSON log dump is created : ", masterLog, is(nullValue()));
   }
 
   @Test
   public void streamingOutput()
-      throws ProcessException, IOException, ProcessConfigurationException {
+      throws ProcessConfigurationException, IOException, InterruptedException, ProcessException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     PrintStream ps = new PrintStream(baos);
     final Output response =
         ProcessRunnerFactory.startProcess(
-            new ProcessConfiguration(
-                getDefaultInterpreter(),
-                getInterPreterVersion(),
-                Constants.DEFAULT_CURRENT_DIR,
-                Utilities.createTempLogDump(),
-                true,
-                Level.INFO,
-                ps));
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                .setMasterLogFile(Utilities.createTempLogDump(), true)
+                .setLogLevel(Level.INFO)
+                .setStramingDestination(ps)
+                .build());
     String outputString =
         baos.toString(StandardCharsets.UTF_8.toString()).split(Constants.NEW_LINE)[2].substring(10);
     assertThat(
@@ -306,18 +297,21 @@ public class ProcessRunnerImplFactoryTest {
   }
 
   @Test
-  public void getProcessMoreDetailed() throws IOException, ProcessException, InterruptedException {
+  public void getProcessMoreDetailed()
+      throws IOException, ProcessException, InterruptedException, ProcessConfigurationException {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(),
-            getInterPreterVersion(),
-            Constants.DEFAULT_CURRENT_DIR,
-            File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON),
-            false,
-            Level.SEVERE);
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                .setMasterLogFile(
+                    File.createTempFile(
+                        Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON),
+                    false)
+                .setLogLevel(Level.SEVERE)
+                .build());
     final Output response = processRunner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
-    final File masterLog = response.getMasterLog();
+    final File masterLog = response.getMasterLogAsJson();
     assertThat("Validating if JSON log dump is created : ", masterLog.exists(), is(true));
     final String jsonLogAsString =
         new Scanner(masterLog, Charset.defaultCharset().name()).useDelimiter("\\Z").next();
@@ -335,15 +329,14 @@ public class ProcessRunnerImplFactoryTest {
 
   @Test(expected = ProcessException.class)
   public void validateUtilitiesClassWriteLogHandlesFileExceptionProperlyOrNot()
-      throws IOException, ProcessException, InterruptedException {
+      throws IOException, ProcessException, InterruptedException, ProcessConfigurationException {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
-            getDefaultInterpreter(),
-            getInterPreterVersion(),
-            Constants.DEFAULT_CURRENT_DIR,
-            File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON),
-            false,
-            Level.SEVERE);
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                .setMasterLogFile(Utilities.createTempLogDump(), false)
+                .setLogLevel(Level.SEVERE)
+                .build());
     final Output response = processRunner.run();
 
     final File sysout =
@@ -357,7 +350,7 @@ public class ProcessRunnerImplFactoryTest {
 
   @Test
   public void testSaveSysOutAndSaveSysError()
-      throws IOException, ProcessException, InterruptedException {
+      throws IOException, ProcessException, InterruptedException, ProcessConfigurationException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
@@ -365,39 +358,41 @@ public class ProcessRunnerImplFactoryTest {
     if (SystemUtils.IS_OS_WINDOWS) {
       processRunner =
           ProcessRunnerFactory.getProcess(
-              "cmd /c",
-              "test.bat",
-              new File(
-                  Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
-                      + File.separator
-                      + "src"
-                      + File.separator
-                      + "test"
-                      + File.separator
-                      + "scripts"
-                      + File.separator
-                      + "batch"),
-              tempFile,
-              true,
-              Level.SEVERE);
+              new ConfigurationBuilder("cmd /c", "test.bat")
+                  .setWorkigDir(
+                      new File(
+                              Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
+                                  + File.separator
+                                  + "src"
+                                  + File.separator
+                                  + "test"
+                                  + File.separator
+                                  + "scripts"
+                                  + File.separator
+                                  + "batch")
+                          .toPath())
+                  .setMasterLogFile(tempFile, true)
+                  .setLogLevel(Level.SEVERE)
+                  .build());
     } else if (SystemUtils.IS_OS_LINUX) {
       processRunner =
           ProcessRunnerFactory.getProcess(
-              "bash",
-              "test.sh",
-              new File(
-                  Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
-                      + File.separator
-                      + "src"
-                      + File.separator
-                      + "test"
-                      + File.separator
-                      + "scripts"
-                      + File.separator
-                      + "shell"),
-              tempFile,
-              true,
-              Level.SEVERE);
+              new ConfigurationBuilder("bash", "test.sh")
+                  .setWorkigDir(
+                      new File(
+                              Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
+                                  + File.separator
+                                  + "src"
+                                  + File.separator
+                                  + "test"
+                                  + File.separator
+                                  + "scripts"
+                                  + File.separator
+                                  + "shell")
+                          .toPath())
+                  .setMasterLogFile(tempFile, true)
+                  .setLogLevel(Level.SEVERE)
+                  .build());
     }
 
     final Output response = processRunner.run();
@@ -410,7 +405,7 @@ public class ProcessRunnerImplFactoryTest {
         response.saveSysError(
             File.createTempFile(
                 Constants.FILE_PREFIX_NAME_LOG_DUMP + "-syserr", Constants.FILE_SUFFIX_JSON));
-    final File masterLog = response.getMasterLog();
+    final File masterLog = response.getMasterLogAsJson();
     masterLog.deleteOnExit();
     syserr.deleteOnExit();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
@@ -429,7 +424,7 @@ public class ProcessRunnerImplFactoryTest {
 
   @Test
   public void testScriptWithLargeOutput()
-      throws IOException, ProcessException, InterruptedException {
+      throws IOException, ProcessException, InterruptedException, ProcessConfigurationException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
@@ -437,46 +432,48 @@ public class ProcessRunnerImplFactoryTest {
     if (SystemUtils.IS_OS_WINDOWS) {
       processRunner =
           ProcessRunnerFactory.getProcess(
-              "cmd /c",
-              "largefile.bat",
-              new File(
-                  Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
-                      + File.separator
-                      + "src"
-                      + File.separator
-                      + "test"
-                      + File.separator
-                      + "scripts"
-                      + File.separator
-                      + "batch"),
-              tempFile,
-              true,
-              Level.SEVERE);
+              new ConfigurationBuilder("cmd /c", "largefile.bat")
+                  .setWorkigDir(
+                      new File(
+                              Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
+                                  + File.separator
+                                  + "src"
+                                  + File.separator
+                                  + "test"
+                                  + File.separator
+                                  + "scripts"
+                                  + File.separator
+                                  + "batch")
+                          .toPath())
+                  .setMasterLogFile(tempFile, true)
+                  .setLogLevel(Level.SEVERE)
+                  .build());
     } else if (SystemUtils.IS_OS_LINUX) {
       processRunner =
           ProcessRunnerFactory.getProcess(
-              "bash",
-              "largefile.sh",
-              new File(
-                  Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
-                      + File.separator
-                      + "src"
-                      + File.separator
-                      + "test"
-                      + File.separator
-                      + "scripts"
-                      + File.separator
-                      + "shell"),
-              tempFile,
-              true,
-              Level.SEVERE);
+              new ConfigurationBuilder("bash", "largefile.sh")
+                  .setWorkigDir(
+                      new File(
+                              Constants.DEFAULT_CURRENT_DIR.getAbsolutePath()
+                                  + File.separator
+                                  + "src"
+                                  + File.separator
+                                  + "test"
+                                  + File.separator
+                                  + "scripts"
+                                  + File.separator
+                                  + "shell")
+                          .toPath())
+                  .setMasterLogFile(tempFile, true)
+                  .setLogLevel(Level.SEVERE)
+                  .build());
     }
 
     final Output response = processRunner.run();
     final File sysout = response.saveSysOut(File.createTempFile("temp-file-sysout", ".json"));
     sysout.deleteOnExit();
     final File syserr = response.saveSysError(File.createTempFile("temp-file-syserr", ".json"));
-    final File masterLog = response.getMasterLog();
+    final File masterLog = response.getMasterLogAsJson();
     masterLog.deleteOnExit();
     syserr.deleteOnExit();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));

@@ -26,8 +26,7 @@
 package com.saptarshidebnath.processrunner.lib.output;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
-import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
-import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
+import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 
 import java.io.File;
@@ -36,17 +35,17 @@ import java.util.logging.Logger;
 
 /** Default Implementation of {@link Output} */
 class OutputImpl implements Output {
-  private final ProcessConfiguration configuration;
+  private final Configuration configuration;
   private final Logger logger;
   private final int returnCode;
 
   /**
-   * Accepts {@link ProcessConfiguration} and retunr code to create a {@link Output} object.
+   * Accepts {@link Configuration} and retunr code to create a {@link Output} object.
    *
-   * @param configuration a valid {@link ProcessConfiguration} object.
+   * @param configuration a valid {@link Configuration} object.
    * @param returnCode a {@link Integer} value typically ranging from 0 - 255
    */
-  OutputImpl(final ProcessConfiguration configuration, final int returnCode) {
+  OutputImpl(final Configuration configuration, final int returnCode) {
     this.configuration = configuration;
     this.logger = Logger.getLogger(this.getClass().getCanonicalName());
     this.logger.setLevel(this.configuration.getLogLevel());
@@ -65,7 +64,13 @@ class OutputImpl implements Output {
   @Override
   public File saveSysOut(final File sysOut) throws ProcessException {
     this.logger.log(Level.INFO, "Saving sys out to {0}", new Object[] {sysOut.getAbsolutePath()});
-    return Utilities.writeLog(this.configuration, sysOut, OutputSourceType.SYSOUT);
+    File response;
+    try {
+      response = Utilities.writeLog(this.configuration, sysOut, OutputSourceType.SYSOUT);
+    } catch (Exception e) {
+      throw new ProcessException(e);
+    }
+    return response;
   }
 
   /**
@@ -81,7 +86,13 @@ class OutputImpl implements Output {
   public File saveSysError(final File sysError) throws ProcessException {
     this.logger.log(
         Level.INFO, "Saving sys error to : {0}", new Object[] {sysError.getAbsolutePath()});
-    return Utilities.writeLog(this.configuration, sysError, OutputSourceType.SYSERROR);
+    File response = null;
+    try {
+      response = Utilities.writeLog(this.configuration, sysError, OutputSourceType.SYSERROR);
+    } catch (Exception e) {
+      throw new ProcessException(e);
+    }
+    return response;
   }
 
   /**
@@ -91,13 +102,24 @@ class OutputImpl implements Output {
    * @return a {@link File} reference to the json formatted master log .
    */
   @Override
-  public File getMasterLog() {
+  public File getMasterLogAsJson() {
     return this.configuration.getMasterLogFile();
   }
 
+  @Override
+  public File saveLog(File log) throws ProcessException {
+    File response = null;
+    try {
+      response = Utilities.writeLog(this.configuration, log, OutputSourceType.ALL);
+    } catch (Exception e) {
+      throw new ProcessException(e);
+    }
+    return response;
+  }
+
   /**
-   * Search the content of the {@link ProcessConfiguration#getMasterLogFile()} for a particular
-   * regex. The search is done line by line.
+   * Search the content of the {@link Configuration#getMasterLogFile()} for a particular regex. The
+   * search is done line by line.
    *
    * @param regex a proper Regular Expression that need to be searched for.
    * @return a {@link Boolean#TRUE} or {@link Boolean#FALSE} depending upon if the search is
@@ -107,28 +129,7 @@ class OutputImpl implements Output {
    */
   @Override
   public boolean searchMasterLog(final String regex) throws ProcessException {
-    boolean isMatching = false;
-    try {
-      this.logger.log(Level.INFO, "Searching for regular expression : {0}", new Object[] {regex});
-      final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
-          new ReadJsonArrayFromFile<>(this.getMasterLog());
-      OutputRecord outputRecord;
-      do {
-        outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
-        if (outputRecord != null) {
-          isMatching = outputRecord.getOutputText().matches(regex);
-        }
-      } while (outputRecord != null && !isMatching);
-      if (isMatching) {
-        this.logger.log(Level.INFO, "Regex {0} is found", new Object[] {regex});
-      } else {
-        this.logger.log(Level.WARNING, "Regex {0} is NOT found", new Object[] {regex});
-      }
-      readJsonArrayFromFile.closeJsonReader();
-    } catch (final Exception ex) {
-      throw new ProcessException(ex);
-    }
-    return isMatching;
+    return Utilities.searchFile(this.logger, this.getMasterLogAsJson(), regex);
   }
 
   /**

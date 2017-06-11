@@ -2,3 +2,5 @@
 *.iml
 target/
 _site/
+.gradle/
+build/

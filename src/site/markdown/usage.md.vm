@@ -4,11 +4,11 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>${project.artifactId}</artifactId>
                 <version>${project.version}</version>
-                <configuration>
+                <processsConfiguration>
                     <releaseGoals>
                         <releaseGoal>install</releaseGoal>
                     </releaseGoals>
-                </configuration>
+                </processsConfiguration>
             </plugin>
         </plugins>
  </build>

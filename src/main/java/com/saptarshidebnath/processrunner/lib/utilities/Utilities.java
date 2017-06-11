@@ -29,12 +29,15 @@ import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
-import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
+import com.saptarshidebnath.processrunner.lib.process.Configuration;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Utilities {
 
@@ -52,17 +55,17 @@ public class Utilities {
   }
 
   /**
-   * Write a log content from the {@link ProcessConfiguration#masterLogFile} to new {@link File} as
-   * per provided {@link ProcessConfiguration} for a particular {@link OutputSourceType}.
+   * Write a log content from the {@link Configuration#masterLogFile} to new {@link File} as per
+   * provided {@link Configuration} for a particular {@link OutputSourceType}.
    *
-   * @param configuration accepts a {@link ProcessConfiguration}
+   * @param configuration accepts a {@link Configuration}
    * @param targetFile accepts a target {@link File}.
    * @param outputSourceType Accepts the {@link OutputSourceType} which need to be printed only.
    * @return a {@link File} reference to the newly written log {@link File}.
    * @throws ProcessException in case of any exception.
    */
   public static File writeLog(
-      final ProcessConfiguration configuration,
+      final Configuration configuration,
       final File targetFile,
       final OutputSourceType outputSourceType)
       throws ProcessException {
@@ -81,7 +84,9 @@ public class Utilities {
       do {
         outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
         final String currentOutputLine;
-        if (outputRecord != null && outputRecord.getOutputSourceType() == outputSourceType) {
+        if (outputRecord != null
+            && (outputSourceType == OutputSourceType.ALL
+                || outputRecord.getOutputSourceType() == outputSourceType)) {
           currentOutputLine = outputRecord.getOutputText();
           logger.log(
               Level.INFO,
@@ -99,5 +104,39 @@ public class Utilities {
       throw new ProcessException(e);
     }
     return targetFile;
+  }
+
+  public static String joinString(String... stringArray) {
+    return joinString(Arrays.asList(stringArray));
+  }
+
+  public static String joinString(List<String> stringList) {
+    return stringList.stream().collect(Collectors.joining(Constants.EMPTY_STRING));
+  }
+
+  public static boolean searchFile(Logger logger, File fileToRead, final String regex)
+      throws ProcessException {
+    boolean isMatching = false;
+    try {
+      logger.log(Level.INFO, "Searching for regular expression : {0}", new Object[] {regex});
+      final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
+          new ReadJsonArrayFromFile<>(fileToRead);
+      OutputRecord outputRecord;
+      do {
+        outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
+        if (outputRecord != null) {
+          isMatching = outputRecord.getOutputText().matches(regex);
+        }
+      } while (outputRecord != null && !isMatching);
+      if (isMatching) {
+        logger.log(Level.INFO, "Regex {0} is found", new Object[] {regex});
+      } else {
+        logger.log(Level.WARNING, "Regex {0} is NOT found", new Object[] {regex});
+      }
+      readJsonArrayFromFile.closeJsonReader();
+    } catch (final Exception ex) {
+      throw new ProcessException(ex);
+    }
+    return isMatching;
   }
 }

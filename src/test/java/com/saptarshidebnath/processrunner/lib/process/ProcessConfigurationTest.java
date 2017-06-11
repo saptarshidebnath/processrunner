@@ -48,22 +48,20 @@ public class ProcessConfigurationTest {
         File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     final boolean fileSetToBeAutoDeleted = true;
     final Level logLevel = Level.OFF;
-    final ProcessConfiguration configuration =
-        new ProcessConfiguration(
-            interpreter,
-            command,
-            Constants.DEFAULT_CURRENT_DIR,
-            tempFile,
-            fileSetToBeAutoDeleted,
-            logLevel);
+    final Configuration configuration =
+        new ConfigurationBuilder(interpreter, command)
+            .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+            .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
+            .setLogLevel(logLevel)
+            .build();
     assertThat(
         "Validating process runner Interpreter : ",
-        configuration.getCommandRunnerInterPreter(),
+        configuration.getInterpreter(),
         is(interpreter));
     assertThat("Validating process runner command: ", configuration.getCommand(), is(command));
     assertThat(
         "Validating process configuration default work dir: ",
-        configuration.getCurrentDirectory().getCanonicalPath(),
+        configuration.getWorkingDir().toFile().getCanonicalPath(),
         is(Constants.DEFAULT_CURRENT_DIR.getCanonicalPath()));
     assertThat(
         "Validating process configuration json log dump: ",
@@ -89,13 +87,11 @@ public class ProcessConfigurationTest {
     tempFile.deleteOnExit();
     final Level logLevel = Level.ALL;
     final boolean fileSetToBeAutoDeleted = true;
-    new ProcessConfiguration(
-        interpreter,
-        command,
-        Constants.DEFAULT_CURRENT_DIR,
-        tempFile,
-        fileSetToBeAutoDeleted,
-        logLevel);
+    new ConfigurationBuilder(interpreter, command)
+        .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+        .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
+        .setLogLevel(logLevel)
+        .build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -108,13 +104,11 @@ public class ProcessConfigurationTest {
     tempFile.deleteOnExit();
     final Level logLevel = Level.FINER;
     final boolean fileSetToBeAutoDeleted = true;
-    new ProcessConfiguration(
-        interpreter,
-        command,
-        Constants.DEFAULT_CURRENT_DIR,
-        tempFile,
-        fileSetToBeAutoDeleted,
-        logLevel);
+    new ConfigurationBuilder(interpreter, command)
+        .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+        .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
+        .setLogLevel(logLevel)
+        .build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
@@ -127,9 +121,12 @@ public class ProcessConfigurationTest {
     tempFile.deleteOnExit();
     final Level logLevel = Level.FINER;
     final boolean fileSetToBeAutoDeleted = true;
-    final ProcessConfiguration configuration =
-        new ProcessConfiguration(
-            interpreter, command, new File("a:\\"), tempFile, fileSetToBeAutoDeleted, logLevel);
+    final Configuration configuration =
+        new ConfigurationBuilder(interpreter, command)
+            .setWorkigDir(new File("\\root\\").toPath())
+            .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
+            .setLogLevel(logLevel)
+            .build();
     //
     // Un reachable step.
     //
@@ -146,7 +143,10 @@ public class ProcessConfigurationTest {
     tempFile.deleteOnExit();
     final boolean fileSetToBeAutoDeleted = true;
     final Level logLevel = Level.FINEST;
-    new ProcessConfiguration(
-        interpreter, command, tempFile, tempFile, fileSetToBeAutoDeleted, logLevel);
+    new ConfigurationBuilder(interpreter, command)
+        .setWorkigDir(tempFile.toPath())
+        .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
+        .setLogLevel(logLevel)
+        .build();
   }
 }
