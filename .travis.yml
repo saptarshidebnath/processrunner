@@ -8,7 +8,7 @@ before_install:
 #  - ~/jpm/bin/jpm install com.codacy:codacy-coverage-reporter:assembly
 install:
   - gradle clean
-  - gradle build -x test --parallel
+  - gradle assemble -x test --parallel
 addons:
   sonarqube:
     token:
