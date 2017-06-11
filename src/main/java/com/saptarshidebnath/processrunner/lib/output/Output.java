@@ -26,7 +26,7 @@
 package com.saptarshidebnath.processrunner.lib.output;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
-import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
+import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.process.ProcessRunner;
 
 import java.io.File;
@@ -34,7 +34,7 @@ import java.io.File;
 /**
  * The Output of a run is returned as a reference of {@link Output} class. The interface for the
  * Object which is going to be returned after running {@link ProcessRunner#run()} or {@link
- * ProcessRunner#run(boolean)}.
+ * ProcessRunner#runAsync()}.
  */
 public interface Output {
 
@@ -66,8 +66,17 @@ public interface Output {
    *
    * @return a {@link File} reference to the json formatted master log .
    */
-  File getMasterLog();
+  File getMasterLogAsJson();
 
+  /**
+   * Prints the {@link OutputRecord#getOutputText()} of both {@link OutputSourceType#SYSERROR} &
+   * {@link OutputSourceType#SYSOUT} to the {@link File} supplied.
+   *
+   * @param log A {@link File} object where the log is going to be written.
+   * @return A {@link File} object where the log is going to be written.
+   * @throws ProcessException
+   */
+  File saveLog(final File log) throws ProcessException;
   /**
    * Returns the process exit / return code.
    *
@@ -76,8 +85,8 @@ public interface Output {
   int getReturnCode();
 
   /**
-   * Search the content of the {@link ProcessConfiguration#getMasterLogFile()} for a particular
-   * regex. The search is done line by line.
+   * Search the content of the {@link Configuration#getMasterLogFile()} for a particular regex. The
+   * search is done line by line.
    *
    * @param regex a proper Regular Expression that need to be searched for.
    * @return a {@link Boolean#TRUE} or {@link Boolean#FALSE} depending upon if the search is

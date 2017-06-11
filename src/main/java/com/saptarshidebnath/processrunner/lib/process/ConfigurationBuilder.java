@@ -120,7 +120,7 @@ public class ConfigurationBuilder {
       throw new ProcessConfigurationException(
           Utilities.joinString(
               "Command's current directory is set '",
-              this.workingDir.toAbsolutePath().toString(),
+              workingDir.toAbsolutePath().toString(),
               "'. Either the Directory doesn't exist or is not a directory at all"));
     }
     this.workingDir = workingDir;

@@ -25,14 +25,11 @@
 
 package com.saptarshidebnath.processrunner.lib.utilities;
 
-import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
-import com.saptarshidebnath.processrunner.lib.process.ConfigurationBuilder;
-import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -55,25 +52,6 @@ public class Utilities {
    */
   public static File createTempLogDump() throws IOException {
     return File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
-  }
-
-  /**
-   * Write a log content from the {@link ProcessConfiguration#masterLogFile} to new {@link File} as
-   * per provided {@link ProcessConfiguration} for a particular {@link OutputSourceType}.
-   *
-   * @param configuration accepts a {@link ProcessConfiguration}
-   * @param targetFile accepts a target {@link File}.
-   * @param outputSourceType Accepts the {@link OutputSourceType} which need to be printed only.
-   * @return a {@link File} reference to the newly written log {@link File}.
-   * @throws ProcessException in case of any exception.
-   */
-  @Deprecated
-  public static File writeLog(
-      final ProcessConfiguration configuration,
-      final File targetFile,
-      final OutputSourceType outputSourceType)
-      throws ProcessException, ProcessConfigurationException, IOException {
-    return writeLog(convertConfig(configuration), targetFile, outputSourceType);
   }
 
   /**
@@ -106,7 +84,9 @@ public class Utilities {
       do {
         outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
         final String currentOutputLine;
-        if (outputRecord != null && outputRecord.getOutputSourceType() == outputSourceType) {
+        if (outputRecord != null
+            && (outputSourceType == OutputSourceType.ALL
+                || outputRecord.getOutputSourceType() == outputSourceType)) {
           currentOutputLine = outputRecord.getOutputText();
           logger.log(
               Level.INFO,
@@ -132,17 +112,6 @@ public class Utilities {
 
   public static String joinString(List<String> stringList) {
     return stringList.stream().collect(Collectors.joining(Constants.EMPTY_STRING));
-  }
-
-  public static Configuration convertConfig(ProcessConfiguration configuration)
-      throws ProcessConfigurationException, IOException {
-    return new ConfigurationBuilder(
-            configuration.getCommand(), configuration.getCommandRunnerInterPreter())
-        .setLogLevel(configuration.getLogLevel())
-        .setMasterLogFile(configuration.getMasterLogFile(), configuration.getAutoDeleteFileOnExit())
-        .setStramingDestination(configuration.getPrintStream())
-        .setWorkigDir(configuration.getCurrentDirectory().toPath())
-        .build();
   }
 
   public static boolean searchFile(Logger logger, File fileToRead, final String regex)

@@ -25,11 +25,9 @@
 
 package com.saptarshidebnath.processrunner.lib.exception;
 
-import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
+import com.saptarshidebnath.processrunner.lib.process.Configuration;
 
-/**
- * Custom {@link Exception} denote that the {@link ProcessConfiguration} is not configured correctly
- */
+/** Custom {@link Exception} denote that the {@link Configuration} is not configured correctly */
 public class ProcessConfigurationException extends Exception {
 
   /**

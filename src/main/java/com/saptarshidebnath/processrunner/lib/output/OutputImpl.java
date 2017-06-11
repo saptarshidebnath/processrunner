@@ -26,7 +26,7 @@
 package com.saptarshidebnath.processrunner.lib.output;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
-import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
+import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 
 import java.io.File;
@@ -34,19 +34,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Default Implementation of {@link Output} */
-@Deprecated
 class OutputImpl implements Output {
-  private final ProcessConfiguration configuration;
+  private final Configuration configuration;
   private final Logger logger;
   private final int returnCode;
 
   /**
-   * Accepts {@link ProcessConfiguration} and retunr code to create a {@link Output} object.
+   * Accepts {@link Configuration} and retunr code to create a {@link Output} object.
    *
-   * @param configuration a valid {@link ProcessConfiguration} object.
+   * @param configuration a valid {@link Configuration} object.
    * @param returnCode a {@link Integer} value typically ranging from 0 - 255
    */
-  OutputImpl(final ProcessConfiguration configuration, final int returnCode) {
+  OutputImpl(final Configuration configuration, final int returnCode) {
     this.configuration = configuration;
     this.logger = Logger.getLogger(this.getClass().getCanonicalName());
     this.logger.setLevel(this.configuration.getLogLevel());
@@ -103,13 +102,24 @@ class OutputImpl implements Output {
    * @return a {@link File} reference to the json formatted master log .
    */
   @Override
-  public File getMasterLog() {
+  public File getMasterLogAsJson() {
     return this.configuration.getMasterLogFile();
   }
 
+  @Override
+  public File saveLog(File log) throws ProcessException {
+    File response = null;
+    try {
+      response = Utilities.writeLog(this.configuration, log, OutputSourceType.ALL);
+    } catch (Exception e) {
+      throw new ProcessException(e);
+    }
+    return response;
+  }
+
   /**
-   * Search the content of the {@link ProcessConfiguration#getMasterLogFile()} for a particular
-   * regex. The search is done line by line.
+   * Search the content of the {@link Configuration#getMasterLogFile()} for a particular regex. The
+   * search is done line by line.
    *
    * @param regex a proper Regular Expression that need to be searched for.
    * @return a {@link Boolean#TRUE} or {@link Boolean#FALSE} depending upon if the search is
@@ -119,7 +129,7 @@ class OutputImpl implements Output {
    */
   @Override
   public boolean searchMasterLog(final String regex) throws ProcessException {
-    return Utilities.searchFile(this.logger, this.getMasterLog(), regex);
+    return Utilities.searchFile(this.logger, this.getMasterLogAsJson(), regex);
   }
 
   /**

@@ -13,6 +13,7 @@ apply plugin: 'java'
 apply plugin: 'signing'
 apply plugin: 'maven'
 apply plugin: 'io.codearte.nexus-staging'
+apply plugin: 'jacoco'
 
 group = 'com.saptarshidebnath.utilities'
 archivesBaseName = 'ProcessRunner'
@@ -116,3 +117,14 @@ nexusStaging {
 //
 // https://github.com/Codearte/gradle-nexus-staging-plugin/
 //
+
+jacocoTestReport {
+    group = "Reporting"
+    reports {
+        xml.enabled true
+        csv.enabled true
+        html.destination "${buildDir}/reports/coverage"
+    }
+}
+
+check.dependsOn jacocoTestReport

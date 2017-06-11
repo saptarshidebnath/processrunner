@@ -26,7 +26,6 @@
 package com.saptarshidebnath.processrunner.lib.output;
 
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
-import com.saptarshidebnath.processrunner.lib.process.ProcessConfiguration;
 
 /**
  * Factory class to create reference for {@link Output}. It uses the {@link OutputImpl} which
@@ -39,24 +38,11 @@ public class OutputFactory {
   /**
    * Creates a object of type {@link Output}
    *
-   * @param configuration Accepts a valid {@link ProcessConfiguration} reference.
-   * @param returnCode Accepts the exit code of process / script executed.
-   * @return a reference of type {@link Output}
-   */
-  @Deprecated
-  public static Output createOutput(
-      final ProcessConfiguration configuration, final int returnCode) {
-    return new OutputImpl(configuration, returnCode);
-  }
-
-  /**
-   * Creates a object of type {@link Output}
-   *
-   * @param configuration Accepts a valid {@link ProcessConfiguration} reference.
+   * @param configuration Accepts a valid {@link Configuration} reference.
    * @param returnCode Accepts the exit code of process / script executed.
    * @return a reference of type {@link Output}
    */
   public static Output createOutput(final Configuration configuration, final int returnCode) {
-    return new OutputImple(configuration, returnCode);
+    return new OutputImpl(configuration, returnCode);
   }
 }
