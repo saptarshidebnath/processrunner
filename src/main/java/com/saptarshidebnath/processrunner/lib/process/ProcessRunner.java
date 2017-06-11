@@ -43,6 +43,9 @@ public interface ProcessRunner {
    * @return the {@link Integer} exit code for the process.
    * @throws ProcessException Throws {@link ProcessException} to denote that there is an error. You
    *     can get the cause by {@link ProcessException#getCause()}
+   * @throws IOException denoting there is an IO problem during writing the log files.
+   * @throws InterruptedException there is a problem when writing the logs via thread enabled log
+   *     handlers.
    */
   Output run() throws ProcessException, IOException, InterruptedException;
 

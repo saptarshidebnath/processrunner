@@ -59,16 +59,18 @@ public class ConfigurationBuilder {
    *
    * @param interpreter as {@link String} for example "bash", "cmd.exe /c"
    * @param command as {@link String} for example "echo 'I solemnly swear I am up to no good'"
+   * @throws ProcessConfigurationException is thrown if the interpreter or the command is null or
+   *     empty {@link String}
    */
   public ConfigurationBuilder(String interpreter, String command)
       throws ProcessConfigurationException {
-    if (interpreter.trim().length() == 0) {
+    if (interpreter == null || interpreter.trim().length() == 0) {
       throw new ProcessConfigurationException(
           Utilities.joinString(
               "Command ProcessRunnerImple Interpreter is set '",
               interpreter,
               "'. Need a valid command runner interpreter as /bin/bash in unix"));
-    } else if (command.trim().length() == 0) {
+    } else if (command == null || command.trim().length() == 0) {
       throw new ProcessConfigurationException(
           Utilities.joinString(
               "Command is set '", command, "'. Need a valid command like 'echo Hello World'"));
@@ -85,6 +87,7 @@ public class ConfigurationBuilder {
    *
    * @param param as {@link String}
    * @return the {@link ConfigurationBuilder}
+   * @throws ProcessConfigurationException if the parameter is null or an empty String.
    */
   public ConfigurationBuilder setParam(String param) throws ProcessConfigurationException {
     if (param == null || param.length() == 0) {
@@ -95,10 +98,11 @@ public class ConfigurationBuilder {
   }
 
   /**
-   * Add a {@link List<String>} paramter
+   * Add a {@link List} parameter of type {@link String}
    *
-   * @param paramList as {@link List<String>}
+   * @param paramList as {@link List} of type {@link String}
    * @return the {@link ConfigurationBuilder}
+   * @throws ProcessConfigurationException if the parameter is null or an empty String.
    */
   public ConfigurationBuilder setParamList(List<String> paramList)
       throws ProcessConfigurationException {
@@ -114,6 +118,8 @@ public class ConfigurationBuilder {
    *
    * @param workingDir accepts {@link Path} current working directory
    * @return the {@link ConfigurationBuilder}
+   * @throws ProcessConfigurationException if the working directory is not a directory or it doesn't
+   *     exist.
    */
   public ConfigurationBuilder setWorkigDir(Path workingDir) throws ProcessConfigurationException {
     if (!workingDir.toFile().exists() || !workingDir.toFile().isDirectory()) {
@@ -171,8 +177,9 @@ public class ConfigurationBuilder {
    * Builds the {@link Configuration} object and returns it back
    *
    * @return a reference to the {@link Configuration} object created.
-   * @throws IOException
-   * @throws ProcessConfigurationException
+   * @throws IOException on errors while validating paths and log file if any
+   * @throws ProcessConfigurationException if there is any exception while populating the {@link
+   *     Configuration}
    */
   public Configuration build() throws IOException, ProcessConfigurationException {
     String commandWithParam =

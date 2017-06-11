@@ -49,7 +49,7 @@ public class Configuration {
   private final PrintStream printStream;
 
   /**
-   * Constructor to set the configureation to be consumed by {@link ProcessRunner}.
+   * Constructor to set the configuration to be consumed by {@link ProcessRunner}.
    *
    * @param interpreter : sets the {@link String} command interpreter like /bin/bash in unix
    * @param command : set the actual {@link String} command to be executed

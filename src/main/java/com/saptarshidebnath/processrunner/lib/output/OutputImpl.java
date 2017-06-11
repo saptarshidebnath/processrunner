@@ -25,11 +25,13 @@
 
 package com.saptarshidebnath.processrunner.lib.output;
 
+import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,15 +108,18 @@ class OutputImpl implements Output {
     return this.configuration.getMasterLogFile();
   }
 
+  /**
+   * Save the log of the process executed as a text file.
+   *
+   * @param log A {@link File} object where the log is going to be written.
+   * @return a reference to the {@link File} where the log is written. Its the same as that of the
+   *     parameter taken as input.
+   * @throws IOException when there are problems with IO
+   * @throws JsonArrayReaderException when there are problems reading the master log file.
+   */
   @Override
-  public File saveLog(File log) throws ProcessException {
-    File response = null;
-    try {
-      response = Utilities.writeLog(this.configuration, log, OutputSourceType.ALL);
-    } catch (Exception e) {
-      throw new ProcessException(e);
-    }
-    return response;
+  public File saveLog(File log) throws IOException, JsonArrayReaderException {
+    return Utilities.writeLog(this.configuration, log, OutputSourceType.ALL);
   }
 
   /**

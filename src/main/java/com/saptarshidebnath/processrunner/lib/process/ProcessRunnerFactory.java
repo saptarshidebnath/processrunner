@@ -44,6 +44,9 @@ public class ProcessRunnerFactory {
    * @return a reference to {@link Output}
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
+   * @throws IOException denoting there is an IO problem during writing the log files.
+   * @throws InterruptedException there is a problem when writing the logs via thread enabled log
+   *     handlers.
    */
   public static Output startProcess(final Configuration configuration)
       throws ProcessException, IOException, InterruptedException {
@@ -59,6 +62,7 @@ public class ProcessRunnerFactory {
    *     {@link Output} of the process.
    * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
    *     have happened.
+   * @throws IOException denoting there is an IO problem during writing the log files.
    */
   public static Future<Output> startAsyncProcess(final Configuration configuration)
       throws ProcessException, IOException {
@@ -69,9 +73,10 @@ public class ProcessRunnerFactory {
    * Create a instance of {@link ProcessRunner}. This method doesn't start the process and is upon
    * the developer to actually trigger the process.
    *
-   * @param configuration
-   * @return
-   * @throws IOException
+   * @param configuration a reference of {@link Configuration}. The {@link Configuration} can be
+   *     build quite easily via {@link ConfigurationBuilder}
+   * @return a reference of {@link ProcessRunner}
+   * @throws IOException when there are any issue when pre creating the json log handlers.
    */
   public static ProcessRunner getProcess(Configuration configuration) throws IOException {
     return new ProcessRunnerImpl(configuration);

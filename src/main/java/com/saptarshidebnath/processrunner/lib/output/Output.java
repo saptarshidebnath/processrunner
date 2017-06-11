@@ -25,11 +25,13 @@
 
 package com.saptarshidebnath.processrunner.lib.output;
 
+import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.process.ProcessRunner;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * The Output of a run is returned as a reference of {@link Output} class. The interface for the
@@ -69,14 +71,18 @@ public interface Output {
   File getMasterLogAsJson();
 
   /**
-   * Prints the {@link OutputRecord#getOutputText()} of both {@link OutputSourceType#SYSERROR} &
+   * Prints the {@link OutputRecord#getOutputText()} of both {@link OutputSourceType#SYSERROR} and
    * {@link OutputSourceType#SYSOUT} to the {@link File} supplied.
    *
    * @param log A {@link File} object where the log is going to be written.
    * @return A {@link File} object where the log is going to be written.
-   * @throws ProcessException
+   * @throws ProcessException is thrown that there are issues regarding the writing of the log or
+   *     reading the JSON array.
+   * @throws IOException when there is a issue with the IO for reading and writing the file.
+   * @throws JsonArrayReaderException when the aster log file in JSON format cannot be read back
+   *     from the disk.
    */
-  File saveLog(final File log) throws ProcessException;
+  File saveLog(final File log) throws ProcessException, IOException, JsonArrayReaderException;
   /**
    * Returns the process exit / return code.
    *
