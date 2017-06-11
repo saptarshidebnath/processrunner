@@ -249,8 +249,19 @@ public class ProcessProcessRunnerFactoryTest {
                 .setLogLevel(Level.INFO)
                 .setStramingDestination(ps)
                 .build());
-    String outputString =
-        baos.toString(StandardCharsets.UTF_8.toString()).split(Constants.NEW_LINE)[2].substring(10);
+    String outputString = null;
+    if (SystemUtils.IS_OS_WINDOWS) {
+      outputString =
+          baos.toString(StandardCharsets.UTF_8.toString())
+              .split(Constants.NEW_LINE)[2]
+              .substring(10);
+    } else {
+      outputString =
+          baos.toString(StandardCharsets.UTF_8.toString())
+              .split(Constants.NEW_LINE)[1]
+              .substring(10);
+    }
+
     assertThat(
         "Validating streaming log content : ",
         outputString,
