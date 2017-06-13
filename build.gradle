@@ -159,6 +159,9 @@ jacocoTestReport {
 
 check.dependsOn jacocoTestReport
 
+//
+// Sonar
+//
 sonarqube {
     properties {
         property "sonar.projectName", "Process Runner is java based library using which one can execute system process or scripts from inside your java program."
