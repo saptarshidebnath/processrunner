@@ -23,9 +23,6 @@ apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'jacoco'
 apply plugin: 'org.sonarqube'
 
-plugins {
-    id "org.sonarqube" version "2.5"
-}
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
