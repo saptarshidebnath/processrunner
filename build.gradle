@@ -9,7 +9,6 @@ buildscript {
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.8.0"
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
     }
 }
 
@@ -23,6 +22,10 @@ apply plugin: 'maven'
 apply plugin: 'io.codearte.nexus-staging'
 apply plugin: 'jacoco'
 apply plugin: 'org.sonarqube'
+
+plugins {
+    id "org.sonarqube" version "2.5"
+}
 
 group = 'com.saptarshidebnath.utilities'
 archivesBaseName = 'ProcessRunner'
@@ -155,3 +158,10 @@ jacocoTestReport {
 }
 
 check.dependsOn jacocoTestReport
+
+sonarqube {
+    properties {
+        property "sonar.projectName", "Process Runner is java based library using which one can execute system process or scripts from inside your java program."
+        property "sonar.projectKey", "com.saptarshidebnath.utilities:ProcessRunner"
+    }
+}
