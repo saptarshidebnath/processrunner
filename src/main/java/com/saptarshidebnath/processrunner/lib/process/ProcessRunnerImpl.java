@@ -26,6 +26,7 @@
 package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
+import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile;
 import com.saptarshidebnath.processrunner.lib.output.Output;
@@ -66,7 +67,8 @@ class ProcessRunnerImpl implements ProcessRunner {
     this.runTime = Runtime.getRuntime();
     if (this.configuration.getMasterLogFile() != null) {
       this.jsonArrayToOutputStream =
-          new WriteJsonArrayToFile<>(this.configuration.getMasterLogFile());
+          new WriteJsonArrayToFile<>(
+              this.configuration.getMasterLogFile(), this.configuration.getCharset());
     } else {
       this.jsonArrayToOutputStream = null;
     }
@@ -206,18 +208,17 @@ class ProcessRunnerImpl implements ProcessRunner {
         final String currentLine = scanner.nextLine();
         //        this.logger.log(
         //            Level.INFO, "{0} >> {1}", new Object[] {outputSourceType.toString(), currentLine});
-        if (printStream != null) {
+        if (printStream != null)
           printStream.println(outputSourceType.toString() + " >> " + currentLine);
-        }
         ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
             new OutputRecord(outputSourceType, currentLine));
       }
-    } catch (final Exception ex) {
+    } catch (JsonArrayWriterException | IOException ex) {
       final StringWriter sw = new StringWriter();
       ex.printStackTrace(new PrintWriter(sw));
       this.logger.log(
           Level.SEVERE,
-          "Unable to write data to {0}",
+          "Unable to log {0}",
           new Object[] {this.configuration.getMasterLogFile().getAbsolutePath()});
       this.logger.log(Level.SEVERE, "Cause : {0}", ex);
       this.logger.log(Level.SEVERE, "{0}", new Object[] {sw.toString()});

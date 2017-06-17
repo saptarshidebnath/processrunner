@@ -28,6 +28,7 @@ package com.saptarshidebnath.processrunner.lib.process;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.output.Output;
@@ -124,8 +125,8 @@ public class ProcessProcessRunnerFactoryTest {
 
   @Test
   public void searchContent()
-      throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
-          InterruptedException {
+      throws ProcessConfigurationException, IOException, InterruptedException, ProcessException,
+          JsonArrayReaderException {
 
     final Output response =
         ProcessRunnerFactory.startProcess(
@@ -151,8 +152,8 @@ public class ProcessProcessRunnerFactoryTest {
 
   @Test
   public void searchContentNegativeTestCase()
-      throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
-          InterruptedException {
+      throws ProcessConfigurationException, IOException, InterruptedException, ProcessException,
+          JsonArrayReaderException {
 
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
@@ -247,7 +248,7 @@ public class ProcessProcessRunnerFactoryTest {
                 .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
                 .setMasterLogFile(Utilities.createTempLogDump(), true)
                 .setLogLevel(Level.INFO)
-                .setStramingDestination(ps)
+                .setStreamingDestination(ps)
                 .build());
     String outputString = null;
     if (SystemUtils.IS_OS_WINDOWS) {

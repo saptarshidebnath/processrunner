@@ -100,5 +100,5 @@ public interface Output {
    * @throws ProcessException In case of any error. This is a generic error. To get the details,
    *     please use {@link ProcessException#getCause()}.
    */
-  boolean searchMasterLog(final String regex) throws ProcessException;
+  boolean searchMasterLog(final String regex) throws ProcessException, IOException, JsonArrayReaderException;
 }

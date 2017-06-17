@@ -26,6 +26,7 @@
 package com.saptarshidebnath.processrunner.lib.utilities;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -41,6 +42,7 @@ public class Constants {
   public static final ThreadGroup PROCESS_RUNNER_THREAD_GROUP =
       new ThreadGroup("PROCESS_RUNNER_0.0.2");
   public static final int LOGGER_THREAD_COUNT = 2;
+  public static final Charset UTF_8 = Charset.forName("UTF-8");
 
   private Constants() {}
 }

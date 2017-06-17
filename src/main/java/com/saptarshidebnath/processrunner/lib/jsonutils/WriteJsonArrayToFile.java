@@ -29,11 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 
 /**
@@ -52,13 +48,13 @@ public class WriteJsonArrayToFile<T> {
    * Constructor with the target {@link File} where the array needs to be written.
    *
    * @param targetFile : {@link File} reference where the content is going to be saved.
+   * @param charset : sets a reference of {@link Charset} which will be used for encoding while
+   *     writing the master log file.
    * @throws IOException When the target file could not be opened for the {@link File}.
    */
-  public WriteJsonArrayToFile(final File targetFile) throws IOException {
+  public WriteJsonArrayToFile(final File targetFile, Charset charset) throws IOException {
     this.printWriter =
-        new PrintWriter(
-            new OutputStreamWriter(
-                new FileOutputStream(targetFile, true), Charset.defaultCharset()));
+        new PrintWriter(new OutputStreamWriter(new FileOutputStream(targetFile, true), charset));
     this.gson = new GsonBuilder().create();
   }
 

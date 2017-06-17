@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import static com.saptarshidebnath.processrunner.lib.utilities.Constants.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
@@ -63,7 +64,7 @@ public class WriteJsonArrayToFileTest {
     }
     this.arrayOfDataToWrite = new String[dataList.size()];
     this.arrayOfDataToWrite = dataList.toArray(this.arrayOfDataToWrite);
-    this.testObject = new WriteJsonArrayToFile<>(this.tempFile);
+    this.testObject = new WriteJsonArrayToFile<>(this.tempFile, UTF_8);
     this.gson = new GsonBuilder().create();
     this.logger = Logger.getLogger(this.getClass().getCanonicalName());
   }

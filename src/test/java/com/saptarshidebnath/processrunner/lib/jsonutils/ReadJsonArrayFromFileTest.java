@@ -32,15 +32,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import static com.saptarshidebnath.processrunner.lib.utilities.Constants.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
@@ -69,7 +66,7 @@ public class ReadJsonArrayFromFileTest {
     pw.print(this.jsonContent);
     pw.flush();
     pw.close();
-    this.testObject = new ReadJsonArrayFromFile<>(this.testFile);
+    this.testObject = new ReadJsonArrayFromFile<>(this.testFile, UTF_8);
   }
 
   @After

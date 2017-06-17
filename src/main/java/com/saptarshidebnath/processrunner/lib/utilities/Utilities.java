@@ -26,7 +26,6 @@
 package com.saptarshidebnath.processrunner.lib.utilities;
 
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
-import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
@@ -74,37 +73,37 @@ public class Utilities {
       throws IOException, JsonArrayReaderException {
     final Logger logger = Logger.getLogger(Utilities.class.getCanonicalName());
     logger.setLevel(configuration.getLogLevel());
-    final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
-    final PrintWriter printWriter =
-        new PrintWriter(new OutputStreamWriter(fileOutputStream, Charset.defaultCharset()));
-    final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
-        new ReadJsonArrayFromFile<>(configuration.getMasterLogFile());
-    logger.log(
-        Level.INFO,
-        "Writing {0} to : {1}",
-        new Object[] {outputSourceType.toString(), targetFile.getCanonicalPath()});
-    OutputRecord outputRecord;
-    do {
-      outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
-      final String currentOutputLine;
-      if (outputRecord != null
-          && (outputSourceType == OutputSourceType.ALL
-              || outputRecord.getOutputSourceType() == outputSourceType)) {
-        currentOutputLine = outputRecord.getOutputText();
-        logger.log(
-            Level.INFO,
-            "{0} >> {1}",
-            new Object[] {outputSourceType.toString(), currentOutputLine});
-        printWriter.println(currentOutputLine);
-      }
-    } while (outputRecord != null);
+    try (final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
+        final PrintWriter printWriter =
+            new PrintWriter(new OutputStreamWriter(fileOutputStream, configuration.getCharset()))) {
+
+      final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
+          new ReadJsonArrayFromFile<>(configuration.getMasterLogFile(), configuration.getCharset());
+      logger.log(
+          Level.INFO,
+          "Writing {0} to : {1}",
+          new Object[] {outputSourceType.toString(), targetFile.getCanonicalPath()});
+      OutputRecord outputRecord;
+      do {
+        outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
+        final String currentOutputLine;
+        if (outputRecord != null
+            && (outputSourceType == OutputSourceType.ALL
+                || outputRecord.getOutputSourceType() == outputSourceType)) {
+          currentOutputLine = outputRecord.getOutputText();
+          logger.log(
+              Level.INFO,
+              "{0} >> {1}",
+              new Object[] {outputSourceType.toString(), currentOutputLine});
+          printWriter.println(currentOutputLine);
+        }
+      } while (outputRecord != null);
+    }
 
     logger.log(
         Level.INFO,
         "{0} written completely to : {1}",
         new Object[] {outputSourceType.toString(), targetFile.getCanonicalPath()});
-    printWriter.close();
-    fileOutputStream.close();
     return targetFile;
   }
 
@@ -116,29 +115,26 @@ public class Utilities {
     return stringList.stream().collect(Collectors.joining(Constants.EMPTY_STRING));
   }
 
-  public static boolean searchFile(Logger logger, File fileToRead, final String regex)
-      throws ProcessException {
+  public static boolean searchFile(
+      Logger logger, File fileToRead, final String regex, Charset charset)
+      throws IOException, JsonArrayReaderException {
     boolean isMatching = false;
-    try {
-      logger.log(Level.INFO, "Searching for regular expression : {0}", new Object[] {regex});
-      final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
-          new ReadJsonArrayFromFile<>(fileToRead);
-      OutputRecord outputRecord;
-      do {
-        outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
-        if (outputRecord != null) {
-          isMatching = outputRecord.getOutputText().matches(regex);
-        }
-      } while (outputRecord != null && !isMatching);
-      if (isMatching) {
-        logger.log(Level.INFO, "Regex {0} is found", new Object[] {regex});
-      } else {
-        logger.log(Level.WARNING, "Regex {0} is NOT found", new Object[] {regex});
+    logger.log(Level.INFO, "Searching for regular expression : {0}", new Object[] {regex});
+    final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
+        new ReadJsonArrayFromFile<>(fileToRead, charset);
+    OutputRecord outputRecord;
+    do {
+      outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
+      if (outputRecord != null) {
+        isMatching = outputRecord.getOutputText().matches(regex);
       }
-      readJsonArrayFromFile.closeJsonReader();
-    } catch (final Exception ex) {
-      throw new ProcessException(ex);
+    } while (outputRecord != null && !isMatching);
+    if (isMatching) {
+      logger.log(Level.INFO, "Regex {0} is found", new Object[] {regex});
+    } else {
+      logger.log(Level.WARNING, "Regex {0} is NOT found", new Object[] {regex});
     }
+    readJsonArrayFromFile.closeJsonReader();
     return isMatching;
   }
 }

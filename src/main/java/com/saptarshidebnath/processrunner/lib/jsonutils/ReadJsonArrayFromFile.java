@@ -50,13 +50,13 @@ public class ReadJsonArrayFromFile<T> {
    * Constructor to read a Json Array File Object by Object
    *
    * @param targetFile : {@link File} reference to the JSON file that needs to be read.
+   * @param charset : sets the decoding {@link Charset} of the file.
    * @throws IOException to inform if there is any problem reading the {@link File} reference
    *     objects.
    */
-  public ReadJsonArrayFromFile(final File targetFile) throws IOException {
+  public ReadJsonArrayFromFile(final File targetFile, Charset charset) throws IOException {
     this.jsonReader =
-        new JsonReader(
-            new InputStreamReader(new FileInputStream(targetFile), Charset.defaultCharset()));
+        new JsonReader(new InputStreamReader(new FileInputStream(targetFile), charset));
     this.gson = new GsonBuilder().setPrettyPrinting().create();
   }
 

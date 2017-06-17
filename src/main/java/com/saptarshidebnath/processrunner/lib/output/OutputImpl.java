@@ -129,12 +129,14 @@ class OutputImpl implements Output {
    * @param regex a proper Regular Expression that need to be searched for.
    * @return a {@link Boolean#TRUE} or {@link Boolean#FALSE} depending upon if the search is
    *     positive or negative.
-   * @throws ProcessException In case of any error. This is a generic error. To get the details,
-   *     please use {@link ProcessException#getCause()}.
+   * @throws JsonArrayReaderException In case of any error reading the master JSON file . To get the
+   *     details, please use {@link ProcessException#getCause()}.
+   * @throws IOException In case of any IO error.
    */
   @Override
-  public boolean searchMasterLog(final String regex) throws ProcessException {
-    return Utilities.searchFile(this.logger, this.getMasterLogAsJson(), regex);
+  public boolean searchMasterLog(final String regex) throws IOException, JsonArrayReaderException {
+    return Utilities.searchFile(
+        this.logger, this.getMasterLogAsJson(), regex, this.configuration.getCharset());
   }
 
   /**

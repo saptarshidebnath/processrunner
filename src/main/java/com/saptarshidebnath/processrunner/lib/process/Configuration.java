@@ -30,6 +30,7 @@ import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationExce
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +44,7 @@ public class Configuration {
   private final String command;
   private final Path workingDir;
   private final File masterLogFile;
+  private final Charset charset;
   private final boolean autoDeleteFileOnExit;
   private final Logger logger;
   private final Level logLevel;
@@ -55,6 +57,8 @@ public class Configuration {
    * @param command : set the actual {@link String} command to be executed
    * @param workingDir : sets the working directory in {@link File} format
    * @param masterLogFile : {@link File} where the log data will be stored.
+   * @param charset : a reference of which {@link Charset} to use while writing the {@link
+   *     Configuration#masterLogFile}
    * @param autoDeleteFileOnExit : set the flag to denote if the sysout and the syserror {@link
    *     File} going to be auto deleted on exit
    * @param logLevel {@link Level} value setting for the minimum {@link Level} for printing debug
@@ -71,6 +75,7 @@ public class Configuration {
       final String command,
       final Path workingDir,
       final File masterLogFile,
+      final Charset charset,
       final boolean autoDeleteFileOnExit,
       final Level logLevel,
       final PrintStream printStream)
@@ -89,6 +94,7 @@ public class Configuration {
     final String currentConfiguration = toString();
     this.logger.info(currentConfiguration);
     this.printStream = printStream;
+    this.charset = charset;
   }
 
   @Override
@@ -166,5 +172,24 @@ public class Configuration {
    */
   public PrintStream getPrintStream() {
     return this.printStream;
+  }
+
+  /**
+   * Returns the charset set for the {@link Configuration#masterLogFile}
+   *
+   * @return a reference of the class {@link Charset} in which the {@link
+   *     Configuration#masterLogFile} will be written.
+   */
+  public Charset getCharset() {
+    return charset;
+  }
+
+  /**
+   * Denotes if the master log file is going to be auto deleted when teh JVM exits.
+   *
+   * @return a {@link Boolean}
+   */
+  public boolean isAutoDeleteFileOnExit() {
+    return autoDeleteFileOnExit;
   }
 }

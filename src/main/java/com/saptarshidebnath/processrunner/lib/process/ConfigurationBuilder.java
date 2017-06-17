@@ -32,12 +32,15 @@ import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static com.saptarshidebnath.processrunner.lib.utilities.Constants.UTF_8;
 
 /**
  * {@link ConfigurationBuilder} is the way going forward to build the configuration for the {@link
@@ -53,6 +56,7 @@ public class ConfigurationBuilder {
   private Logger logger;
   private Level logLevel;
   private PrintStream printStream;
+  private Charset charset;
 
   /**
    * The only required parameters are the {@link String} interpreter and the {@link String} command
@@ -142,8 +146,24 @@ public class ConfigurationBuilder {
    * @return the {@link ConfigurationBuilder}
    */
   public ConfigurationBuilder setMasterLogFile(File masterLogFile, boolean autoDeleteFileOnExit) {
+    return this.setMasterLogFile(masterLogFile, autoDeleteFileOnExit, UTF_8);
+  }
+
+  /**
+   * Set the master log file as {@link File}
+   *
+   * @param masterLogFile accepts a {@link File} reference as master log file.
+   * @param autoDeleteFileOnExit accepts a {@link Boolean} flag to determine if the master log file
+   *     is going to be auto deleted or not on JVM exit.
+   * @param charset a reference of {@link Charset} class to set in which chaset the output file is
+   *     going to be written.
+   * @return the {@link ConfigurationBuilder}
+   */
+  public ConfigurationBuilder setMasterLogFile(
+      File masterLogFile, boolean autoDeleteFileOnExit, Charset charset) {
     this.masterLogFile = masterLogFile;
     this.autoDeleteFileOnExit = autoDeleteFileOnExit;
+    this.charset = charset;
     return this;
   }
 
@@ -168,7 +188,7 @@ public class ConfigurationBuilder {
    * @param printStream a reference of {@link PrintStream}
    * @return the {@link ConfigurationBuilder}
    */
-  public ConfigurationBuilder setStramingDestination(PrintStream printStream) {
+  public ConfigurationBuilder setStreamingDestination(PrintStream printStream) {
     this.printStream = printStream;
     return this;
   }
@@ -196,6 +216,7 @@ public class ConfigurationBuilder {
             commandWithParam,
             workingDir,
             masterLogFile,
+            charset,
             autoDeleteFileOnExit,
             logLevel,
             printStream);
