@@ -29,7 +29,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 group = 'com.saptarshidebnath.utilities'
 archivesBaseName = 'ProcessRunner'
-version = '0.0.3.0'
+version = '0.3.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -66,6 +66,7 @@ tasks.withType(Test) {
         showExceptions true
         showStackTraces true
     }
+    maxParallelForks = maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
