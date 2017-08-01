@@ -40,64 +40,69 @@ import java.nio.charset.Charset;
  */
 public class WriteJsonArrayToFile<T> {
 
-  private final Gson gson;
-  private PrintWriter printWriter;
-  private volatile Boolean firstElement = true;
+    private final Gson gson;
+    private PrintWriter printWriter;
+    private volatile Boolean firstElement = true;
 
-  /**
-   * Constructor with the target {@link File} where the array needs to be written.
-   *
-   * @param targetFile : {@link File} reference where the content is going to be saved.
-   * @param charset : sets a reference of {@link Charset} which will be used for encoding while
-   *     writing the master log file.
-   * @throws IOException When the target file could not be opened for the {@link File}.
-   */
-  public WriteJsonArrayToFile(final File targetFile, Charset charset) throws IOException {
-    this.printWriter =
-        new PrintWriter(new OutputStreamWriter(new FileOutputStream(targetFile, true), charset));
-    this.gson = new GsonBuilder().create();
-  }
-
-  /**
-   * This method doesn't modify the {@link File} configured in the constructor. It just marks that
-   * the beginning of a object by a flag. Actual start will be written when the {@link
-   * WriteJsonArrayToFile#writeJsonObject(Object)} is called.
-   */
-  public void startJsonObject() {
-    this.firstElement = true;
-  }
-
-  /**
-   * Write a json object to the {@link File} configured. The library used {@link Gson} to convert
-   * any object to json {@link String}.
-   *
-   * @param object : Object of Type T to be written to the disk.
-   * @throws JsonArrayWriterException an {@link JsonArrayWriterException} if there is an error
-   *     writing the object to the disk.
-   */
-  public synchronized void writeJsonObject(final T object) throws JsonArrayWriterException {
-    if (this.printWriter != null) {
-      final String objectAsJson = this.gson.toJson(object);
-      final String stringToWrite = this.firstElement ? "[" + objectAsJson : ", " + objectAsJson;
-      this.printWriter.println(stringToWrite);
-      this.firstElement = false;
-    } else {
-      throw new JsonArrayWriterException(
-          "Json object is already written and file is closed. Please create a new process ot write another json array");
+    /**
+     * Constructor with the target {@link File} where the array needs to be written.
+     *
+     * @param targetFile : {@link File} reference where the content is going to be saved.
+     * @param charset    : sets a reference of {@link Charset} which will be used for encoding while
+     *                   writing the master log file.
+     * @throws IOException When the target file could not be opened for the {@link File}.
+     */
+    public WriteJsonArrayToFile(final File targetFile, Charset charset) throws IOException {
+        this.printWriter =
+                new PrintWriter(new OutputStreamWriter(new FileOutputStream(targetFile, true), charset));
+        this.gson = new GsonBuilder().create();
     }
-  }
 
-  /** Ends the json object and actually writes the same to the disk. */
-  public synchronized void endJsonObjectWrite() {
-    this.printWriter.write("]");
-    this.printWriter.flush();
-  }
-
-  /** Cleans up the Streams so that the lock on the {@link File} is released. */
-  public synchronized void cleanup() {
-    if (this.printWriter != null) {
-      this.printWriter.close();
-      this.printWriter = null;
+    /**
+     * This method doesn't modify the {@link File} configured in the constructor. It just marks that
+     * the beginning of a object by a flag. Actual start will be written when the {@link
+     * WriteJsonArrayToFile#writeJsonObject(Object)} is called.
+     */
+    public void startJsonObject() {
+        this.firstElement = true;
     }
-  }
+
+    /**
+     * Write a json object to the {@link File} configured. The library used {@link Gson} to convert
+     * any object to json {@link String}.
+     *
+     * @param object : Object of Type T to be written to the disk.
+     * @throws JsonArrayWriterException an {@link JsonArrayWriterException} if there is an error
+     *                                  writing the object to the disk.
+     */
+    public synchronized void writeJsonObject(final T object) throws JsonArrayWriterException {
+        if (this.printWriter != null) {
+            final String objectAsJson = this.gson.toJson(object);
+            final String stringToWrite = this.firstElement ? "[" + objectAsJson : ", " + objectAsJson;
+            this.printWriter.println(stringToWrite);
+            this.firstElement = false;
+        } else {
+            throw new JsonArrayWriterException(
+                    "Json object is already written and file is closed. Please create a new process ot write another json array");
+        }
+    }
+
+    /**
+     * Ends the json object and actually writes the same to the disk.
+     */
+    public synchronized void endJsonObjectWrite() {
+        this.printWriter.write("]");
+        this.printWriter.flush();
+    }
+
+    /**
+     * Cleans up the Streams so that the lock on the {@link File} is released.
+     */
+    public synchronized void cleanup() {
+        if (this.printWriter != null) {
+            this.printWriter.close();
+            this.printWriter = null;
+        }
+    }
 }
+

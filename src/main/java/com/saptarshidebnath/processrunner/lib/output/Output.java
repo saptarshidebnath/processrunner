@@ -26,12 +26,16 @@
 package com.saptarshidebnath.processrunner.lib.output;
 
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
+import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.process.ProcessRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * The Output of a run is returned as a reference of {@link Output} class. The interface for the
@@ -40,6 +44,7 @@ import java.io.IOException;
  */
 public interface Output {
 
+  public static final Logger logger = LoggerFactory.getLogger(Output.class);
   /**
    * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSOUT} to the
    * {@link File} supplied.
@@ -49,18 +54,18 @@ public interface Output {
    * @throws ProcessException In case of any error. This is a generic error. To get the details,
    *     please use {@link ProcessException#getCause()}.
    */
-  File saveSysOut(final File sysOut) throws ProcessException;
+  File saveSysOut(final File sysOut) throws ProcessException, ProcessConfigurationException;
 
   /**
-   * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSERROR} to
-   * the {@link File} supplied.
+   * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSERR} to the
+   * {@link File} supplied.
    *
    * @param sysError A {@link File} object where the log is going to be written.
    * @return A {@link File} object where the log has been written.
    * @throws ProcessException In case of any error. This is a generic error. To get the details,
    *     please use {@link ProcessException#getCause()}.
    */
-  File saveSysError(final File sysError) throws ProcessException;
+  File saveSysError(final File sysError) throws ProcessException, ProcessConfigurationException;
 
   /**
    * Returns the master log file originally captured while executing the Process. Its an Json Array
@@ -68,10 +73,10 @@ public interface Output {
    *
    * @return a {@link File} reference to the json formatted master log .
    */
-  File getMasterLogAsJson();
+  File getMasterLogAsJson() throws ProcessConfigurationException;
 
   /**
-   * Prints the {@link OutputRecord#getOutputText()} of both {@link OutputSourceType#SYSERROR} and
+   * Prints the {@link OutputRecord#getOutputText()} of both {@link OutputSourceType#SYSERR} and
    * {@link OutputSourceType#SYSOUT} to the {@link File} supplied.
    *
    * @param log A {@link File} object where the log is going to be written.
@@ -82,7 +87,7 @@ public interface Output {
    * @throws JsonArrayReaderException when the aster log file in JSON format cannot be read back
    *     from the disk.
    */
-  File saveLog(final File log) throws ProcessException, IOException, JsonArrayReaderException;
+  File saveLog(final File log) throws ProcessException, IOException, JsonArrayReaderException, ProcessConfigurationException;
   /**
    * Returns the process exit / return code.
    *
@@ -100,5 +105,17 @@ public interface Output {
    * @throws ProcessException In case of any error. This is a generic error. To get the details,
    *     please use {@link ProcessException#getCause()}.
    */
-  boolean searchMasterLog(final String regex) throws ProcessException, IOException, JsonArrayReaderException;
+  boolean searchMasterLog(final String regex)
+          throws ProcessException, IOException, JsonArrayReaderException, ProcessConfigurationException;
+
+  /**
+   * Searches for a pattern and returns a {@link List} of {@link String} which contains extracts
+   * from the output matching the provided regex ins {@link String} format
+   *
+   * @param regex accepts a {@link String} object to search for
+   * @return a {@link List} of {@link String}
+   * @throws IOException if there is a problem reading the log file
+   * @throws JsonArrayReaderException if there is a problem reading the Json log file.
+   */
+  List<String> grepForRegex(String regex) throws IOException, JsonArrayReaderException, ProcessConfigurationException;
 }

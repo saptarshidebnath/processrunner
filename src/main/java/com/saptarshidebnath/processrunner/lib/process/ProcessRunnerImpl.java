@@ -34,12 +34,11 @@ import com.saptarshidebnath.processrunner.lib.output.OutputFactory;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 
 import java.io.*;
 import java.util.Scanner;
 import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static com.saptarshidebnath.processrunner.lib.utilities.Constants.LOGGER_THREAD_COUNT;
 import static com.saptarshidebnath.processrunner.lib.utilities.Constants.PROCESS_RUNNER_THREAD_GROUP;
@@ -53,7 +52,6 @@ class ProcessRunnerImpl implements ProcessRunner {
   private final Configuration configuration;
   private final Runtime runTime;
   private final WriteJsonArrayToFile<OutputRecord> jsonArrayToOutputStream;
-  private final Logger logger = Logger.getLogger(this.getClass().getCanonicalName());
 
   /**
    * Constructor receiving the {@link Configuration} to create the process runner.
@@ -62,7 +60,6 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @throws IOException if Unable to work with the log files
    */
   ProcessRunnerImpl(final Configuration configuration) throws IOException {
-    this.logger.setLevel(configuration.getLogLevel());
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
     if (this.configuration.getMasterLogFile() != null) {
@@ -72,7 +69,7 @@ class ProcessRunnerImpl implements ProcessRunner {
     } else {
       this.jsonArrayToOutputStream = null;
     }
-    this.logger.log(Level.INFO, "Process ProcessRunnerImple created");
+    logger.info("Process ProcessRunner created");
   }
 
   /**
@@ -91,7 +88,7 @@ class ProcessRunnerImpl implements ProcessRunner {
         .append(this.configuration.getInterpreter())
         .append(Constants.SPACE)
         .append(this.configuration.getCommand());
-    this.logger.log(Level.INFO, "Executing command : {0}", commandToExecute.toString());
+    logger.trace("Executing command : {0}", commandToExecute.toString());
     final Process currentProcess =
         this.runTime.exec(
             commandToExecute.toString(),
@@ -99,17 +96,20 @@ class ProcessRunnerImpl implements ProcessRunner {
             this.configuration.getWorkingDir() == null
                 ? null
                 : this.configuration.getWorkingDir().toFile());
-    this.logger.info("Capturing logs");
+    logger.trace("Capturing logs");
     if (jsonArrayToOutputStream != null) {
       this.jsonArrayToOutputStream.startJsonObject();
     }
     //
-    // If both streaming and logging is disabled.
+    // If both streaming and logging is disabled, we are not going to bother capturing the log file.
     //
-    if (this.configuration.getPrintStream() == null
+    if (!this.configuration.isEnableLogStreaming()
         && this.configuration.getMasterLogFile() == null) {
-      this.logger.log(Level.WARNING, "Both output logging and log streaming is not configured.");
+      logger.warn("Both output logging and log streaming is disabled or not configured.");
     } else {
+      //
+      // Capturing log and streaming to log file or to logger or to both
+      //
       final ExecutorService executor =
           Executors.newFixedThreadPool(
               LOGGER_THREAD_COUNT,
@@ -118,16 +118,16 @@ class ProcessRunnerImpl implements ProcessRunner {
                       PROCESS_RUNNER_THREAD_GROUP,
                       runnable,
                       ProcessRunnerImpl.this.configuration.toString() + " >> log-handlers"));
-      if (configuration.getPrintStream() != null) {
-        configuration.getPrintStream().println("Streaming log output");
+      if (configuration.isEnableLogStreaming()) {
+        logger.trace("Streaming log output");
       }
       executor.execute(this.writeLogs(currentProcess.getInputStream(), OutputSourceType.SYSOUT));
-      executor.execute(this.writeLogs(currentProcess.getErrorStream(), OutputSourceType.SYSERROR));
+      executor.execute(this.writeLogs(currentProcess.getErrorStream(), OutputSourceType.SYSERR));
       executor.shutdown();
-      this.logger.info("Waiting for the log streams to shutdown");
+      logger.trace("Waiting for the log streams to shutdown");
       executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
     }
-    this.logger.info("Waiting for the process to terminate");
+    logger.info("Waiting for the process to terminate");
     currentProcess.waitFor();
     if (this.jsonArrayToOutputStream != null) {
       this.jsonArrayToOutputStream.endJsonObjectWrite();
@@ -135,8 +135,7 @@ class ProcessRunnerImpl implements ProcessRunner {
     }
     final int processExitValue = currentProcess.exitValue();
     output = OutputFactory.createOutput(this.configuration, processExitValue);
-    this.logger.log(Level.INFO, "Process exited with exit value : {0}", processExitValue);
-
+    logger.info("Process exited with exit value : {0}", processExitValue);
     return output;
   }
 
@@ -196,32 +195,27 @@ class ProcessRunnerImpl implements ProcessRunner {
   private void logData(
       final InputStream inputStreamToWrite, final OutputSourceType outputSourceType) {
     try {
-      this.logger.log(
-          Level.INFO,
+      logger.trace(
           "Writing {0} as jsonObject to {1}",
           new Object[] {
             outputSourceType.toString(), this.configuration.getMasterLogFile().getCanonicalPath()
           });
       final Scanner scanner = new Scanner(inputStreamToWrite);
-      PrintStream printStream = configuration.getPrintStream();
       while (scanner.hasNext()) {
         final String currentLine = scanner.nextLine();
-        //        this.logger.log(
-        //            Level.INFO, "{0} >> {1}", new Object[] {outputSourceType.toString(), currentLine});
-        if (printStream != null)
-          printStream.println(outputSourceType.toString() + " >> " + currentLine);
+        if (configuration.isEnableLogStreaming())
+          logger.info(Utilities.joinString(outputSourceType.toString(), " >> ", currentLine));
         ProcessRunnerImpl.this.jsonArrayToOutputStream.writeJsonObject(
             new OutputRecord(outputSourceType, currentLine));
       }
     } catch (JsonArrayWriterException | IOException ex) {
       final StringWriter sw = new StringWriter();
       ex.printStackTrace(new PrintWriter(sw));
-      this.logger.log(
-          Level.SEVERE,
+      logger.error(
           "Unable to log {0}",
           new Object[] {this.configuration.getMasterLogFile().getAbsolutePath()});
-      this.logger.log(Level.SEVERE, "Cause : {0}", ex);
-      this.logger.log(Level.SEVERE, "{0}", new Object[] {sw.toString()});
+      logger.error("Cause : {0}", ex);
+      logger.error(sw.toString());
     }
   }
 }

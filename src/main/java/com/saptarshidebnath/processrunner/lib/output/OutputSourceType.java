@@ -31,7 +31,7 @@ public enum OutputSourceType {
   SYSOUT,
 
   /** Depicst the same source similar to {@link System#err}. */
-  SYSERROR,
+  SYSERR,
   /** Depcts both sysout and SYSERR */
   ALL
 }

@@ -40,7 +40,7 @@ public class OutputRecord {
    * Constructor to store the OutputRecord line by line.
    *
    * @param outputSourceType Type of {@link OutputSourceType} ie. either {@link
-   *     OutputSourceType#SYSOUT} or {@link OutputSourceType#SYSERROR}
+   *     OutputSourceType#SYSOUT} or {@link OutputSourceType#SYSERR}
    * @param outputText The log as {@link String} that is logged.
    */
   public OutputRecord(final OutputSourceType outputSourceType, final String outputText) {

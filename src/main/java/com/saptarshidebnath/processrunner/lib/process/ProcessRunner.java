@@ -27,6 +27,8 @@ package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.output.Output;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Future;
@@ -36,6 +38,7 @@ import java.util.concurrent.Future;
  * script
  */
 public interface ProcessRunner {
+  public static final Logger logger = LoggerFactory.getLogger(ProcessRunner.class);
 
   /**
    * Triggers the process or command.
