@@ -40,140 +40,140 @@ import java.nio.file.Path;
  * ProcessRunner} object
  */
 public class Configuration {
-  private static Logger logger = LoggerFactory.getLogger(Configuration.class);
-  private final String interpreter;
-  private final String command;
-  private final Path workingDir;
-  private final File masterLogFile;
-  private final Charset charset;
-  private final boolean autoDeleteFileOnExit;
-  private final boolean enableLogStreaming;
+    private static Logger logger = LoggerFactory.getLogger(Configuration.class);
+    private final String interpreter;
+    private final String command;
+    private final Path workingDir;
+    private final File masterLogFile;
+    private final Charset charset;
+    private final boolean autoDeleteFileOnExit;
+    private final boolean enableLogStreaming;
 
-  /**
-   * Constructor to set the configuration to be consumed by {@link ProcessRunner}.
-   *
-   * @param interpreter : sets the {@link String} command interpreter like /bin/bash in unix
-   * @param command : set the actual {@link String} command to be executed
-   * @param workingDir : sets the working directory in {@link File} format
-   * @param masterLogFile : {@link File} where the log data will be stored.
-   * @param charset : a reference of which {@link Charset} to use while writing the {@link
-   *     Configuration#masterLogFile}
-   * @param autoDeleteFileOnExit : set the flag to denote if the sysout and the syserror {@link
-   *     File} going to be auto deleted on exit.
-   * @param enableLogStreaming : enable lor disable log streaming by passing a @{@link Boolean}
-   *     value
-   * @throws ProcessConfigurationException : Exception thrown if configuration received is not at
-   *     par.
-   * @throws IOException : Exception thrown if there are any error while validating the {@link File}
-   *     objects
-   */
-  Configuration(
-      final String interpreter,
-      final String command,
-      final Path workingDir,
-      final File masterLogFile,
-      final Charset charset,
-      final boolean autoDeleteFileOnExit,
-      final boolean enableLogStreaming)
-      throws ProcessConfigurationException, IOException {
-    this.interpreter = interpreter.trim();
-    this.command = command.trim();
-    this.workingDir = workingDir;
-    this.autoDeleteFileOnExit = autoDeleteFileOnExit;
-    this.masterLogFile = masterLogFile;
-    if (this.autoDeleteFileOnExit) {
-      this.masterLogFile.deleteOnExit();
+    /**
+     * Constructor to set the configuration to be consumed by {@link ProcessRunner}.
+     *
+     * @param interpreter          : sets the {@link String} command interpreter like /bin/bash in unix
+     * @param command              : set the actual {@link String} command to be executed
+     * @param workingDir           : sets the working directory in {@link File} format
+     * @param masterLogFile        : {@link File} where the log data will be stored.
+     * @param charset              : a reference of which {@link Charset} to use while writing the {@link
+     *                             Configuration#masterLogFile}
+     * @param autoDeleteFileOnExit : set the flag to denote if the sysout and the syserror {@link
+     *                             File} going to be auto deleted on exit.
+     * @param enableLogStreaming   : enable lor disable log streaming by passing a @{@link Boolean}
+     *                             value
+     * @throws ProcessConfigurationException : Exception thrown if configuration received is not at
+     *                                       par.
+     * @throws IOException                   : Exception thrown if there are any error while validating the {@link File}
+     *                                       objects
+     */
+    Configuration(
+            final String interpreter,
+            final String command,
+            final Path workingDir,
+            final File masterLogFile,
+            final Charset charset,
+            final boolean autoDeleteFileOnExit,
+            final boolean enableLogStreaming)
+            throws ProcessConfigurationException, IOException {
+        this.interpreter = interpreter.trim();
+        this.command = command.trim();
+        this.workingDir = workingDir;
+        this.autoDeleteFileOnExit = autoDeleteFileOnExit;
+        this.masterLogFile = masterLogFile;
+        if (this.autoDeleteFileOnExit) {
+            this.masterLogFile.deleteOnExit();
+        }
+        this.enableLogStreaming = enableLogStreaming;
+        this.charset = charset;
+        logger.trace(Utilities.joinString("Process Runner Configuration : ", this.toString()));
     }
-    this.enableLogStreaming = enableLogStreaming;
-    this.charset = charset;
-    logger.info(Utilities.joinString("Current Configuration : ", this.toString()));
-  }
 
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("Configuration{");
-    sb.append("interpreter='").append(interpreter).append('\'');
-    sb.append(", command='").append(command).append('\'');
-    sb.append(", workingDir=").append(workingDir);
-    sb.append(", masterLogFile=").append(masterLogFile);
-    sb.append(", charset=").append(charset);
-    sb.append(", autoDeleteFileOnExit=").append(autoDeleteFileOnExit);
-    sb.append(", enableLogStreaming=").append(enableLogStreaming);
-    sb.append('}');
-    return sb.toString();
-  }
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Configuration{");
+        sb.append("interpreter='").append(interpreter).append('\'');
+        sb.append(", command='").append(command).append('\'');
+        sb.append(", workingDir=").append(workingDir);
+        sb.append(", masterLogFile=").append(masterLogFile);
+        sb.append(", charset=").append(charset);
+        sb.append(", autoDeleteFileOnExit=").append(autoDeleteFileOnExit);
+        sb.append(", enableLogStreaming=").append(enableLogStreaming);
+        sb.append('}');
+        return sb.toString();
+    }
 
-  /**
-   * Getter for flag if {@link Configuration#getMasterLogFile()} is going to auto deleted or not.
-   *
-   * @return a {@link Boolean} value depicting the same.
-   */
-  public boolean getAutoDeleteFileOnExit() {
-    return this.autoDeleteFileOnExit;
-  }
+    /**
+     * Getter for flag if {@link Configuration#getMasterLogFile()} is going to auto deleted or not.
+     *
+     * @return a {@link Boolean} value depicting the same.
+     */
+    public boolean getAutoDeleteFileOnExit() {
+        return this.autoDeleteFileOnExit;
+    }
 
-  /**
-   * A {@link File} reference for the masterLogFile.
-   *
-   * @return a {@link File} reference where master logs need to be considered.
-   */
-  public File getMasterLogFile() {
-    return this.masterLogFile;
-  }
+    /**
+     * A {@link File} reference for the masterLogFile.
+     *
+     * @return a {@link File} reference where master logs need to be considered.
+     */
+    public File getMasterLogFile() {
+        return this.masterLogFile;
+    }
 
-  /**
-   * Get the currently configured command interpreter.
-   *
-   * @return a {@link String} value.
-   */
-  public String getInterpreter() {
-    return this.interpreter;
-  }
+    /**
+     * Get the currently configured command interpreter.
+     *
+     * @return a {@link String} value.
+     */
+    public String getInterpreter() {
+        return this.interpreter;
+    }
 
-  /**
-   * Get the command / process to be executed.
-   *
-   * @return a {@link String} value
-   */
-  public String getCommand() {
-    return this.command;
-  }
+    /**
+     * Get the command / process to be executed.
+     *
+     * @return a {@link String} value
+     */
+    public String getCommand() {
+        return this.command;
+    }
 
-  /**
-   * Get the currently configured current directory.
-   *
-   * @return a {@link Path} reference where the current working directory is.
-   */
-  public Path getWorkingDir() {
-    return this.workingDir;
-  }
+    /**
+     * Get the currently configured current directory.
+     *
+     * @return a {@link Path} reference where the current working directory is.
+     */
+    public Path getWorkingDir() {
+        return this.workingDir;
+    }
 
-  /**
-   * Returns the charset set for the {@link Configuration#masterLogFile}
-   *
-   * @return a reference of the class {@link Charset} in which the {@link
-   *     Configuration#masterLogFile} will be written.
-   */
-  public Charset getCharset() {
-    return charset;
-  }
+    /**
+     * Returns the charset set for the {@link Configuration#masterLogFile}
+     *
+     * @return a reference of the class {@link Charset} in which the {@link
+     * Configuration#masterLogFile} will be written.
+     */
+    public Charset getCharset() {
+        return charset;
+    }
 
-  /**
-   * Denotes if the master log file is going to be auto deleted when teh JVM exits.
-   *
-   * @return a {@link Boolean}
-   */
-  public boolean isAutoDeleteFileOnExit() {
-    return autoDeleteFileOnExit;
-  }
+    /**
+     * Denotes if the master log file is going to be auto deleted when teh JVM exits.
+     *
+     * @return a {@link Boolean}
+     */
+    public boolean isAutoDeleteFileOnExit() {
+        return autoDeleteFileOnExit;
+    }
 
-  /**
-   * Returns {@link Boolean#TRUE} or @{@link Boolean#FALSE} to denote if log streaming on the run
-   * time is enabled or not.
-   *
-   * @return a {@link Boolean}
-   */
-  public boolean isEnableLogStreaming() {
-    return enableLogStreaming;
-  }
+    /**
+     * Returns {@link Boolean#TRUE} or @{@link Boolean#FALSE} to denote if log streaming on the run
+     * time is enabled or not.
+     *
+     * @return a {@link Boolean}
+     */
+    public boolean isEnableLogStreaming() {
+        return enableLogStreaming;
+    }
 }
