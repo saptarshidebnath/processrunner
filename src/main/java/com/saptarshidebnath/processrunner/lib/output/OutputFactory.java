@@ -35,23 +35,25 @@ import org.slf4j.LoggerFactory;
  * implementes {@link Output}.
  */
 public class OutputFactory {
-    private static Logger logger = LoggerFactory.getLogger(OutputFactory.class);
+  private static Logger logger = LoggerFactory.getLogger(OutputFactory.class);
 
-    /**
-     * private constructor.
-     */
-    private OutputFactory() {
-    }
+  /** private constructor. */
+  private OutputFactory() {}
 
-    /**
-     * Creates a object of type {@link Output}
-     *
-     * @param configuration Accepts a valid {@link Configuration} reference.
-     * @param returnCode    Accepts the exit code of process / script executed.
-     * @return a reference of type {@link Output}
-     */
-    public static Output createOutput(final Configuration configuration, final int returnCode) {
-        logger.trace(Utilities.joinString("Creating output for configuration ", configuration.toString(), " with return code ", returnCode + ""));
-        return new OutputImpl(configuration, returnCode);
-    }
+  /**
+   * Creates a object of type {@link Output}
+   *
+   * @param configuration Accepts a valid {@link Configuration} reference.
+   * @param returnCode Accepts the exit code of process / script executed.
+   * @return a reference of type {@link Output}
+   */
+  public static Output createOutput(final Configuration configuration, final int returnCode) {
+    logger.trace(
+        Utilities.joinString(
+            "Creating output for configuration ",
+            configuration.toString(),
+            " with return code ",
+            String.valueOf(returnCode)));
+    return new OutputImpl(configuration, returnCode);
+  }
 }

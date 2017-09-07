@@ -26,6 +26,7 @@
 package com.saptarshidebnath.processrunner.lib.exception;
 
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Blanket custom {@link Exception} to be used by the {@link
@@ -39,14 +40,15 @@ public class ProcessException extends Exception {
    *
    * @param ex Accepts a {@link Exception} object as input.
    */
+  @SuppressFBWarnings("OPM_OVERLY_PERMISSIVE_METHOD")
   public ProcessException(final Exception ex) {
-    super(ex);
+    this.initCause(ex);
   }
 
   /**
    * Creates a generic {@link ProcessException} with the message {@link Constants#GENERIC_ERROR}.
    */
   public ProcessException() {
-    this(new Exception(Constants.GENERIC_ERROR));
+    super(Constants.GENERIC_ERROR);
   }
 }

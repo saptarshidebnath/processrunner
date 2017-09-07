@@ -27,7 +27,6 @@ package com.saptarshidebnath.processrunner.lib.jsonutils;
 
 import com.google.gson.GsonBuilder;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,7 +73,7 @@ public class ReadJsonArrayFromFileTest {
     if (this.testFile.delete()) {
       this.logger.severe(
           "Unable to delete file : "
-              + StringEscapeUtils.escapeJava(this.testFile.getCanonicalPath())
+              + this.testFile.getCanonicalPath()
               + ". Please delete manually");
     }
     this.testObject.closeJsonReader();

@@ -25,6 +25,8 @@
 
 package com.saptarshidebnath.processrunner.lib.exception;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Custom {@link Exception} denote that the {@link
  * com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile } is not configured
@@ -38,7 +40,7 @@ public class JsonArrayReaderException extends Exception {
    * @param message Takes a String as input
    */
   public JsonArrayReaderException(final String message) {
-    this(new Exception(message));
+    super(message);
   }
 
   /**
@@ -46,7 +48,8 @@ public class JsonArrayReaderException extends Exception {
    *
    * @param exception Consumes a object of {@link Exception}
    */
+  @SuppressFBWarnings("OPM_OVERLY_PERMISSIVE_METHOD")
   public JsonArrayReaderException(final Exception exception) {
-    super(exception);
+    this.initCause(exception);
   }
 }

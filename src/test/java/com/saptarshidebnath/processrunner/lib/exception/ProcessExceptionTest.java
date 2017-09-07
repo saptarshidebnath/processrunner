@@ -43,7 +43,7 @@ public class ProcessExceptionTest {
       assertThat(
           "Validating message of default ProcessException : ",
           message,
-          is("java.lang.Exception: " + Constants.GENERIC_ERROR));
+          is(Constants.GENERIC_ERROR));
     }
   }
 }

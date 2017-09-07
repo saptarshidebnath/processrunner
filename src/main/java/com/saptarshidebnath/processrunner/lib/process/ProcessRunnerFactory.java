@@ -34,64 +34,63 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.Future;
 
-/**
- * Factory method to to run command or to get an instance of {@link ProcessRunner}
- */
+/** Factory method to to run command or to get an instance of {@link ProcessRunner} */
 public class ProcessRunnerFactory {
-    private static final Logger logger = LoggerFactory.getLogger(ProcessRunnerFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProcessRunnerFactory.class);
 
-    /**
-     * Hidden constructor so that no body can create object of the class.
-     */
-    private ProcessRunnerFactory() {
-    }
+  /** Hidden constructor so that no body can create object of the class. */
+  private ProcessRunnerFactory() {}
 
-    /**
-     * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
-     * Configuration}. The process is then <strong>triggered in a synchronously</strong>.
-     *
-     * @param configuration Takes a valid {@link Configuration} object.
-     * @return a reference to {@link Output}
-     * @throws ProcessException     : Throws a {@link ProcessException} detailing what kind of error might
-     *                              have happened.
-     * @throws IOException          denoting there is an IO problem during writing the log files.
-     * @throws InterruptedException there is a problem when writing the logs via thread enabled log
-     *                              handlers.
-     */
-    public static Output startProcess(final Configuration configuration)
-            throws ProcessException, IOException, InterruptedException {
-        logger.trace(Utilities.joinString("Starting process with config", configuration.toString()));
-        return new ProcessRunnerImpl(configuration).run();
-    }
+  /**
+   * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
+   * Configuration}. The process is then <strong>triggered in a synchronously</strong>.
+   *
+   * @param configuration Takes a valid {@link Configuration} object.
+   * @return a reference to {@link Output}
+   * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
+   *     have happened.
+   * @throws IOException denoting there is an IO problem during writing the log files.
+   * @throws InterruptedException there is a problem when writing the logs via thread enabled log
+   *     handlers.
+   */
+  public static Output startProcess(final Configuration configuration)
+      throws ProcessException, IOException, InterruptedException {
+    logger.trace(Utilities.joinString("Starting process with config", configuration.toString()));
+    return new ProcessRunnerImpl(configuration).run();
+  }
 
-    /**
-     * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
-     * Configuration}. The process is then <strong>triggered asynchronously</strong>.
-     *
-     * @param configuration Takes a valid {@link Configuration} object
-     * @return a reference of {@link Future} of type {@link Output} from where you can retrieve the
-     * {@link Output} of the process.
-     * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
-     *                          have happened.
-     * @throws IOException      denoting there is an IO problem during writing the log files.
-     */
-    public static Future<Output> startAsyncProcess(final Configuration configuration)
-            throws ProcessException, IOException {
-        logger.trace(Utilities.joinString("Starting asynchronous process with configuration ", configuration.toString()));
-        return new ProcessRunnerImpl(configuration).runAsync();
-    }
+  /**
+   * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
+   * Configuration}. The process is then <strong>triggered asynchronously</strong>.
+   *
+   * @param configuration Takes a valid {@link Configuration} object
+   * @return a reference of {@link Future} of type {@link Output} from where you can retrieve the
+   *     {@link Output} of the process.
+   * @throws ProcessException : Throws a {@link ProcessException} detailing what kind of error might
+   *     have happened.
+   * @throws IOException denoting there is an IO problem during writing the log files.
+   */
+  public static Future<Output> startAsyncProcess(final Configuration configuration)
+      throws ProcessException, IOException {
+    logger.trace(
+        Utilities.joinString(
+            "Starting asynchronous process with configuration ", configuration.toString()));
+    return new ProcessRunnerImpl(configuration).runAsync();
+  }
 
-    /**
-     * Create a instance of {@link ProcessRunner}. This method doesn't start the process and is upon
-     * the developer to actually trigger the process.
-     *
-     * @param configuration a reference of {@link Configuration}. The {@link Configuration} can be
-     *                      build quite easily via {@link ConfigurationBuilder}
-     * @return a reference of {@link ProcessRunner}
-     * @throws IOException when there are any issue when pre creating the json log handlers.
-     */
-    public static ProcessRunner getProcess(Configuration configuration) throws IOException {
-        logger.trace(Utilities.joinString("Creating Process with the configuration : ", configuration.toString()));
-        return new ProcessRunnerImpl(configuration);
-    }
+  /**
+   * Create a instance of {@link ProcessRunner}. This method doesn't start the process and is upon
+   * the developer to actually trigger the process.
+   *
+   * @param configuration a reference of {@link Configuration}. The {@link Configuration} can be
+   *     build quite easily via {@link ConfigurationBuilder}
+   * @return a reference of {@link ProcessRunner}
+   * @throws IOException when there are any issue when pre creating the json log handlers.
+   */
+  public static ProcessRunner getProcess(Configuration configuration) throws IOException {
+    logger.trace(
+        Utilities.joinString(
+            "Creating Process with the configuration : ", configuration.toString()));
+    return new ProcessRunnerImpl(configuration);
+  }
 }

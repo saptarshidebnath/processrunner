@@ -29,6 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,9 +42,11 @@ import java.nio.charset.Charset;
  *
  * @param <T> Type safes the JsonArray File reader to a particular {@link Class}.
  */
+@SuppressFBWarnings({"IMC_IMMATURE_CLASS_NO_TOSTRING"})
 public class ReadJsonArrayFromFile<T> {
   private final Gson gson;
   private boolean isFirstRead = true;
+
   private JsonReader jsonReader;
 
   /**
@@ -81,6 +84,7 @@ public class ReadJsonArrayFromFile<T> {
    *     already closed. Need to create a new {@link ReadJsonArrayFromFile} object to read the array
    *     from file.
    */
+  @SuppressFBWarnings("WEM_WEAK_EXCEPTION_MESSAGING")
   public synchronized T readNext(final Class<T> clazz) throws JsonArrayReaderException {
     T object = null;
     try {

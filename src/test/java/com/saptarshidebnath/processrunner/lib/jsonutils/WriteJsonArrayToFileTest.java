@@ -29,6 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.After;
 import org.junit.Test;
 
@@ -55,6 +56,7 @@ public class WriteJsonArrayToFileTest {
   private final Logger logger;
   private String[] arrayOfDataToWrite;
 
+  @SuppressFBWarnings("PCAIL_POSSIBLE_CONSTANT_ALLOCATION_IN_LOOP")
   public WriteJsonArrayToFileTest() throws IOException {
 
     this.tempFile = File.createTempFile("test-prefix", "test-suffix");

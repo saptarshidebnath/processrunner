@@ -30,6 +30,7 @@ import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Utilities {
+public final class Utilities {
 
   private static final Logger logger = LoggerFactory.getLogger(Utilities.class);
 
@@ -81,7 +82,7 @@ public class Utilities {
       final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
           new ReadJsonArrayFromFile<>(configuration.getMasterLogFile(), configuration.getCharset());
       logger.info(
-          "Writing {0} to : {1}",
+          "Writing {} to : {}",
           new Object[] {outputSourceType.toString(), targetFile.getCanonicalPath()});
       OutputRecord outputRecord;
       do {
@@ -91,22 +92,24 @@ public class Utilities {
             && (outputSourceType == OutputSourceType.ALL
                 || outputRecord.getOutputSourceType() == outputSourceType)) {
           currentOutputLine = outputRecord.getOutputText();
-          logger.trace("{0} >> {1}", new Object[] {outputSourceType.toString(), currentOutputLine});
+          logger.trace("{} >> {}", new Object[] {outputSourceType.toString(), currentOutputLine});
           printWriter.println(currentOutputLine);
         }
       } while (outputRecord != null);
     }
 
     logger.info(
-        "{0} written completely to : {1}",
+        "{} written completely to : {}",
         new Object[] {outputSourceType.toString(), targetFile.getCanonicalPath()});
     return targetFile;
   }
 
+  @SuppressFBWarnings("OPM_OVERLY_PERMISSIVE_METHOD")
   public static String joinString(String... stringArray) {
     return joinString(Arrays.asList(stringArray));
   }
 
+  @SuppressFBWarnings("OPM_OVERLY_PERMISSIVE_METHOD")
   public static String joinString(List<String> stringList) {
     return stringList.stream().collect(Collectors.joining(Constants.EMPTY_STRING));
   }
@@ -114,7 +117,7 @@ public class Utilities {
   public static boolean searchFile(File fileToRead, final String regex, Charset charset)
       throws IOException, JsonArrayReaderException {
     boolean isMatching = false;
-    logger.trace("Searching for regular expression : {0}", new Object[] {regex});
+    logger.trace("Searching for regular expression : {}", new Object[] {regex});
     final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
         new ReadJsonArrayFromFile<>(fileToRead, charset);
     OutputRecord outputRecord;
@@ -125,18 +128,22 @@ public class Utilities {
       }
     } while (outputRecord != null && !isMatching);
     if (isMatching) {
-      logger.info("Regex {0} is found", new Object[] {regex});
+      logger.info("Regex {} is found", new Object[] {regex});
     } else {
-      logger.warn("Regex {0} is NOT found", new Object[] {regex});
+      logger.warn("Regex {} is NOT found", new Object[] {regex});
     }
     readJsonArrayFromFile.closeJsonReader();
     return isMatching;
   }
 
+  public static String generateThreadName(Configuration configuration, String suffix) {
+    return joinString(configuration.getInterpreter(), configuration.getCommand(), suffix);
+  }
+
   public static List<String> grepFile(File fileToRead, final String regex, Charset charset)
       throws IOException, JsonArrayReaderException {
     List<String> grepedLines = new ArrayList<>();
-    logger.trace("Searching for regular expression : {0}", new Object[] {regex});
+    logger.trace("Searching for regular expression : {}", new Object[] {regex});
     final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
         new ReadJsonArrayFromFile<>(fileToRead, charset);
     OutputRecord outputRecord;
