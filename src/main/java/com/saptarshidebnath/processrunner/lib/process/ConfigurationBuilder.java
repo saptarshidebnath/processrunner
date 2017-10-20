@@ -29,6 +29,7 @@ import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationExce
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,16 +226,6 @@ public class ConfigurationBuilder {
    */
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("ConfigurationBuilder{");
-    sb.append("interpreter='").append(interpreter).append('\'');
-    sb.append(", command='").append(command).append('\'');
-    sb.append(", comamndParams=").append(comamndParams);
-    sb.append(", workingDir=").append(workingDir);
-    sb.append(", masterLogFile=").append(masterLogFile);
-    sb.append(", autoDeleteFileOnExit=").append(autoDeleteFileOnExit);
-    sb.append(", logStreamingEnabled=").append(logStreamingEnabled);
-    sb.append(", charset=").append(charset);
-    sb.append('}');
-    return sb.toString();
+      return ReflectionToStringBuilder.toString(this);
   }
 }

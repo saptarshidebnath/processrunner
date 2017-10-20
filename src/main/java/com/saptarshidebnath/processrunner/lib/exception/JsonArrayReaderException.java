@@ -25,7 +25,7 @@
 
 package com.saptarshidebnath.processrunner.lib.exception;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 /**
  * Custom {@link Exception} denote that the {@link
@@ -48,8 +48,11 @@ public class JsonArrayReaderException extends Exception {
    *
    * @param exception Consumes a object of {@link Exception}
    */
-  @SuppressFBWarnings("OPM_OVERLY_PERMISSIVE_METHOD")
   public JsonArrayReaderException(final Exception exception) {
     this.initCause(exception);
   }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
+    }
 }

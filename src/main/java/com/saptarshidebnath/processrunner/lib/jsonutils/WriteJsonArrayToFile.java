@@ -29,6 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -41,11 +42,9 @@ import java.nio.charset.Charset;
  */
 @SuppressFBWarnings("IMC_IMMATURE_CLASS_NO_TOSTRING")
 public class WriteJsonArrayToFile<T> {
-
   private final Gson gson;
   private PrintWriter printWriter;
   private volatile boolean firstElement = true;
-
   /**
    * Constructor with the target {@link File} where the array needs to be written.
    *
@@ -58,6 +57,10 @@ public class WriteJsonArrayToFile<T> {
     this.printWriter =
         new PrintWriter(new OutputStreamWriter(new FileOutputStream(targetFile, true), charset));
     this.gson = new GsonBuilder().create();
+  }
+
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
   }
 
   /**
@@ -77,7 +80,6 @@ public class WriteJsonArrayToFile<T> {
    * @throws JsonArrayWriterException an {@link JsonArrayWriterException} if there is an error
    *     writing the object to the disk.
    */
-  @SuppressFBWarnings("WEM_WEAK_EXCEPTION_MESSAGING")
   public synchronized void writeJsonObject(final T object) throws JsonArrayWriterException {
     if (this.printWriter != null) {
       final String objectAsJson = this.gson.toJson(object);

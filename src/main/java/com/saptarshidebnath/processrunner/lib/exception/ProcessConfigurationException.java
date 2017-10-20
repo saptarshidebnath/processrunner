@@ -26,6 +26,7 @@
 package com.saptarshidebnath.processrunner.lib.exception;
 
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 /** Custom {@link Exception} denote that the {@link Configuration} is not configured correctly */
 public class ProcessConfigurationException extends Exception {
@@ -38,4 +39,8 @@ public class ProcessConfigurationException extends Exception {
   public ProcessConfigurationException(final String message) {
     super(message);
   }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
+    }
 }

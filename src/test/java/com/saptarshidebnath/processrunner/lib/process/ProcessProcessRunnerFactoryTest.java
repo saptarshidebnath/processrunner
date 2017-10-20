@@ -84,7 +84,7 @@ public class ProcessProcessRunnerFactoryTest {
 
   @Test(expected = ProcessConfigurationException.class)
   public void getProcessWithLessParamsWrongParamets()
-      throws ProcessException, ProcessConfigurationException, IOException {
+          throws ProcessConfigurationException, IOException {
     new ConfigurationBuilder(getDefaultInterpreter(), "").build();
   }
 
@@ -220,21 +220,22 @@ public class ProcessProcessRunnerFactoryTest {
             .build());
   }
 
-  @Test(expected = ProcessConfigurationException.class)
-  public void getProcessLessDetailed()
-      throws IOException, ProcessException, InterruptedException, ProcessConfigurationException {
-    final ProcessRunner processRunner =
-        ProcessRunnerFactory.getProcess(
-            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
-                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
-                .build());
-    final Output response = processRunner.run();
-    assertThat("Validating process return code : ", response.getReturnCode(), is(0));
-    //
-    // This line should generate an error as master log file have not been saved.
-    //
-    final File masterLog = response.getMasterLogAsJson();
-  }
+    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
+    @Test(expected = ProcessConfigurationException.class)
+    public void getProcessLessDetailed()
+            throws IOException, ProcessException, InterruptedException, ProcessConfigurationException {
+        final ProcessRunner processRunner =
+                ProcessRunnerFactory.getProcess(
+                        new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                                .build());
+        final Output response = processRunner.run();
+        assertThat("Validating process return code : ", response.getReturnCode(), is(0));
+        //
+        // This line should generate an error as master log file have not been saved.
+        //
+        final File masterLog = response.getMasterLogAsJson();
+    }
 
   //  @Test
   //  public void streamingOutput()

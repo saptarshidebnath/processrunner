@@ -31,6 +31,7 @@ import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,11 +49,14 @@ class OutputImpl implements Output {
    * @param configuration a valid {@link Configuration} object.
    * @param returnCode a {@link Integer} value typically ranging from 0 - 255
    */
-  @SuppressFBWarnings("IMC_IMMATURE_CLASS_NO_TOSTRING")
   OutputImpl(final Configuration configuration, final int returnCode) {
     this.configuration = configuration;
     this.returnCode = returnCode;
   }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
+    }
 
   /**
    * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSOUT} to the

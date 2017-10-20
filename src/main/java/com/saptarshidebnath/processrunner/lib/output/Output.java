@@ -44,7 +44,7 @@ import java.util.List;
  */
 public interface Output {
 
-  public static final Logger logger = LoggerFactory.getLogger(Output.class);
+    Logger logger = LoggerFactory.getLogger(Output.class);
   /**
    * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSOUT} to the
    * {@link File} supplied.
@@ -87,7 +87,8 @@ public interface Output {
    * @throws JsonArrayReaderException when the aster log file in JSON format cannot be read back
    *     from the disk.
    */
-  File saveLog(final File log) throws ProcessException, IOException, JsonArrayReaderException, ProcessConfigurationException;
+  File saveLog(final File log)
+          throws ProcessException, IOException, JsonArrayReaderException, ProcessConfigurationException;
   /**
    * Returns the process exit / return code.
    *
@@ -117,5 +118,6 @@ public interface Output {
    * @throws IOException if there is a problem reading the log file
    * @throws JsonArrayReaderException if there is a problem reading the Json log file.
    */
-  List<String> grepForRegex(String regex) throws IOException, JsonArrayReaderException, ProcessConfigurationException;
+  List<String> grepForRegex(String regex)
+          throws IOException, JsonArrayReaderException, ProcessConfigurationException;
 }

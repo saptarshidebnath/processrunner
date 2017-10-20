@@ -27,6 +27,7 @@ package com.saptarshidebnath.processrunner.lib.exception;
 
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 /**
  * Blanket custom {@link Exception} to be used by the {@link
@@ -51,4 +52,8 @@ public class ProcessException extends Exception {
   public ProcessException() {
     super(Constants.GENERIC_ERROR);
   }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
+    }
 }

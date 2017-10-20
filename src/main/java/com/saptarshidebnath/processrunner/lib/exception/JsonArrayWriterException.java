@@ -25,6 +25,8 @@
 
 package com.saptarshidebnath.processrunner.lib.exception;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+
 /**
  * Custom {@link Exception} denote that the {@link
  * com.saptarshidebnath.processrunner.lib.jsonutils.WriteJsonArrayToFile } is not configured
@@ -40,4 +42,8 @@ public class JsonArrayWriterException extends Exception {
   public JsonArrayWriterException(final String message) {
     super(message);
   }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
+    }
 }

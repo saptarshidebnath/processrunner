@@ -36,6 +36,7 @@ import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import java.io.*;
 import java.util.Scanner;
@@ -49,7 +50,6 @@ import static com.saptarshidebnath.processrunner.lib.utilities.Utilities.generat
  * Implementation of the {@link ProcessRunner} interface. Gives a solid body to the {@link
  * ProcessRunner}.
  */
-@edu.umd.cs.findbugs.annotations.SuppressFBWarnings("COMMAND_INJECTION")
 class ProcessRunnerImpl implements ProcessRunner {
   private final Configuration configuration;
   private final Runtime runTime;
@@ -61,7 +61,6 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @param configuration a valid object of {@link Configuration}
    * @throws IOException if Unable to work with the log files
    */
-  @SuppressFBWarnings("IMC_IMMATURE_CLASS_NO_TOSTRING")
   ProcessRunnerImpl(final Configuration configuration) throws IOException {
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
@@ -84,7 +83,7 @@ class ProcessRunnerImpl implements ProcessRunner {
    */
   @SuppressFBWarnings({"CRLF_INJECTION_LOGS", "HES_LOCAL_EXECUTOR_SERVICE"})
   @Override
-  public Output run() throws ProcessException, IOException, InterruptedException {
+  public Output run() throws IOException, InterruptedException {
     final Output output;
     this.logger.info("Starting process");
     final StringBuilder commandToExecute = new StringBuilder();
@@ -225,5 +224,9 @@ class ProcessRunnerImpl implements ProcessRunner {
       logger.error("Cause : {0}", ex);
       logger.error(sw.toString());
     }
+  }
+
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
   }
 }

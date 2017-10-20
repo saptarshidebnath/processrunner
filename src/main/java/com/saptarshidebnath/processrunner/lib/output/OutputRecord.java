@@ -28,7 +28,7 @@ package com.saptarshidebnath.processrunner.lib.output;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.saptarshidebnath.processrunner.lib.process.ProcessRunner;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,6 @@ public class OutputRecord {
    *     OutputSourceType#SYSOUT} or {@link OutputSourceType#SYSERR}
    * @param outputText The log as {@link String} that is logged.
    */
-  @SuppressFBWarnings("CRLF_INJECTION_LOGS")
   public OutputRecord(final OutputSourceType outputSourceType, final String outputText) {
     this.timeStamp = getCurrentTime();
     this.outputSourceType = outputSourceType;
@@ -99,13 +98,7 @@ public class OutputRecord {
     return gson.toJson(this);
   }
 
-  @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("OutputRecord{");
-    sb.append("timeStamp=").append(timeStamp);
-    sb.append(", outputSourceType=").append(outputSourceType);
-    sb.append(", outputText='").append(outputText).append('\'');
-    sb.append('}');
-    return sb.toString();
+      return ReflectionToStringBuilder.toString(this);
   }
 }

@@ -28,6 +28,7 @@ package com.saptarshidebnath.processrunner.lib.process;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.output.Output;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,7 @@ public class ProcessRunnerFactory {
    * @throws IOException denoting there is an IO problem during writing the log files.
    */
   public static Future<Output> startAsyncProcess(final Configuration configuration)
-      throws ProcessException, IOException {
+          throws IOException {
     logger.trace(
         Utilities.joinString(
             "Starting asynchronous process with configuration ", configuration.toString()));
@@ -93,4 +94,8 @@ public class ProcessRunnerFactory {
             "Creating Process with the configuration : ", configuration.toString()));
     return new ProcessRunnerImpl(configuration);
   }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
+    }
 }

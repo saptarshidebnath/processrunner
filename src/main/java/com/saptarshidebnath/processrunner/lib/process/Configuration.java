@@ -27,7 +27,7 @@ package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,16 +68,14 @@ public class Configuration {
    * @throws IOException : Exception thrown if there are any error while validating the {@link File}
    *     objects
    */
-  @SuppressFBWarnings("PCOA_PARTIALLY_CONSTRUCTED_OBJECT_ACCESS")
   Configuration(
-      final String interpreter,
-      final String command,
-      final Path workingDir,
-      final File masterLogFile,
-      final Charset charset,
-      final boolean autoDeleteFileOnExit,
-      final boolean enableLogStreaming)
-      throws ProcessConfigurationException, IOException {
+          final String interpreter,
+          final String command,
+          final Path workingDir,
+          final File masterLogFile,
+          final Charset charset,
+          final boolean autoDeleteFileOnExit,
+          final boolean enableLogStreaming) {
     this.interpreter = interpreter.trim();
     this.command = command.trim();
     this.workingDir = workingDir;
@@ -89,20 +87,6 @@ public class Configuration {
     this.enableLogStreaming = enableLogStreaming;
     this.charset = charset;
     logger.trace(Utilities.joinString("Process Runner Configuration : ", this.toString()));
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("Configuration{");
-    sb.append("interpreter='").append(interpreter).append('\'');
-    sb.append(", command='").append(command).append('\'');
-    sb.append(", workingDir=").append(workingDir);
-    sb.append(", masterLogFile=").append(masterLogFile);
-    sb.append(", charset=").append(charset);
-    sb.append(", autoDeleteFileOnExit=").append(autoDeleteFileOnExit);
-    sb.append(", enableLogStreaming=").append(enableLogStreaming);
-    sb.append('}');
-    return sb.toString();
   }
 
   /**
@@ -178,4 +162,8 @@ public class Configuration {
   public boolean isEnableLogStreaming() {
     return enableLogStreaming;
   }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this);
+    }
 }

@@ -30,6 +30,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -105,5 +106,9 @@ public class ReadJsonArrayFromFile<T> {
       throw new JsonArrayReaderException(ex);
     }
     return object;
+  }
+
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
   }
 }
