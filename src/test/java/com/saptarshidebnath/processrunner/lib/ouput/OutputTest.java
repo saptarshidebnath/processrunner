@@ -1,10 +1,10 @@
 package com.saptarshidebnath.processrunner.lib.ouput;
 
-import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+
+import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
+import org.junit.Test;
 
 /** Created by saptarshi on 7/4/2017. */
 public class OutputTest {

@@ -27,21 +27,20 @@ package com.saptarshidebnath.processrunner.lib.process;
 
 import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@link Configuration} object create a configuration to be consumed by the {@link
  * ProcessRunner} object
  */
 public class Configuration {
-  private static Logger logger = LoggerFactory.getLogger(Configuration.class);
+  private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
   private final String interpreter;
   private final String command;
   private final Path workingDir;
@@ -69,13 +68,13 @@ public class Configuration {
    *     objects
    */
   Configuration(
-          final String interpreter,
-          final String command,
-          final Path workingDir,
-          final File masterLogFile,
-          final Charset charset,
-          final boolean autoDeleteFileOnExit,
-          final boolean enableLogStreaming) {
+      final String interpreter,
+      final String command,
+      final Path workingDir,
+      final File masterLogFile,
+      final Charset charset,
+      final boolean autoDeleteFileOnExit,
+      final boolean enableLogStreaming) {
     this.interpreter = interpreter.trim();
     this.command = command.trim();
     this.workingDir = workingDir;
@@ -163,7 +162,7 @@ public class Configuration {
     return enableLogStreaming;
   }
 
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 }

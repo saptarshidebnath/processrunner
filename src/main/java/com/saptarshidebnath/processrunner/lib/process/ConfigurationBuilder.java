@@ -25,14 +25,12 @@
 
 package com.saptarshidebnath.processrunner.lib.process;
 
+import static com.saptarshidebnath.processrunner.lib.utilities.Constants.UTF_8;
+
 import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -41,18 +39,19 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.saptarshidebnath.processrunner.lib.utilities.Constants.UTF_8;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ConfigurationBuilder} is the way going forward to build the configuration for the {@link
  * ProcessRunnerFactory} to consume
  */
 public class ConfigurationBuilder {
-  private static Logger logger = LoggerFactory.getLogger(ConfigurationBuilder.class);
+  private static final Logger logger = LoggerFactory.getLogger(ConfigurationBuilder.class);
   private final String interpreter;
   private final String command;
-  private final ArrayList<String> comamndParams;
+  private final List<String> comamndParams;
   private Path workingDir;
   private File masterLogFile;
   private boolean autoDeleteFileOnExit;
@@ -202,7 +201,7 @@ public class ConfigurationBuilder {
    * @throws ProcessConfigurationException if there is any exception while populating the {@link
    *     Configuration}
    */
-  public Configuration build() throws IOException, ProcessConfigurationException {
+  public Configuration build() {
     logger.trace("Building configuration");
     String commandWithParam =
         Utilities.joinString(
@@ -226,6 +225,6 @@ public class ConfigurationBuilder {
    */
   @Override
   public String toString() {
-      return ReflectionToStringBuilder.toString(this);
+    return ReflectionToStringBuilder.toString(this);
   }
 }

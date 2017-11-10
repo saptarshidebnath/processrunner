@@ -29,12 +29,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.saptarshidebnath.processrunner.lib.process.ProcessRunner;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Stores each line of output from the {@link ProcessRunner}. */
 public class OutputRecord {
-  private static final Logger logger = LoggerFactory.getLogger(OutputRecord.class);
   private static final Gson gson = new GsonBuilder().create();
   private final long timeStamp;
   private final OutputSourceType outputSourceType;
@@ -99,6 +96,6 @@ public class OutputRecord {
   }
 
   public String toString() {
-      return ReflectionToStringBuilder.toString(this);
+    return ReflectionToStringBuilder.toString(this);
   }
 }

@@ -25,14 +25,16 @@
 
 package com.saptarshidebnath.processrunner.lib.jsonutils;
 
+import static com.saptarshidebnath.processrunner.lib.utilities.Constants.UTF_8;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
+import static org.hamcrest.core.IsCollectionContaining.hasItems;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayWriterException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.junit.After;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,11 +44,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Logger;
-
-import static com.saptarshidebnath.processrunner.lib.utilities.Constants.UTF_8;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
-import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import org.junit.After;
+import org.junit.Test;
 
 /** Created by saptarshi on 11/25/2016. */
 public class WriteJsonArrayToFileTest {
@@ -110,7 +109,7 @@ public class WriteJsonArrayToFileTest {
   }
 
   @Test(expected = JsonArrayWriterException.class)
-  public void writeJsonObjectAfterEndingJsonObject() throws IOException, JsonArrayWriterException {
+  public void writeJsonObjectAfterEndingJsonObject() throws JsonArrayWriterException {
     this.testObject.startJsonObject();
     this.testObject.endJsonObjectWrite();
     this.testObject.cleanup();

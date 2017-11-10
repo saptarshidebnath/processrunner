@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-ps 1>&2
+ps 2>&1
 echo Saptarshi

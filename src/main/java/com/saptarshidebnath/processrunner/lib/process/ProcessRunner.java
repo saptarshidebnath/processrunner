@@ -25,32 +25,28 @@
 
 package com.saptarshidebnath.processrunner.lib.process;
 
-import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.output.Output;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.concurrent.Future;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Process ProcessRunnerImple interface is the base interface to run any system process or shell
  * script
  */
 public interface ProcessRunner {
-  public static final Logger logger = LoggerFactory.getLogger(ProcessRunner.class);
+  Logger logger = LoggerFactory.getLogger(ProcessRunner.class);
 
   /**
    * Triggers the process or command.
    *
    * @return the {@link Integer} exit code for the process.
-   * @throws ProcessException Throws {@link ProcessException} to denote that there is an error. You
-   *     can get the cause by {@link ProcessException#getCause()}
    * @throws IOException denoting there is an IO problem during writing the log files.
    * @throws InterruptedException there is a problem when writing the logs via thread enabled log
    *     handlers.
    */
-  Output run() throws ProcessException, IOException, InterruptedException;
+  Output run() throws IOException, InterruptedException;
 
   /**
    * Runs the process as a {@link java.util.concurrent.Callable} {@link Thread} with default

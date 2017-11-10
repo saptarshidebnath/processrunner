@@ -25,6 +25,13 @@
 
 package com.saptarshidebnath.processrunner.lib.process;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.StringStartsWith.startsWith;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -36,20 +43,20 @@ import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.utilities.Constants;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.SystemUtils;
-import org.junit.Test;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.StringStartsWith.startsWith;
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Test;
 
 /** Created by saptarshi on 12/22/2016. */
 public class ProcessProcessRunnerFactoryTest {
@@ -68,7 +75,7 @@ public class ProcessProcessRunnerFactoryTest {
 
   @Test
   public void startProcess()
-      throws ProcessConfigurationException, IOException, InterruptedException, ProcessException {
+      throws ProcessConfigurationException, IOException, InterruptedException {
     final Output response =
         ProcessRunnerFactory.startProcess(
             new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion()).build());
@@ -77,20 +84,19 @@ public class ProcessProcessRunnerFactoryTest {
 
   @Test(expected = ProcessConfigurationException.class)
   public void startProcessWithWrongParmeters()
-      throws ProcessConfigurationException, IOException, InterruptedException, ProcessException {
+      throws ProcessConfigurationException, IOException, InterruptedException {
     ProcessRunnerFactory.startProcess(
         new ConfigurationBuilder("", getInterPreterVersion()).build());
   }
 
   @Test(expected = ProcessConfigurationException.class)
-  public void getProcessWithLessParamsWrongParamets()
-          throws ProcessConfigurationException, IOException {
+  public void getProcessWithLessParamsWrongParamets() throws ProcessConfigurationException {
     new ConfigurationBuilder(getDefaultInterpreter(), "").build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
   public void getProcessMoreParamWrongParamets()
-      throws IOException, ProcessConfigurationException, InterruptedException, ProcessException {
+      throws IOException, ProcessConfigurationException, InterruptedException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
@@ -104,7 +110,7 @@ public class ProcessProcessRunnerFactoryTest {
 
   @Test
   public void startProcessWithProcessConfig()
-      throws IOException, ProcessConfigurationException, InterruptedException, ProcessException {
+      throws IOException, ProcessConfigurationException, InterruptedException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
@@ -121,7 +127,7 @@ public class ProcessProcessRunnerFactoryTest {
   @SuppressFBWarnings("PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS")
   @Test
   public void searchContent()
-      throws ProcessConfigurationException, IOException, InterruptedException, ProcessException,
+      throws ProcessConfigurationException, IOException, InterruptedException,
           JsonArrayReaderException {
 
     final Output response =
@@ -148,7 +154,7 @@ public class ProcessProcessRunnerFactoryTest {
   @SuppressFBWarnings("PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS")
   @Test
   public void searchContentNegativeTestCase()
-      throws ProcessConfigurationException, IOException, InterruptedException, ProcessException,
+      throws ProcessConfigurationException, IOException, InterruptedException,
           JsonArrayReaderException {
 
     final ProcessRunner processRunner =
@@ -169,8 +175,7 @@ public class ProcessProcessRunnerFactoryTest {
 
   @Test
   public void startThreadedProcessWithProcessConfig()
-      throws ProcessException, IOException, ProcessConfigurationException, ExecutionException,
-          InterruptedException {
+      throws IOException, ProcessConfigurationException, ExecutionException, InterruptedException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
@@ -186,7 +191,7 @@ public class ProcessProcessRunnerFactoryTest {
 
   @Test(expected = FileNotFoundException.class)
   public void startProcessWithProcessConfigWithWrongParams()
-      throws IOException, ProcessConfigurationException, InterruptedException, ProcessException {
+      throws IOException, ProcessConfigurationException, InterruptedException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     if (!tempFile.setReadOnly()) {
@@ -204,7 +209,7 @@ public class ProcessProcessRunnerFactoryTest {
 
   @Test(expected = FileNotFoundException.class)
   public void startThreadedProcessWithProcessConfigWithWrongParams()
-      throws ProcessException, IOException, ProcessConfigurationException {
+      throws IOException, ProcessConfigurationException {
     final File tempFile =
         File.createTempFile(Constants.FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
     if (!tempFile.setReadOnly()) {
@@ -220,22 +225,23 @@ public class ProcessProcessRunnerFactoryTest {
             .build());
   }
 
-    @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
-    @Test(expected = ProcessConfigurationException.class)
-    public void getProcessLessDetailed()
-            throws IOException, ProcessException, InterruptedException, ProcessConfigurationException {
-        final ProcessRunner processRunner =
-                ProcessRunnerFactory.getProcess(
-                        new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
-                                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
-                                .build());
-        final Output response = processRunner.run();
-        assertThat("Validating process return code : ", response.getReturnCode(), is(0));
-        //
-        // This line should generate an error as master log file have not been saved.
-        //
-        final File masterLog = response.getMasterLogAsJson();
-    }
+  @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
+  @Test(expected = ProcessConfigurationException.class)
+  public void getProcessLessDetailed()
+      throws IOException, InterruptedException, ProcessConfigurationException {
+    final ProcessRunner processRunner =
+        ProcessRunnerFactory.getProcess(
+            new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
+                .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+                .build());
+    final Output response = processRunner.run();
+    assertThat("Validating process return code : ", response.getReturnCode(), is(0));
+    //
+    // This line should generate an error as master log file have not been saved.
+    //
+    // noinspection unused
+    final File masterLog = response.getMasterLogAsJson();
+  }
 
   //  @Test
   //  public void streamingOutput()
@@ -309,13 +315,9 @@ public class ProcessProcessRunnerFactoryTest {
     return message;
   }
 
-  @SuppressFBWarnings({
-    "PRMC_POSSIBLY_REDUNDANT_METHOD_CALLS",
-    "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"
-  })
   @Test
   public void getProcessMoreDetailed()
-      throws IOException, ProcessException, InterruptedException, ProcessConfigurationException {
+      throws IOException, InterruptedException, ProcessConfigurationException {
     final ProcessRunner processRunner =
         ProcessRunnerFactory.getProcess(
             new ConfigurationBuilder(getDefaultInterpreter(), getInterPreterVersion())
@@ -340,7 +342,7 @@ public class ProcessProcessRunnerFactoryTest {
         "Validating json log content : ",
         outputRecord.get(this.arryPosition).getOutputText(),
         startsWith(getInitialVersionComments()));
-    masterLog.delete();
+    assertThat("Checking if master file gets deleted or not", masterLog.delete(), is(true));
   }
 
   @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
@@ -360,7 +362,8 @@ public class ProcessProcessRunnerFactoryTest {
             File.createTempFile(
                 Constants.FILE_PREFIX_NAME_LOG_DUMP + "-sysout", Constants.FILE_SUFFIX_JSON));
     sysout.deleteOnExit();
-    sysout.setReadOnly();
+    assertThat(
+        "Validating if sysout file is set as readonly or not", sysout.setReadOnly(), is(true));
     response.saveSysOut(sysout);
   }
 
@@ -411,6 +414,7 @@ public class ProcessProcessRunnerFactoryTest {
     }
 
     assertThat("Validating if processrunner got created or not", processRunner, not(nullValue()));
+    assert processRunner != null;
     final Output response = processRunner.run();
     final File sysout =
         response.saveSysOut(
@@ -489,6 +493,7 @@ public class ProcessProcessRunnerFactoryTest {
     }
 
     assertThat("Validating if processrunner is not null", processRunner, not(nullValue()));
+    assert processRunner != null;
     final Output response = processRunner.run();
     final File sysout = response.saveSysOut(File.createTempFile("temp-file-sysout", ".json"));
     sysout.deleteOnExit();
@@ -513,7 +518,7 @@ public class ProcessProcessRunnerFactoryTest {
   @SuppressFBWarnings("DM_DEFAULT_ENCODING")
   private int getFileLineNumber(final File fileToCountLineNumber) throws IOException {
     LineNumberReader lnr = null;
-    int lineNumber = 0;
+    int lineNumber;
     try {
       lnr = new LineNumberReader(new InputStreamReader(new FileInputStream(fileToCountLineNumber)));
       long skipValue = Long.MAX_VALUE;

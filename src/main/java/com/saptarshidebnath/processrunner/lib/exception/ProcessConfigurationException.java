@@ -28,11 +28,15 @@ package com.saptarshidebnath.processrunner.lib.exception;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
-/** Custom {@link Exception} denote that the {@link Configuration} is not configured correctly */
+/**
+ * Custom {@link Exception} denote that the {@link Configuration} is not configured correctly.
+ *
+ * <p>This is a generic base exception.
+ */
 public class ProcessConfigurationException extends Exception {
 
   /**
-   * The constructor accepting a string message
+   * The constructor accepting a string message.
    *
    * @param message The message that needs to be provided while creating the exception.
    */
@@ -40,7 +44,7 @@ public class ProcessConfigurationException extends Exception {
     super(message);
   }
 
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 }

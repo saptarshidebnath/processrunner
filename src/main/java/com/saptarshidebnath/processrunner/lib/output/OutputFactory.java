@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * implementes {@link Output}.
  */
 public class OutputFactory {
-  private static Logger logger = LoggerFactory.getLogger(OutputFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(OutputFactory.class);
 
   /** private constructor. */
   private OutputFactory() {}

@@ -25,21 +25,24 @@
 
 package com.saptarshidebnath.processrunner.lib.jsonutils;
 
-import com.google.gson.GsonBuilder;
-import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.logging.Logger;
-
 import static com.saptarshidebnath.processrunner.lib.utilities.Constants.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
+
+import com.google.gson.GsonBuilder;
+import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.logging.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ReadJsonArrayFromFileTest {
 
@@ -80,7 +83,7 @@ public class ReadJsonArrayFromFileTest {
   }
 
   @Test
-  public void textReadNext() throws IOException, JsonArrayReaderException {
+  public void textReadNext() throws JsonArrayReaderException {
     final ArrayList<String> readData = new ArrayList<>();
     String data;
     do {

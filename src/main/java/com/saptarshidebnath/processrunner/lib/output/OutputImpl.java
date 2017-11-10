@@ -28,15 +28,14 @@ package com.saptarshidebnath.processrunner.lib.output;
 import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationException;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
+import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 /** Default Implementation of {@link Output} */
 class OutputImpl implements Output {
@@ -54,9 +53,9 @@ class OutputImpl implements Output {
     this.returnCode = returnCode;
   }
 
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 
   /**
    * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSOUT} to the
@@ -73,10 +72,9 @@ class OutputImpl implements Output {
    *     please use {@link ProcessException#getCause()}.
    * @throws ProcessConfigurationException if master log is accessed without configuring the same.
    */
-  @SuppressFBWarnings("CRLF_INJECTION_LOGS")
   @Override
   public File saveSysOut(final File sysOut) throws ProcessException, ProcessConfigurationException {
-    File response = null;
+    File response;
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
           "Master log file not configured, cannot save sysout. Please set master log file while configuring the process. Configuration : "
@@ -106,11 +104,10 @@ class OutputImpl implements Output {
    *     please use {@link ProcessException#getCause()}.
    * @throws ProcessConfigurationException if master log is accessed without configuring the same.
    */
-  @SuppressFBWarnings("CRLF_INJECTION_LOGS")
   @Override
   public File saveSysError(final File sysError)
       throws ProcessException, ProcessConfigurationException {
-    File response = null;
+    File response;
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
           "Master log file not configured, cannot save syserr. Please set master log file while configuring the process. Configuration : "
@@ -191,7 +188,7 @@ class OutputImpl implements Output {
   @Override
   public boolean searchMasterLog(final String regex)
       throws IOException, JsonArrayReaderException, ProcessConfigurationException {
-    Boolean response = null;
+    Boolean response;
     if (configuration.getMasterLogFile() == null) {
       String message =
           "Master log file not configured, cannot search log. Please set master log file while configuring the process. Configuration : "
@@ -199,8 +196,7 @@ class OutputImpl implements Output {
       throw new ProcessConfigurationException(message);
     } else {
       response =
-          Utilities.searchFile(
-              configuration.getMasterLogFile(), regex, this.configuration.getCharset());
+          this.searchFile(configuration.getMasterLogFile(), regex, this.configuration.getCharset());
     }
     return response;
   }
@@ -220,7 +216,6 @@ class OutputImpl implements Output {
   @Override
   public List<String> grepForRegex(String regex)
       throws IOException, JsonArrayReaderException, ProcessConfigurationException {
-    List<String> response = null;
     if (configuration.getMasterLogFile() == null) {
       String message =
           "Master log file not configured, cannot search log. Please set master log file while configuring the process. Configuration : "
@@ -238,5 +233,27 @@ class OutputImpl implements Output {
   @Override
   public int getReturnCode() {
     return this.returnCode;
+  }
+
+  public boolean searchFile(File fileToRead, final String regex, Charset charset)
+      throws IOException, JsonArrayReaderException {
+    boolean isMatching = false;
+    this.logger.trace("Searching for regular expression : {}", new Object[] {regex});
+    final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
+        new ReadJsonArrayFromFile<>(fileToRead, charset);
+    OutputRecord outputRecord;
+    do {
+      outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
+      if (outputRecord != null) {
+        isMatching = outputRecord.getOutputText().matches(regex);
+      }
+    } while (outputRecord != null && !isMatching);
+    if (isMatching) {
+      this.logger.info("Regex {} is found", new Object[] {regex});
+    } else {
+      this.logger.warn("Regex {} is NOT found", new Object[] {regex});
+    }
+    readJsonArrayFromFile.closeJsonReader();
+    return isMatching;
   }
 }

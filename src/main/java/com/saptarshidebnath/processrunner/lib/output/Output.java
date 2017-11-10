@@ -30,12 +30,12 @@ import com.saptarshidebnath.processrunner.lib.exception.ProcessConfigurationExce
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
 import com.saptarshidebnath.processrunner.lib.process.ProcessRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The Output of a run is returned as a reference of {@link Output} class. The interface for the
@@ -44,7 +44,21 @@ import java.util.List;
  */
 public interface Output {
 
-    Logger logger = LoggerFactory.getLogger(Output.class);
+  Logger logger = LoggerFactory.getLogger(Output.class);
+
+  /**
+   * Search a file for a regular expression.
+   *
+   * @param fileToRead The {@link File} object which needss to be read.
+   * @param regex The regex which need to be searched for in {@link String} format.
+   * @param charset a reference to {@link Charset} to undernstand how to read the file.
+   * @return a {@link Boolean#TRUE} or a {@link Boolean#FALSE}
+   * @throws IOException
+   * @throws JsonArrayReaderException
+   */
+  boolean searchFile(File fileToRead, final String regex, Charset charset)
+      throws IOException, JsonArrayReaderException;
+
   /**
    * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSOUT} to the
    * {@link File} supplied.
@@ -88,7 +102,7 @@ public interface Output {
    *     from the disk.
    */
   File saveLog(final File log)
-          throws ProcessException, IOException, JsonArrayReaderException, ProcessConfigurationException;
+      throws IOException, JsonArrayReaderException, ProcessConfigurationException;
   /**
    * Returns the process exit / return code.
    *
@@ -103,11 +117,9 @@ public interface Output {
    * @param regex a proper Regular Expression that need to be searched for.
    * @return a {@link Boolean#TRUE} or {@link Boolean#FALSE} depending upon if the search is
    *     positive or negative.
-   * @throws ProcessException In case of any error. This is a generic error. To get the details,
-   *     please use {@link ProcessException#getCause()}.
    */
   boolean searchMasterLog(final String regex)
-          throws ProcessException, IOException, JsonArrayReaderException, ProcessConfigurationException;
+      throws IOException, JsonArrayReaderException, ProcessConfigurationException;
 
   /**
    * Searches for a pattern and returns a {@link List} of {@link String} which contains extracts
@@ -119,5 +131,5 @@ public interface Output {
    * @throws JsonArrayReaderException if there is a problem reading the Json log file.
    */
   List<String> grepForRegex(String regex)
-          throws IOException, JsonArrayReaderException, ProcessConfigurationException;
+      throws IOException, JsonArrayReaderException, ProcessConfigurationException;
 }

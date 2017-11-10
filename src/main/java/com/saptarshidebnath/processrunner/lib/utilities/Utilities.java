@@ -25,24 +25,29 @@
 
 package com.saptarshidebnath.processrunner.lib.utilities;
 
-import com.saptarshidebnath.processrunner.lib.exception.JsonArrayReaderException;
-import com.saptarshidebnath.processrunner.lib.jsonutils.ReadJsonArrayFromFile;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.saptarshidebnath.processrunner.lib.output.OutputRecord;
 import com.saptarshidebnath.processrunner.lib.output.OutputSourceType;
 import com.saptarshidebnath.processrunner.lib.process.Configuration;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.nio.charset.Charset;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class Utilities {
 
+  public static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
   private static final Logger logger = LoggerFactory.getLogger(Utilities.class);
 
   /** Hidden Constructor. */
@@ -66,100 +71,73 @@ public final class Utilities {
    * @param targetFile accepts a target {@link File}.
    * @param outputSourceType Accepts the {@link OutputSourceType} which need to be printed only.
    * @return a {@link File} reference to the newly written log {@link File}.
-   * @throws IOException when there are problems reading and wrting the {@link File}s
-   * @throws JsonArrayReaderException when there are issuee reading the Json based master log {@link
-   *     File}.
+   * @throws IOException when there are problems reading and wrting the {@link File}.
    */
   public static File writeLog(
       final Configuration configuration,
       final File targetFile,
       final OutputSourceType outputSourceType)
-      throws IOException, JsonArrayReaderException {
+      throws IOException {
     try (final FileOutputStream fileOutputStream = new FileOutputStream(targetFile, true);
         final PrintWriter printWriter =
             new PrintWriter(new OutputStreamWriter(fileOutputStream, configuration.getCharset()))) {
+      logger.trace(
+          "Writing {} to : {}", outputSourceType.toString(), targetFile.getCanonicalPath());
 
-      final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
-          new ReadJsonArrayFromFile<>(configuration.getMasterLogFile(), configuration.getCharset());
-      logger.info(
-          "Writing {} to : {}",
-          new Object[] {outputSourceType.toString(), targetFile.getCanonicalPath()});
-      OutputRecord outputRecord;
-      do {
-        outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
-        final String currentOutputLine;
-        if (outputRecord != null
-            && (outputSourceType == OutputSourceType.ALL
-                || outputRecord.getOutputSourceType() == outputSourceType)) {
-          currentOutputLine = outputRecord.getOutputText();
-          logger.trace("{} >> {}", new Object[] {outputSourceType.toString(), currentOutputLine});
-          printWriter.println(currentOutputLine);
+      try (BufferedReader br =
+          new BufferedReader(
+              new InputStreamReader(
+                  new FileInputStream(configuration.getMasterLogFile()),
+                  configuration.getCharset()))) {
+        for (OutputRecord record;
+            (record = gson.fromJson(br.readLine(), OutputRecord.class)) != null; ) {
+          if (outputSourceType == OutputSourceType.ALL) {
+            printWriter.println(record.getOutputText());
+          } else if (outputSourceType == record.getOutputSourceType()) {
+            printWriter.println(record.getOutputText());
+          }
         }
-      } while (outputRecord != null);
+      }
     }
 
     logger.info(
         "{} written completely to : {}",
-        new Object[] {outputSourceType.toString(), targetFile.getCanonicalPath()});
+        outputSourceType.toString(),
+        targetFile.getCanonicalPath());
     return targetFile;
   }
 
-  @SuppressFBWarnings("OPM_OVERLY_PERMISSIVE_METHOD")
   public static String joinString(String... stringArray) {
     return joinString(Arrays.asList(stringArray));
   }
 
-  @SuppressFBWarnings("OPM_OVERLY_PERMISSIVE_METHOD")
   public static String joinString(List<String> stringList) {
     return stringList.stream().collect(Collectors.joining(Constants.EMPTY_STRING));
-  }
-
-  public static boolean searchFile(File fileToRead, final String regex, Charset charset)
-      throws IOException, JsonArrayReaderException {
-    boolean isMatching = false;
-    logger.trace("Searching for regular expression : {}", new Object[] {regex});
-    final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
-        new ReadJsonArrayFromFile<>(fileToRead, charset);
-    OutputRecord outputRecord;
-    do {
-      outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
-      if (outputRecord != null) {
-        isMatching = outputRecord.getOutputText().matches(regex);
-      }
-    } while (outputRecord != null && !isMatching);
-    if (isMatching) {
-      logger.info("Regex {} is found", new Object[] {regex});
-    } else {
-      logger.warn("Regex {} is NOT found", new Object[] {regex});
-    }
-    readJsonArrayFromFile.closeJsonReader();
-    return isMatching;
   }
 
   public static String generateThreadName(Configuration configuration, String suffix) {
     return joinString(configuration.getInterpreter(), configuration.getCommand(), suffix);
   }
 
-  public static List<String> grepFile(File fileToRead, final String regex, Charset charset)
-      throws IOException, JsonArrayReaderException {
+  public static List<String> grepFile(final String regex, Configuration configuration)
+      throws IOException {
     List<String> grepedLines = new ArrayList<>();
-    logger.trace("Searching for regular expression : {}", new Object[] {regex});
-    final ReadJsonArrayFromFile<OutputRecord> readJsonArrayFromFile =
-        new ReadJsonArrayFromFile<>(fileToRead, charset);
-    OutputRecord outputRecord;
-    String text;
-    do {
-      outputRecord = readJsonArrayFromFile.readNext(OutputRecord.class);
-      if (outputRecord != null) {
-        text = outputRecord.getOutputText();
-        if (text.matches(regex)) {
+    logger.trace("Searching for regular expression : {}", regex);
+    try (BufferedReader br =
+        new BufferedReader(
+            new InputStreamReader(
+                new FileInputStream(configuration.getMasterLogFile()),
+                configuration.getCharset()))) {
+      for (OutputRecord record;
+          (record = gson.fromJson(br.readLine(), OutputRecord.class)) != null; ) {
+        if (record.getOutputText().matches(regex)) {
           grepedLines.add(
-              Utilities.joinString(outputRecord.getOutputSourceType().toString(), text));
-          logger.trace(Utilities.joinString("Found ", text, " to match ", regex));
+              Utilities.joinString(
+                  record.getOutputSourceType().toString(), " >> ", record.getOutputText()));
+          logger.trace("Found {} to match the regex : {}", record.getOutputSourceType(), regex);
         }
       }
-    } while (outputRecord != null);
-    readJsonArrayFromFile.closeJsonReader();
+    }
     return grepedLines;
   }
 }

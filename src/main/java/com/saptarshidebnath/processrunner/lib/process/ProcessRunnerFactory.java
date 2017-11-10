@@ -28,14 +28,14 @@ package com.saptarshidebnath.processrunner.lib.process;
 import com.saptarshidebnath.processrunner.lib.exception.ProcessException;
 import com.saptarshidebnath.processrunner.lib.output.Output;
 import com.saptarshidebnath.processrunner.lib.utilities.Utilities;
+import java.io.IOException;
+import java.util.concurrent.Future;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.concurrent.Future;
-
 /** Factory method to to run command or to get an instance of {@link ProcessRunner} */
+@SuppressWarnings("WeakerAccess")
 public class ProcessRunnerFactory {
   private static final Logger logger = LoggerFactory.getLogger(ProcessRunnerFactory.class);
 
@@ -55,7 +55,7 @@ public class ProcessRunnerFactory {
    *     handlers.
    */
   public static Output startProcess(final Configuration configuration)
-      throws ProcessException, IOException, InterruptedException {
+      throws IOException, InterruptedException {
     logger.trace(Utilities.joinString("Starting process with config", configuration.toString()));
     return new ProcessRunnerImpl(configuration).run();
   }
@@ -72,7 +72,7 @@ public class ProcessRunnerFactory {
    * @throws IOException denoting there is an IO problem during writing the log files.
    */
   public static Future<Output> startAsyncProcess(final Configuration configuration)
-          throws IOException {
+      throws IOException {
     logger.trace(
         Utilities.joinString(
             "Starting asynchronous process with configuration ", configuration.toString()));
@@ -95,7 +95,7 @@ public class ProcessRunnerFactory {
     return new ProcessRunnerImpl(configuration);
   }
 
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 }

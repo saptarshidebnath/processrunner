@@ -25,15 +25,14 @@
 
 package com.saptarshidebnath.processrunner.lib.utilities;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@SuppressFBWarnings({"PATH_TRAVERSAL_IN"})
 public class Constants {
+  public static final byte CACHE_SIZE = 100;
   public static final String SPACE_STR = " ";
   public static final char SPACE_CHAR = ' ';
   public static final String FILE_PREFIX_NAME_LOG_DUMP = "ProcessRunner-log-dump-";
@@ -41,15 +40,14 @@ public class Constants {
   public static final String EMPTY_STRING = "";
   public static final String NEW_LINE = System.lineSeparator();
   public static final String GENERIC_ERROR = "Generic Error. Please see log for more details.";
-  public static final ThreadGroup PROCESS_RUNNER_THREAD_GROUP =
-      new ThreadGroup("PROCESS_RUNNER_0.0.2");
-  public static final int LOGGER_THREAD_COUNT = 2;
-  public static final Charset UTF_8 = Charset.forName("UTF-8");
-  private static String userDir = System.getProperty("user.dir");
-
+  public static final Charset UTF_8 = StandardCharsets.UTF_8;
+  private static final String userDir = System.getProperty("user.dir");
   public static final File DEFAULT_CURRENT_DIR = new File(userDir);
-
   public static final Path DEFAULT_CURRENT_DIR_PATH = Paths.get(userDir);
+  public static String DISK_WRITER_THREAD_NAME_SUFFIX = "-dsk-rtr";
+  public static String STREAM_READER_THREAD_NAME_SUFFIX = "-strm-rdr-";
+  public static String PROCESS_RUNNER_THREAD_GROUP_NAME = "proc-rnr";
+  public static long THREAD_WAIT_TIME = 100l;
 
   private Constants() {}
 }

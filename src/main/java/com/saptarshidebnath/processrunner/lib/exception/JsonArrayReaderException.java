@@ -52,7 +52,7 @@ public class JsonArrayReaderException extends Exception {
     this.initCause(exception);
   }
 
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 }

@@ -43,7 +43,7 @@ public class JsonArrayWriterException extends Exception {
     super(message);
   }
 
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 }

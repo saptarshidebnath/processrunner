@@ -25,11 +25,11 @@
 
 package com.saptarshidebnath.processrunner.lib.exception;
 
-import com.saptarshidebnath.processrunner.lib.utilities.Constants;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+
+import com.saptarshidebnath.processrunner.lib.utilities.Constants;
+import org.junit.Test;
 
 /** Created by saptarshi on 1/2/2017. */
 public class ProcessExceptionTest {

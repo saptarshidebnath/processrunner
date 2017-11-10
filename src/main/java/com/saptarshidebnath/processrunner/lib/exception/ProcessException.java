@@ -30,14 +30,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 /**
- * Blanket custom {@link Exception} to be used by the {@link
+ * Blanket custom {@link Exception}. The class need to be used by the {@link
  * com.saptarshidebnath.processrunner.lib.process.ProcessRunnerFactory} class and all public facing
  * methods for this ProcessRunner library. The Developer should be able to get the cause from the
  * {@link ProcessException#getCause()} detailing exactly what triggered the exception.
  */
 public class ProcessException extends Exception {
   /**
-   * Creates a {@link ProcessException} from another {@link Exception}
+   * Creates a {@link ProcessException} from another {@link Exception}.
    *
    * @param ex Accepts a {@link Exception} object as input.
    */
@@ -49,11 +49,11 @@ public class ProcessException extends Exception {
   /**
    * Creates a generic {@link ProcessException} with the message {@link Constants#GENERIC_ERROR}.
    */
-  public ProcessException() {
+  ProcessException() {
     super(Constants.GENERIC_ERROR);
   }
 
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 }
