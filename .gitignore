@@ -1,7 +1,10 @@
 .idea/
+*.ipr
+*.iws
 *.iml
 target/
 _site/
 .gradle/
 build/
 out/
+jpeek*.jar

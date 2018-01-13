@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 
 set -x
-
-./gradlew clean check
-__exit_code=$?
-if [[ ${__exit_code} -eq 0 ]]; then
-    echo "Showing test coverage"
-    google-chrome ./build/reports/coverage/index.html &
-else
-    echo "Test cases failed. Showing Test results"
-    google-chrome ./build/reports/tests/test/index.html
-fi
+mvn clean site install
+#java -jar ./jpeek-0.5-jar-with-dependencies.jar . ./target/jpeek --overwrite
+google-chrome ./target/site/project-info.html
+#google-chrome ./jpeek/index.html

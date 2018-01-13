@@ -24,21 +24,21 @@
   -->
 
 <settings>
-  <servers>
-    <server>
-      <id>ossrh</id>
-      <username>sdebnath</username>
-      <password>{Ka2GRXl0wJYHfqH6Os9oZQaHckX19TtM+C8qLOeS6bU=}</password>
-    </server>
+    <servers>
+        <server>
+            <id>ossrh</id>
+            <username>sdebnath</username>
+            <password>{Ka2GRXl0wJYHfqH6Os9oZQaHckX19TtM+C8qLOeS6bU=}</password>
+        </server>
 
-    <server>
-      <id>gpg.passphrase</id>
-      <passphrase>{Ka2GRXl0wJYHfqH6Os9oZQaHckX19TtM+C8qLOeS6bU=}</passphrase>
-    </server>
+        <server>
+            <id>gpg.passphrase</id>
+            <passphrase>{Ka2GRXl0wJYHfqH6Os9oZQaHckX19TtM+C8qLOeS6bU=}</passphrase>
+        </server>
 
-    <server>
-      <id>github</id>
-      <password>250676972359e3b049574b1646095ee3e51a49b7</password>
-    </server>
-  </servers>
+        <server>
+            <id>github</id>
+            <password>250676972359e3b049574b1646095ee3e51a49b7</password>
+        </server>
+    </servers>
 </settings>
