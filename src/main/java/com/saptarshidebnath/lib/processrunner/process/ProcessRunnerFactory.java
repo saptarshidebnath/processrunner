@@ -58,7 +58,7 @@ public class ProcessRunnerFactory {
    */
   public static Output startProcess(final Configuration configuration)
       throws IOException, InterruptedException, ExecutionException {
-    logger.trace("Starting process with config : {}", configuration.toString());
+    logger.debug("Starting process with config : {}", configuration);
     return new ProcessRunnerImpl(configuration).run();
   }
 
@@ -71,7 +71,7 @@ public class ProcessRunnerFactory {
    *     {@link Output} of the process.
    */
   public static Future<Output> startAsyncProcess(final Configuration configuration) {
-    logger.trace("Starting asynchronous process with configuration : {}", configuration.toString());
+    logger.debug("Starting asynchronous process with configuration : {}", configuration);
     return new ProcessRunnerImpl(configuration).runAsync();
   }
 
@@ -84,7 +84,7 @@ public class ProcessRunnerFactory {
    * @return a reference of {@link ProcessRunner}
    */
   public static ProcessRunner getProcess(Configuration configuration) {
-    logger.trace("Creating Process with the configuration : ", configuration.toString());
+    logger.debug("Creating Process with the configuration : ", configuration);
     return new ProcessRunnerImpl(configuration);
   }
 }
