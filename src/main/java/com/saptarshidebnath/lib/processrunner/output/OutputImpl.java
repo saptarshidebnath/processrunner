@@ -38,6 +38,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default Implementation of {@link Output}.
@@ -53,7 +55,7 @@ import java.util.stream.Stream;
  * </ul>
  */
 class OutputImpl implements Output {
-
+  private static Logger logger = LoggerFactory.getLogger(Output.class);
   private final Configuration configuration;
   private final int returnCode;
 
@@ -70,11 +72,7 @@ class OutputImpl implements Output {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("OutputImpl{");
-    sb.append("configuration=").append(configuration);
-    sb.append(", returnCode=").append(returnCode);
-    sb.append('}');
-    return sb.toString();
+    return "OutputImpl{" + "configuration=" + configuration + ", returnCode=" + returnCode + '}';
   }
 
   /**
@@ -94,9 +92,9 @@ class OutputImpl implements Output {
     File response;
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          "Master log file not configured, cannot save sysout. Configuration : " + configuration);
+          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration);
     }
-    logger.trace("Saving sys out to {}", new Object[] {sysOut.getAbsolutePath()});
+    logger.trace("Saving sys out to {}", sysOut.getAbsolutePath());
     response = new LogWriter().writeLog(this.configuration, sysOut, OutputSourceType.SYSOUT);
     return response;
   }
@@ -118,9 +116,9 @@ class OutputImpl implements Output {
     File response;
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          "Master log file not configured, cannot save syserr. Configuration : " + configuration);
+          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration);
     } else {
-      this.logger.trace("Saving sys error to : {}", new Object[] {sysError.getAbsolutePath()});
+      logger.trace("Saving sys error to : {}", new Object[] {sysError.getAbsolutePath()});
       response = new LogWriter().writeLog(this.configuration, sysError, OutputSourceType.SYSERR);
     }
     return response;
@@ -140,7 +138,7 @@ class OutputImpl implements Output {
   public File getMasterLogAsJson() throws ProcessConfigurationException {
     if (this.configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          "Master log file not configured. Configuration : " + configuration);
+          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration);
     }
     return this.configuration.getMasterLogFile();
   }
@@ -160,7 +158,7 @@ class OutputImpl implements Output {
   public File saveLog(File log) throws IOException, ProcessConfigurationException {
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          "Master log file not configured. Configuration : " + configuration);
+          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration);
     }
     return new LogWriter().writeLog(this.configuration, log, OutputSourceType.ALL);
   }
@@ -182,7 +180,8 @@ class OutputImpl implements Output {
       throws IOException, ProcessConfigurationException {
     Boolean response;
     if (configuration.getMasterLogFile() == null) {
-      String message = "Master log file not configured. Configuration : " + configuration;
+      String message =
+          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration;
       throw new ProcessConfigurationException(message);
     } else {
       response =
@@ -206,7 +205,8 @@ class OutputImpl implements Output {
   public List<OutputRecord> grepForRegex(String regex)
       throws IOException, ProcessConfigurationException {
     if (configuration.getMasterLogFile() == null) {
-      String message = "Master log file not configured. Configuration : " + configuration;
+      String message =
+          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration;
       throw new ProcessConfigurationException(message);
     }
     return new GrepFile().grepFile(regex, configuration);
@@ -224,7 +224,7 @@ class OutputImpl implements Output {
 
   private boolean searchFile(File fileToRead, final String regex, Charset charset)
       throws IOException {
-    this.logger.trace("Searching for regular expression : {}", new Object[] {regex});
+    logger.trace("Searching for regular expression : {}", regex);
     try (Stream<String> stream = Files.lines(Paths.get(fileToRead.getCanonicalPath()), charset)) {
       return stream
           .parallel()

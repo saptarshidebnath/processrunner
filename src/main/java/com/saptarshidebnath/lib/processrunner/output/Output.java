@@ -32,8 +32,6 @@ import com.saptarshidebnath.lib.processrunner.process.ProcessRunner;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The Output of a run is returned as a reference of {@link Output} class. The interface for the
@@ -41,8 +39,6 @@ import org.slf4j.LoggerFactory;
  * ProcessRunner#runAsync()}.
  */
 public interface Output {
-
-  Logger logger = LoggerFactory.getLogger(Output.class);
 
   /**
    * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSOUT} to the

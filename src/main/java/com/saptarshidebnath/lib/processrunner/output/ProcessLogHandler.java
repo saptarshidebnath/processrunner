@@ -154,8 +154,10 @@ public class ProcessLogHandler {
    *
    * <p>Internal method, shouldn't be used externallyy. Automatically called when a object of {@link
    * ProcessLogHandler} is created.
+   *
+   * @return int depciting the number of lines written.
    */
-  private void writeToDisk() {
+  private int writeToDisk() throws InterruptedException {
     String threadName =
         new StringJoiner("")
             .add(Thread.currentThread().getName())
@@ -168,6 +170,7 @@ public class ProcessLogHandler {
     // finished writing to
     // disk
     //
+    int counter = -1;
     while (this.inputStreamReadingThreads.stream().anyMatch(future -> !future.isDone())
         || !queue.isEmpty()) {
       if (queue.isEmpty()) {
@@ -175,21 +178,22 @@ public class ProcessLogHandler {
         // If queue is empty wait for some time
         //
         logger.debug("Queue is empty, waiting for {} milliseconds", Constants.THREAD_WAIT_TIME);
-        try {
-          Thread.sleep(Constants.THREAD_WAIT_TIME);
-        } catch (InterruptedException e) {
-          logger.error("Thread waiting is interrupted", e);
-        }
+        Thread.sleep(Constants.THREAD_WAIT_TIME);
       } else {
         //
         // Write all the element in the queue to the disk.
-        // \\
+        //
         List<OutputRecord> record = new ArrayList<>(Constants.FILE_WRITER_OBJECT_SIZE);
-        queue.drainTo(record, Constants.FILE_WRITER_OBJECT_SIZE);
+        int numberOfelementDrained = queue.drainTo(record, Constants.FILE_WRITER_OBJECT_SIZE);
+        assert numberOfelementDrained == record.size();
+        counter += record.size();
         record
             .stream()
-            .map(outputRecord -> Constants.GSON.toJson(outputRecord))
-            .forEach(line -> printWriter.println(line));
+            .map(Constants.GSON::toJson)
+            .forEach(
+                line -> {
+                  printWriter.println(line);
+                });
       }
       //
       // Force flush
@@ -197,6 +201,8 @@ public class ProcessLogHandler {
       printWriter.flush();
     }
     printWriter.close();
+    logger.debug("Wrote {} lines to master log file.", ++counter);
+    return counter;
   }
 
   /**

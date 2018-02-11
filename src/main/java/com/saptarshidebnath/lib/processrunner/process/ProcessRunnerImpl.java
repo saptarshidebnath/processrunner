@@ -94,7 +94,7 @@ class ProcessRunnerImpl implements ProcessRunner {
     logger.info("Waiting for the process to terminate");
     currentProcess.waitFor();
     final Integer processExitValue = currentProcess.exitValue();
-    output = OutputFactory.createOutput(this.configuration, processExitValue);
+    output = new OutputFactory().createOutput(this.configuration, processExitValue);
     logger.trace("Process exited with exit value : {}", processExitValue);
     return output;
   }

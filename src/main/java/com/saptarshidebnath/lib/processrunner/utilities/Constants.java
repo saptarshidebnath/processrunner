@@ -52,4 +52,6 @@ public interface Constants {
   String PROCESS_RUNNER_THREAD_GROUP_NAME = "PR-";
   long THREAD_WAIT_TIME = 100L;
   Gson GSON = new GsonBuilder().create();
+  String processConfigExceptionTextMasterLogFileNotConfigured =
+      "Master log file not configured. Configuration : ";
 }

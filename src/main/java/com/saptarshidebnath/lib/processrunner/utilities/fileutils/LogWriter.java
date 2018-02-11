@@ -45,9 +45,8 @@ public class LogWriter {
                   configuration.getCharset()))) {
         for (OutputRecord record;
             (record = Constants.GSON.fromJson(br.readLine(), OutputRecord.class)) != null; ) {
-          if (outputSourceType == OutputSourceType.ALL) {
-            printWriter.println(record.getOutputText());
-          } else if (outputSourceType == record.getOutputSourceType()) {
+          if (outputSourceType == OutputSourceType.ALL
+              || outputSourceType == record.getOutputSourceType()) {
             printWriter.println(record.getOutputText());
           }
         }

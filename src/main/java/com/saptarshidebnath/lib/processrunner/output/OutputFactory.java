@@ -37,7 +37,7 @@ public class OutputFactory {
   private static final Logger logger = LoggerFactory.getLogger(OutputFactory.class);
 
   /** private constructor. */
-  private OutputFactory() {}
+  public OutputFactory() {}
 
   /**
    * Creates a object of type {@link Output}.
@@ -46,8 +46,8 @@ public class OutputFactory {
    * @param returnCode Accepts the exit code of process / script executed.
    * @return a reference of type {@link Output}
    */
-  public static Output createOutput(final Configuration configuration, final int returnCode) {
-    logger.trace(
+  public Output createOutput(final Configuration configuration, final int returnCode) {
+    logger.debug(
         "Creating output for configuration {} with return code ",
         configuration.toString(),
         String.valueOf(returnCode));
