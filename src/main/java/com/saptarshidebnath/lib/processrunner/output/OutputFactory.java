@@ -36,9 +36,6 @@ import org.slf4j.LoggerFactory;
 public class OutputFactory {
   private static final Logger logger = LoggerFactory.getLogger(OutputFactory.class);
 
-  /** private constructor. */
-  public OutputFactory() {}
-
   /**
    * Creates a object of type {@link Output}.
    *
@@ -48,7 +45,7 @@ public class OutputFactory {
    */
   public Output createOutput(final Configuration configuration, final int returnCode) {
     logger.debug(
-        "Creating output for configuration {} with return code ",
+        "Creating Output for configuration {} with return code {}",
         configuration.toString(),
         String.valueOf(returnCode));
     return new OutputImpl(configuration, returnCode);

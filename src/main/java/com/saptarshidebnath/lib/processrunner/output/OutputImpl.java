@@ -118,7 +118,7 @@ class OutputImpl implements Output {
       throw new ProcessConfigurationException(
           Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration);
     } else {
-      logger.trace("Saving sys error to : {}", new Object[] {sysError.getAbsolutePath()});
+      logger.trace("Saving sys error to : {}", sysError.getAbsolutePath());
       response = new LogWriter().writeLog(this.configuration, sysError, OutputSourceType.SYSERR);
     }
     return response;
