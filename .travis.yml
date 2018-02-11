@@ -23,6 +23,8 @@ cache:
   directories:
   - "$HOME/.m2/repository"
   - "$HOME/.sonar/cache"
+git:
+  depth: false
 branches:
   only:
   - master
