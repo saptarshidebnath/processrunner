@@ -164,7 +164,7 @@ public class OutputTest {
     String interPreter = "/bin/echo";
     String command = "Saptarshi";
     String param = "Debnath";
-    Path workingDir = new File(Constants.userDir).toPath();
+    Path workingDir = new File(Constants.USER_DIR).toPath();
     Configuration configuration =
         new ConfigurationBuilder(interPreter, command)
             .enableLogStreaming(Boolean.TRUE)

@@ -79,7 +79,7 @@ public class Configuration {
     }
     this.enableLogStreaming = enableLogStreaming;
     this.charset = charset;
-    logger.trace("Process Runner Configuration : {}", this.toString());
+    logger.debug("Process Runner Configuration : {}", this);
   }
 
   /**
@@ -158,15 +158,13 @@ public class Configuration {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("Configuration{");
-    sb.append("interpreter='").append(interpreter).append('\'');
-    sb.append(", command='").append(command).append('\'');
-    sb.append(", workingDir=").append(workingDir);
-    sb.append(", masterLogFile=").append(masterLogFile);
-    sb.append(", charset=").append(charset);
-    sb.append(", autoDeleteFileOnExit=").append(autoDeleteFileOnExit);
-    sb.append(", enableLogStreaming=").append(enableLogStreaming);
-    sb.append('}');
-    return sb.toString();
+    return "Configuration{" + "interpreter='" + interpreter + '\''
+        + ", command='" + command + '\''
+        + ", workingDir=" + workingDir
+        + ", masterLogFile=" + masterLogFile
+        + ", charset=" + charset
+        + ", autoDeleteFileOnExit=" + autoDeleteFileOnExit
+        + ", enableLogStreaming=" + enableLogStreaming
+        + '}';
   }
 }

@@ -45,9 +45,7 @@ public class OutputFactory {
    */
   public Output createOutput(final Configuration configuration, final int returnCode) {
     logger.debug(
-        "Creating Output for configuration {} with return code {}",
-        configuration.toString(),
-        String.valueOf(returnCode));
+        "Creating Output for configuration {} with return code {}", configuration, returnCode);
     return new OutputImpl(configuration, returnCode);
   }
 }

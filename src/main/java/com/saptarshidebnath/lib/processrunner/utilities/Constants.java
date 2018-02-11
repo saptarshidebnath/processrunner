@@ -33,25 +33,27 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public interface Constants {
-  int CACHE_SIZE = Integer.MAX_VALUE;
-  int FILE_WRITER_OBJECT_SIZE = 128;
-  String SPACE_STR = " ";
-  char SPACE_CHAR = ' ';
-  String FILE_PREFIX_NAME_LOG_DUMP = "ProcessRunner-log-dump-";
-  String FILE_SUFFIX_JSON = ".json";
-  String EMPTY_STRING = "";
-  String NEW_LINE = System.lineSeparator();
-  String GENERIC_ERROR = "Generic Error. Please see log for more details.";
-  Charset UTF_8 = StandardCharsets.UTF_8;
-  String userDir = System.getProperty("user.dir");
-  File DEFAULT_CURRENT_DIR = new File(userDir);
-  Path DEFAULT_CURRENT_DIR_PATH = Paths.get(userDir);
-  String DISK_WRITER_THREAD_NAME_SUFFIX = "-dsk-rtr";
-  String STREAM_READER_THREAD_NAME_SUFFIX = "-strm-rdr-";
-  String PROCESS_RUNNER_THREAD_GROUP_NAME = "PR-";
-  long THREAD_WAIT_TIME = 100L;
-  Gson GSON = new GsonBuilder().create();
-  String processConfigExceptionTextMasterLogFileNotConfigured =
+public class Constants {
+
+  /** Private constructor */
+  private Constants() {}
+
+  public static final int CACHE_SIZE = Integer.MAX_VALUE;
+  public static final int FILE_WRITER_OBJECT_SIZE = 128;
+  public static final String SPACE_STR = " ";
+  public static final char SPACE_CHAR = ' ';
+  public static final String FILE_PREFIX_NAME_LOG_DUMP = "ProcessRunner-log-dump-";
+  public static final String FILE_SUFFIX_JSON = ".json";
+  public static final String GENERIC_ERROR = "Generic Error. Please see log for more details.";
+  public static final Charset UTF_8 = StandardCharsets.UTF_8;
+  public static final String USER_DIR = System.getProperty("user.dir");
+  public static final File DEFAULT_CURRENT_DIR = new File(USER_DIR);
+  public static final Path DEFAULT_CURRENT_DIR_PATH = Paths.get(USER_DIR);
+  public static final String DISK_WRITER_THREAD_NAME_SUFFIX = "-dsk-rtr";
+  public static final String STREAM_READER_THREAD_NAME_SUFFIX = "-strm-rdr-";
+  static final String PROCESS_RUNNER_THREAD_GROUP_NAME = "PR-";
+  public static final long THREAD_WAIT_TIME = 100L;
+  public static final Gson GSON = new GsonBuilder().create();
+  public static final String STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED =
       "Master log file not configured. Configuration : ";
 }

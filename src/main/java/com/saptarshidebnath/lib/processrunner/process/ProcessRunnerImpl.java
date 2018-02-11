@@ -37,15 +37,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the {@link ProcessRunner} interface. Gives a solid body to the {@link
  * ProcessRunner}.
  */
 class ProcessRunnerImpl implements ProcessRunner {
-
+  private Logger logger = LoggerFactory.getLogger(ProcessRunner.class);
   private final Configuration configuration;
   private final Runtime runTime;
+  private final String configurationAsString;
 
   /**
    * Constructor receiving the {@link Configuration} to create the process runner.
@@ -53,10 +56,11 @@ class ProcessRunnerImpl implements ProcessRunner {
    * @param configuration a valid object of {@link Configuration}
    */
   ProcessRunnerImpl(final Configuration configuration) {
+    this.configurationAsString = configuration.toString();
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
     logger.info("Process ProcessRunner created");
-    logger.debug("With configuration : " + configuration.toString());
+    logger.debug("With configuration : {}", this.configurationAsString);
   }
 
   /**
@@ -73,7 +77,7 @@ class ProcessRunnerImpl implements ProcessRunner {
         .append(this.configuration.getInterpreter())
         .append(Constants.SPACE_CHAR)
         .append(this.configuration.getCommand());
-    logger.debug("Executing command : {}", commandToExecute.toString());
+    logger.debug("Executing command : {}", commandToExecute);
     Path currentWorkingDir = this.configuration.getWorkingDir();
     File currentWorkingDirFile = null;
     if (null != currentWorkingDir) {
@@ -113,10 +117,8 @@ class ProcessRunnerImpl implements ProcessRunner {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("ProcessRunnerImpl{");
-    sb.append("configuration=").append(configuration);
-    sb.append(", runTime=").append(runTime);
-    sb.append('}');
-    return sb.toString();
+    return  "ProcessRunnerImpl{" + "configuration=" + configuration
+        + ", runTime=" + runTime
+        + '}';
   }
 }

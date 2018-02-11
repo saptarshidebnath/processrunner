@@ -29,15 +29,12 @@ import com.saptarshidebnath.lib.processrunner.output.Output;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@link ProcessRunner} interface is the base interface to run any system process. Any Shell script
  * or system command can be executed via this.
  */
 public interface ProcessRunner {
-  Logger logger = LoggerFactory.getLogger(ProcessRunner.class);
 
   /**
    * Triggers the process or command.

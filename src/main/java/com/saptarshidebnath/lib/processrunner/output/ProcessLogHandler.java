@@ -38,6 +38,7 @@ public class ProcessLogHandler {
   private ExecutorService executorService;
   private Configuration processConfiguration;
   private Future diskWritingThread;
+  private String processConfigrationAsString;
 
   /**
    * The construcor of the class {@link ProcessLogHandler}.
@@ -61,6 +62,7 @@ public class ProcessLogHandler {
     File masterLogFile = processConfiguration.getMasterLogFile();
     streamingEnabled = processConfiguration.isEnableLogStreaming();
     boolean logsNeedTobeWritten = processConfiguration.getMasterLogFile() != null;
+    this.processConfigrationAsString = processConfiguration.toString();
 
     boolean logsNeedTobeRead = logsNeedTobeWritten || streamingEnabled;
     if (logsNeedTobeRead) {
@@ -91,7 +93,7 @@ public class ProcessLogHandler {
         this.diskWritingThread = executorService.submit(this::writeToDisk);
       } else {
         logger.warn(
-            "Logs not written to file as per configuration : {}", processConfiguration.toString());
+            "Logs not written to file as per configuration : {}", processConfigrationAsString);
       }
       //
       // Mark for shutdown after execution is complete.
@@ -100,7 +102,7 @@ public class ProcessLogHandler {
       logger.trace("Created ProcessLogHandler. Tracking SYSOUT and SYSERROR");
     } else {
       logger.warn("Log Streaming is not enabled and Master logfile not set. Discarding logs.");
-      logger.warn("Configuration received : {}", processConfiguration.toString());
+      logger.warn("Configuration received : {}", processConfigrationAsString);
     }
   }
 
@@ -143,7 +145,7 @@ public class ProcessLogHandler {
       logger.info("Waiting for all the logs writing thread to shutdown.");
 
     } else {
-      logger.error("Masterfile Configuration is missing : {}", processConfiguration.toString());
+      logger.error("Masterfile Configuration is missing : {}", this.processConfigrationAsString);
       logger.error("Discarding logs.");
     }
   }
@@ -187,13 +189,7 @@ public class ProcessLogHandler {
         int numberOfelementDrained = queue.drainTo(record, Constants.FILE_WRITER_OBJECT_SIZE);
         assert numberOfelementDrained == record.size();
         counter += record.size();
-        record
-            .stream()
-            .map(Constants.GSON::toJson)
-            .forEach(
-                line -> {
-                  printWriter.println(line);
-                });
+        record.stream().map(Constants.GSON::toJson).forEach(printWriter::println);
       }
       //
       // Force flush
@@ -217,7 +213,8 @@ public class ProcessLogHandler {
    *     OutputSourceType#SYSERR}.
    */
   private void readInputStream(InputStream inputStream, OutputSourceType outputSourceType) {
-    logger.trace("Saving inputstream for : {}", outputSourceType.toString());
+    String outputSourceTypeAsString = outputSourceType.toString();
+    logger.trace("Saving inputstream for : {}", outputSourceTypeAsString);
     String threadName =
         new StringJoiner("")
             .add(Thread.currentThread().getName())
@@ -225,7 +222,7 @@ public class ProcessLogHandler {
             .add(outputSourceType.toString())
             .toString();
     Thread.currentThread().setName(threadName);
-    logger.trace("Starting {} to read {}", threadName, outputSourceType.toString());
+    logger.trace("Starting {} to read {}", threadName, outputSourceTypeAsString);
     Scanner scanner = new Scanner(inputStream, Charset.defaultCharset().toString());
     String currentLine;
     String logginMessage;

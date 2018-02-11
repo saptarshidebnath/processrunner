@@ -92,7 +92,7 @@ class OutputImpl implements Output {
     File response;
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration);
+          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration);
     }
     logger.trace("Saving sys out to {}", sysOut.getAbsolutePath());
     response = new LogWriter().writeLog(this.configuration, sysOut, OutputSourceType.SYSOUT);
@@ -116,7 +116,7 @@ class OutputImpl implements Output {
     File response;
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration);
+          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration);
     } else {
       logger.trace("Saving sys error to : {}", sysError.getAbsolutePath());
       response = new LogWriter().writeLog(this.configuration, sysError, OutputSourceType.SYSERR);
@@ -138,7 +138,7 @@ class OutputImpl implements Output {
   public File getMasterLogAsJson() throws ProcessConfigurationException {
     if (this.configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration);
+          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration);
     }
     return this.configuration.getMasterLogFile();
   }
@@ -158,7 +158,7 @@ class OutputImpl implements Output {
   public File saveLog(File log) throws IOException, ProcessConfigurationException {
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration);
+          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration);
     }
     return new LogWriter().writeLog(this.configuration, log, OutputSourceType.ALL);
   }
@@ -181,7 +181,7 @@ class OutputImpl implements Output {
     Boolean response;
     if (configuration.getMasterLogFile() == null) {
       String message =
-          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration;
+          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration;
       throw new ProcessConfigurationException(message);
     } else {
       response =
@@ -206,7 +206,7 @@ class OutputImpl implements Output {
       throws IOException, ProcessConfigurationException {
     if (configuration.getMasterLogFile() == null) {
       String message =
-          Constants.processConfigExceptionTextMasterLogFileNotConfigured + configuration;
+          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration;
       throw new ProcessConfigurationException(message);
     }
     return new GrepFile().grepFile(regex, configuration);

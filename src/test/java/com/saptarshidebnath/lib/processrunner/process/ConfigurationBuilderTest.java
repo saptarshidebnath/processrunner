@@ -15,7 +15,7 @@ public class ConfigurationBuilderTest {
   @Test(expected = ProcessConfigurationException.class)
   public void setMasterLogFileTest() throws ProcessConfigurationException {
     new ConfigurationBuilder("abc", "def")
-        .setMasterLogFile(new File(Constants.userDir), Boolean.FALSE);
+        .setMasterLogFile(new File(Constants.USER_DIR), Boolean.FALSE);
   }
 
   @Test
@@ -23,7 +23,7 @@ public class ConfigurationBuilderTest {
     File tempFile = new TempFile().createTempLogDump();
     String toStringOfConfigBuilder =
         new ConfigurationBuilder("interpreter", "command")
-            .setWorkigDir(new File(Constants.userDir).toPath())
+            .setWorkigDir(new File(Constants.USER_DIR).toPath())
             .setParam("param1")
             .enableLogStreaming(Boolean.TRUE)
             .setMasterLogFile(tempFile, Boolean.TRUE, Charset.defaultCharset())
@@ -34,7 +34,7 @@ public class ConfigurationBuilderTest {
             + "command='command', "
             + "comamndParams=[param1], "
             + "workingDir="
-            + new File(Constants.userDir)
+            + new File(Constants.USER_DIR)
             + ", "
             + "masterLogFile="
             + tempFile.getCanonicalPath()
