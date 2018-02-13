@@ -158,13 +158,23 @@ public class Configuration {
 
   @Override
   public String toString() {
-    return "Configuration{" + "interpreter='" + interpreter + '\''
-        + ", command='" + command + '\''
-        + ", workingDir=" + workingDir
-        + ", masterLogFile=" + masterLogFile
-        + ", charset=" + charset
-        + ", autoDeleteFileOnExit=" + autoDeleteFileOnExit
-        + ", enableLogStreaming=" + enableLogStreaming
+    return "Configuration{"
+        + "interpreter='"
+        + interpreter
+        + '\''
+        + ", command='"
+        + command
+        + '\''
+        + ", workingDir="
+        + workingDir
+        + ", masterLogFile="
+        + masterLogFile
+        + ", charset="
+        + charset
+        + ", autoDeleteFileOnExit="
+        + autoDeleteFileOnExit
+        + ", enableLogStreaming="
+        + enableLogStreaming
         + '}';
   }
 }

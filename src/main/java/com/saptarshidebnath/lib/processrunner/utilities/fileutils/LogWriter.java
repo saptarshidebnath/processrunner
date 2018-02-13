@@ -35,8 +35,7 @@ public class LogWriter {
     try (FileOutputStream fileOutputStream = new FileOutputStream(targetFile, Boolean.TRUE);
         PrintWriter printWriter =
             new PrintWriter(new OutputStreamWriter(fileOutputStream, configuration.getCharset()))) {
-      logger.trace(
-          "Writing {} to : {}", outputSourceType, targetFile.getCanonicalPath());
+      logger.trace("Writing {} to : {}", outputSourceType, targetFile.getCanonicalPath());
 
       try (BufferedReader br =
           new BufferedReader(
@@ -52,10 +51,7 @@ public class LogWriter {
         }
       }
     }
-    logger.info(
-        "{} written completely to : {}",
-        outputSourceType,
-        targetFile.getCanonicalPath());
+    logger.info("{} written completely to : {}", outputSourceType, targetFile.getCanonicalPath());
     return targetFile;
   }
 }

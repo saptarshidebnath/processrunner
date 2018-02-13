@@ -4,15 +4,18 @@ import static com.saptarshidebnath.lib.processrunner.utilities.Constants.FILE_PR
 import static com.saptarshidebnath.lib.processrunner.utilities.Constants.FILE_SUFFIX_JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.saptarshidebnath.lib.processrunner.exception.ProcessConfigurationException;
 import com.saptarshidebnath.lib.processrunner.exception.ProcessException;
 import com.saptarshidebnath.lib.processrunner.output.Output;
+import com.saptarshidebnath.lib.processrunner.output.OutputRecord;
 import com.saptarshidebnath.lib.processrunner.output.OutputSourceType;
 import com.saptarshidebnath.lib.processrunner.process.Configuration;
 import com.saptarshidebnath.lib.processrunner.process.ConfigurationBuilder;
 import com.saptarshidebnath.lib.processrunner.process.ProcessRunnerFactory;
 import com.saptarshidebnath.lib.processrunner.utilities.Constants;
+import com.saptarshidebnath.lib.processrunner.utilities.fileutils.TempFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -187,5 +190,24 @@ public class OutputTest {
             + tempFile.getCanonicalPath()
             + ", charset=UTF-8, autoDeleteFileOnExit=true, enableLogStreaming=true}, returnCode=0}";
     assertThat("Output to string", outputtoString, is(expectedValue));
+  }
+
+  @Test
+  public void outputRecordTest()
+      throws ProcessConfigurationException, InterruptedException, ExecutionException, IOException {
+    Configuration configuration =
+        new ConfigurationBuilder("/bin/bash -c", "ls -la")
+            .setMasterLogFile(new TempFile().createTempLogDump(), Boolean.TRUE)
+            .build();
+    Output output = ProcessRunnerFactory.startProcess(configuration);
+    List<String> fileLines = Files.readAllLines(output.getMasterLogAsJson().toPath());
+    fileLines
+        .stream()
+        .map(line -> Constants.GSON.fromJson(line, OutputRecord.class))
+        .forEach(
+            outputRecord -> {
+              assertThat(
+                  "Timestamp validation : ", outputRecord.getTimeStamp(), is(notNullValue()));
+            });
   }
 }

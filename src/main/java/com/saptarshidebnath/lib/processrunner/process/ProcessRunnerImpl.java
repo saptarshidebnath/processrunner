@@ -117,8 +117,6 @@ class ProcessRunnerImpl implements ProcessRunner {
 
   @Override
   public String toString() {
-    return  "ProcessRunnerImpl{" + "configuration=" + configuration
-        + ", runTime=" + runTime
-        + '}';
+    return "ProcessRunnerImpl{" + "configuration=" + configuration + ", runTime=" + runTime + '}';
   }
 }

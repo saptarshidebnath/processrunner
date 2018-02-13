@@ -42,6 +42,7 @@ public class Constants {
   public static final int FILE_WRITER_OBJECT_SIZE = 128;
   public static final String SPACE_STR = " ";
   public static final char SPACE_CHAR = ' ';
+  public static final String EMPTY_STR = "";
   public static final String FILE_PREFIX_NAME_LOG_DUMP = "ProcessRunner-log-dump-";
   public static final String FILE_SUFFIX_JSON = ".json";
   public static final String GENERIC_ERROR = "Generic Error. Please see log for more details.";
@@ -49,9 +50,9 @@ public class Constants {
   public static final String USER_DIR = System.getProperty("user.dir");
   public static final File DEFAULT_CURRENT_DIR = new File(USER_DIR);
   public static final Path DEFAULT_CURRENT_DIR_PATH = Paths.get(USER_DIR);
-  public static final String DISK_WRITER_THREAD_NAME_SUFFIX = "-dsk-rtr";
-  public static final String STREAM_READER_THREAD_NAME_SUFFIX = "-strm-rdr-";
-  static final String PROCESS_RUNNER_THREAD_GROUP_NAME = "PR-";
+  public static final String DISK_WRITER_THREAD_NAME_SUFFIX = "-DISKRT";
+  public static final String STREAM_READER_THREAD_NAME_SUFFIX = "-STRMRD-";
+  static final String PROCESS_RUNNER_THREAD_GROUP_NAME = "PR";
   public static final long THREAD_WAIT_TIME = 100L;
   public static final Gson GSON = new GsonBuilder().create();
   public static final String STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED =

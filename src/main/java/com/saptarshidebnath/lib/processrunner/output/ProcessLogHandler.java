@@ -1,5 +1,7 @@
 package com.saptarshidebnath.lib.processrunner.output;
 
+import static com.saptarshidebnath.lib.processrunner.utilities.Constants.EMPTY_STR;
+
 import com.saptarshidebnath.lib.processrunner.process.Configuration;
 import com.saptarshidebnath.lib.processrunner.utilities.Constants;
 import com.saptarshidebnath.lib.processrunner.utilities.Threadify;
@@ -158,10 +160,11 @@ public class ProcessLogHandler {
    * ProcessLogHandler} is created.
    *
    * @return int depciting the number of lines written.
+   * @throws InterruptedException if the disk writing thread is interrupted.
    */
   private int writeToDisk() throws InterruptedException {
     String threadName =
-        new StringJoiner("")
+        new StringJoiner(EMPTY_STR)
             .add(Thread.currentThread().getName())
             .add(Constants.DISK_WRITER_THREAD_NAME_SUFFIX)
             .toString();
@@ -186,8 +189,8 @@ public class ProcessLogHandler {
         // Write all the element in the queue to the disk.
         //
         List<OutputRecord> record = new ArrayList<>(Constants.FILE_WRITER_OBJECT_SIZE);
-        int numberOfelementDrained = queue.drainTo(record, Constants.FILE_WRITER_OBJECT_SIZE);
-        assert numberOfelementDrained == record.size();
+        int numberElementDrained = queue.drainTo(record, Constants.FILE_WRITER_OBJECT_SIZE);
+        assert numberElementDrained == record.size();
         counter += record.size();
         record.stream().map(Constants.GSON::toJson).forEach(printWriter::println);
       }
@@ -214,7 +217,7 @@ public class ProcessLogHandler {
    */
   private void readInputStream(InputStream inputStream, OutputSourceType outputSourceType) {
     String outputSourceTypeAsString = outputSourceType.toString();
-    logger.trace("Saving inputstream for : {}", outputSourceTypeAsString);
+    logger.trace("Saving input stream for : {}", outputSourceTypeAsString);
     String threadName =
         new StringJoiner("")
             .add(Thread.currentThread().getName())
@@ -225,15 +228,15 @@ public class ProcessLogHandler {
     logger.trace("Starting {} to read {}", threadName, outputSourceTypeAsString);
     Scanner scanner = new Scanner(inputStream, Charset.defaultCharset().toString());
     String currentLine;
-    String logginMessage;
+    String loggingMessage;
     while (scanner.hasNextLine()) {
       currentLine = scanner.nextLine();
-      logginMessage =
+      loggingMessage =
           new StringJoiner(" >> ").add(outputSourceType.toString()).add(currentLine).toString();
       if (streamingEnabled) {
-        logger.info(logginMessage);
+        logger.info(loggingMessage);
       } else {
-        logger.trace(logginMessage);
+        logger.trace(loggingMessage);
       }
       boolean response = this.queue.add(new OutputRecord(outputSourceType, currentLine));
       assert response;
