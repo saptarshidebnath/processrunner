@@ -1,3 +1,5 @@
+sudo: false
+
 language: java
 
 jdk:
@@ -9,8 +11,7 @@ before_install:
 #  - java -jar jpm4j.jar -u init
 #  - ~/jpm/bin/jpm install com.codacy:codacy-coverage-reporter:assembly
 #
-#install:
-#  - mvn clean install -U -Dmaven.test.skip=test -B -V -q -T 2C -C
+install: true
 
 addons:
   sonarcloud:
@@ -20,7 +21,7 @@ addons:
 
 
 script:
-  - mvn clean test install sonar:sonar
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent test install package sonar:sonar
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
@@ -36,6 +37,7 @@ cache:
 
 git:
   depth: false
+
 branches:
   only:
   - master
