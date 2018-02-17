@@ -1,9 +1,9 @@
 package com.saptarshidebnath.lib.processrunner.utilities.fileutils;
 
-import com.saptarshidebnath.lib.processrunner.output.OutputRecord;
-import com.saptarshidebnath.lib.processrunner.output.OutputSourceType;
-import com.saptarshidebnath.lib.processrunner.process.Configuration;
-import com.saptarshidebnath.lib.processrunner.utilities.Constants;
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.constants.OutputSourceType;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
+import com.saptarshidebnath.lib.processrunner.model.OutputRecord;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,7 +43,8 @@ public class LogWriter {
                   new FileInputStream(configuration.getMasterLogFile()),
                   configuration.getCharset()))) {
         for (OutputRecord record;
-            (record = Constants.GSON.fromJson(br.readLine(), OutputRecord.class)) != null; ) {
+            (record = ProcessRunnerConstants.GSON.fromJson(br.readLine(), OutputRecord.class))
+                != null; ) {
           if (outputSourceType == OutputSourceType.ALL
               || outputSourceType == record.getOutputSourceType()) {
             printWriter.println(record.getOutputText());

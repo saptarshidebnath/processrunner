@@ -31,10 +31,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- * {@link ProcessRunner} interface is the base interface to run any system process. Any Shell script
- * or system command can be executed via this.
+ * {@link Runner} interface is the base interface to run any system process. Any Shell script or
+ * system command can be executed via this.
  */
-public interface ProcessRunner {
+public interface Runner {
 
   /**
    * Triggers the process or command.

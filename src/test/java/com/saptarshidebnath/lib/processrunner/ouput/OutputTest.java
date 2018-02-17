@@ -1,20 +1,20 @@
 package com.saptarshidebnath.lib.processrunner.ouput;
 
-import static com.saptarshidebnath.lib.processrunner.utilities.Constants.FILE_PREFIX_NAME_LOG_DUMP;
-import static com.saptarshidebnath.lib.processrunner.utilities.Constants.FILE_SUFFIX_JSON;
+import static com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants.FILE_PREFIX_NAME_LOG_DUMP;
+import static com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants.FILE_SUFFIX_JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration.ConfigBuilder;
+import com.saptarshidebnath.lib.processrunner.constants.OutputSourceType;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
 import com.saptarshidebnath.lib.processrunner.exception.ProcessConfigurationException;
 import com.saptarshidebnath.lib.processrunner.exception.ProcessException;
+import com.saptarshidebnath.lib.processrunner.model.OutputRecord;
 import com.saptarshidebnath.lib.processrunner.output.Output;
-import com.saptarshidebnath.lib.processrunner.output.OutputRecord;
-import com.saptarshidebnath.lib.processrunner.output.OutputSourceType;
-import com.saptarshidebnath.lib.processrunner.process.Configuration;
-import com.saptarshidebnath.lib.processrunner.process.ConfigurationBuilder;
-import com.saptarshidebnath.lib.processrunner.process.ProcessRunnerFactory;
-import com.saptarshidebnath.lib.processrunner.utilities.Constants;
+import com.saptarshidebnath.lib.processrunner.process.RunnerFactory;
 import com.saptarshidebnath.lib.processrunner.utilities.fileutils.TempFile;
 import java.io.File;
 import java.io.IOException;
@@ -46,8 +46,7 @@ public class OutputTest {
     final File tempFile = File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     Output output =
-        ProcessRunnerFactory.startProcess(
-            new ConfigurationBuilder("bash", "echo Hi This is Saptarshi").build());
+        RunnerFactory.startProcess(new ConfigBuilder("bash", "echo Hi This is Saptarshi").build());
     //
     // Should generate an error as Master log file is not set.
     //
@@ -61,8 +60,7 @@ public class OutputTest {
     final File tempFile = File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     Output output =
-        ProcessRunnerFactory.startProcess(
-            new ConfigurationBuilder("bash", "echo Hi This is Saptarshi").build());
+        RunnerFactory.startProcess(new ConfigBuilder("bash", "echo Hi This is Saptarshi").build());
     //
     // Should generate an error as Master log file is not set.
     //
@@ -75,8 +73,7 @@ public class OutputTest {
     final File tempFile = File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     Output output =
-        ProcessRunnerFactory.startProcess(
-            new ConfigurationBuilder("bash", "echo Hi This is Saptarshi").build());
+        RunnerFactory.startProcess(new ConfigBuilder("bash", "echo Hi This is Saptarshi").build());
     //
     // Should generate an error as Master log file is not set.
     //
@@ -90,8 +87,8 @@ public class OutputTest {
     tempFile.deleteOnExit();
     String toOutput = "Hi This is Saptarshi";
     Output output =
-        ProcessRunnerFactory.startProcess(
-            new ConfigurationBuilder("/bin/echo", toOutput)
+        RunnerFactory.startProcess(
+            new ConfigBuilder("/bin/echo", toOutput)
                 .setMasterLogFile(
                     File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, FILE_SUFFIX_JSON), Boolean.TRUE)
                 .build());
@@ -110,8 +107,8 @@ public class OutputTest {
     tempFile.deleteOnExit();
     String toOutput = "Hi This is Saptarshi";
     Output output =
-        ProcessRunnerFactory.startProcess(
-            new ConfigurationBuilder("/bin/echo", toOutput)
+        RunnerFactory.startProcess(
+            new ConfigBuilder("/bin/echo", toOutput)
                 .setMasterLogFile(
                     File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, FILE_SUFFIX_JSON), Boolean.TRUE)
                 .build());
@@ -124,8 +121,8 @@ public class OutputTest {
       throws IOException, ExecutionException, ProcessConfigurationException, InterruptedException {
     final File tempFile = File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, FILE_SUFFIX_JSON);
     Output output =
-        ProcessRunnerFactory.startProcess(
-            new ConfigurationBuilder("/bin/bash -c", "ls -la")
+        RunnerFactory.startProcess(
+            new ConfigBuilder("/bin/bash -c", "ls -la")
                 .enableLogStreaming(true)
                 .setMasterLogFile(tempFile, true)
                 .build());
@@ -143,8 +140,8 @@ public class OutputTest {
   public void seachMasterLogFileForRegexWithoutMasterLogFile()
       throws IOException, ExecutionException, ProcessConfigurationException, InterruptedException {
     Output output =
-        ProcessRunnerFactory.startProcess(
-            new ConfigurationBuilder("/bin/bash -c", "ls -la").enableLogStreaming(true).build());
+        RunnerFactory.startProcess(
+            new ConfigBuilder("/bin/bash -c", "ls -la").enableLogStreaming(true).build());
     //
     // Should generate exception as masterLogFile is not set.
     //
@@ -155,8 +152,7 @@ public class OutputTest {
   public void seachMasterLogFileWithoutMasterLogFile()
       throws IOException, ExecutionException, ProcessConfigurationException, InterruptedException {
     String toOutput = "Hi This is Saptarshi";
-    Output output =
-        ProcessRunnerFactory.startProcess(new ConfigurationBuilder("/bin/echo", toOutput).build());
+    Output output = RunnerFactory.startProcess(new ConfigBuilder("/bin/echo", toOutput).build());
     output.searchMasterLog(".*Sap.*");
   }
 
@@ -167,15 +163,15 @@ public class OutputTest {
     String interPreter = "/bin/echo";
     String command = "Saptarshi";
     String param = "Debnath";
-    Path workingDir = new File(Constants.USER_DIR).toPath();
+    Path workingDir = new File(ProcessRunnerConstants.USER_DIR).toPath();
     Configuration configuration =
-        new ConfigurationBuilder(interPreter, command)
+        new ConfigBuilder(interPreter, command)
             .enableLogStreaming(Boolean.TRUE)
             .setMasterLogFile(tempFile, Boolean.TRUE)
             .setParam(param)
             .setWorkigDir(workingDir)
             .build();
-    Output output = ProcessRunnerFactory.startProcess(configuration);
+    Output output = RunnerFactory.startProcess(configuration);
     String outputtoString = output.toString();
     String expectedValue =
         "OutputImpl{configuration=Configuration{interpreter='"
@@ -196,14 +192,14 @@ public class OutputTest {
   public void outputRecordTest()
       throws ProcessConfigurationException, InterruptedException, ExecutionException, IOException {
     Configuration configuration =
-        new ConfigurationBuilder("/bin/bash -c", "ls -la")
+        new ConfigBuilder("/bin/bash -c", "ls -la")
             .setMasterLogFile(new TempFile().createTempLogDump(), Boolean.TRUE)
             .build();
-    Output output = ProcessRunnerFactory.startProcess(configuration);
+    Output output = RunnerFactory.startProcess(configuration);
     List<String> fileLines = Files.readAllLines(output.getMasterLogAsJson().toPath());
     fileLines
         .stream()
-        .map(line -> Constants.GSON.fromJson(line, OutputRecord.class))
+        .map(line -> ProcessRunnerConstants.GSON.fromJson(line, OutputRecord.class))
         .forEach(
             outputRecord -> {
               assertThat(

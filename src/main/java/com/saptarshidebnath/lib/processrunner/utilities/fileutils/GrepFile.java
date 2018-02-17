@@ -1,9 +1,10 @@
 package com.saptarshidebnath.lib.processrunner.utilities.fileutils;
 
-import com.saptarshidebnath.lib.processrunner.output.OutputRecord;
-import com.saptarshidebnath.lib.processrunner.output.OutputSourceType;
-import com.saptarshidebnath.lib.processrunner.process.Configuration;
-import com.saptarshidebnath.lib.processrunner.utilities.Constants;
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.constants.OutputSourceType;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
+import com.saptarshidebnath.lib.processrunner.model.OutputRecord;
+import com.saptarshidebnath.lib.processrunner.process.Runner;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,8 +21,7 @@ public class GrepFile {
   /**
    * Greps the masterlog file as defined in the {@link Configuration} for the regular expression.
    * The method looks into both i.e. {@link OutputSourceType#ALL}. Also the method presumes that the
-   * {@link com.saptarshidebnath.lib.processrunner.process.ProcessRunner} have executed
-   * successfully.
+   * {@link Runner} have executed successfully.
    *
    * @param regex A valid regular expression regular expression using which the file needs to be
    *     searched for.
@@ -39,7 +39,8 @@ public class GrepFile {
                 new FileInputStream(configuration.getMasterLogFile()),
                 configuration.getCharset()))) {
       for (OutputRecord record;
-          (record = Constants.GSON.fromJson(br.readLine(), OutputRecord.class)) != null; ) {
+          (record = ProcessRunnerConstants.GSON.fromJson(br.readLine(), OutputRecord.class))
+              != null; ) {
         if (record.getOutputText().matches(regex)) {
           grepedLines.add(record);
           logger.trace("Found {} to match the regex : {}", record.getOutputSourceType(), regex);

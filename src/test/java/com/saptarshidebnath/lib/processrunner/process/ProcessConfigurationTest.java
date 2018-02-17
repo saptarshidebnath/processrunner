@@ -25,14 +25,16 @@
 
 package com.saptarshidebnath.lib.processrunner.process;
 
-import static com.saptarshidebnath.lib.processrunner.utilities.Constants.FILE_PREFIX_NAME_LOG_DUMP;
+import static com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants.FILE_PREFIX_NAME_LOG_DUMP;
 import static java.lang.Boolean.FALSE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration.ConfigBuilder;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
 import com.saptarshidebnath.lib.processrunner.exception.ProcessConfigurationException;
-import com.saptarshidebnath.lib.processrunner.utilities.Constants;
 import com.saptarshidebnath.lib.processrunner.utilities.fileutils.TempFile;
 import java.io.File;
 import java.io.IOException;
@@ -54,13 +56,13 @@ public class ProcessConfigurationTest {
     final String command = "echo";
     final String commandParam = "Saptarshi";
     final File tempFile =
-        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
+        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, ProcessRunnerConstants.FILE_SUFFIX_JSON);
     final boolean fileSetToBeAutoDeleted = true;
     final Configuration configuration =
-        new ConfigurationBuilder(interpreter, command)
+        new ConfigBuilder(interpreter, command)
             .setParam(commandParam)
             .setParamList(Arrays.asList(testObjectCreationWithCorrectValuecommandParamArray))
-            .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+            .setWorkigDir(ProcessRunnerConstants.DEFAULT_CURRENT_DIR_PATH)
             .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
             .enableLogStreaming(false)
             .build();
@@ -80,7 +82,7 @@ public class ProcessConfigurationTest {
     assertThat(
         "Validating process configuration default work dir: ",
         configuration.getWorkingDir().toFile().getCanonicalPath(),
-        is(Constants.DEFAULT_CURRENT_DIR.getCanonicalPath()));
+        is(ProcessRunnerConstants.DEFAULT_CURRENT_DIR.getCanonicalPath()));
     assertThat(
         "Validating process configuration json log dump: ",
         configuration.getMasterLogFile().getCanonicalPath(),
@@ -98,11 +100,11 @@ public class ProcessConfigurationTest {
     final String interpreter = "";
     final String command = "echo Saptarshi";
     final File tempFile =
-        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
+        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, ProcessRunnerConstants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     final boolean fileSetToBeAutoDeleted = true;
-    new ConfigurationBuilder(interpreter, command)
-        .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+    new ConfigBuilder(interpreter, command)
+        .setWorkigDir(ProcessRunnerConstants.DEFAULT_CURRENT_DIR_PATH)
         .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
         .build();
   }
@@ -113,11 +115,11 @@ public class ProcessConfigurationTest {
     final String interpreter = "bash";
     final String command = "";
     final File tempFile =
-        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
+        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, ProcessRunnerConstants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     final boolean fileSetToBeAutoDeleted = true;
-    new ConfigurationBuilder(interpreter, command)
-        .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
+    new ConfigBuilder(interpreter, command)
+        .setWorkigDir(ProcessRunnerConstants.DEFAULT_CURRENT_DIR_PATH)
         .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
         .build();
   }
@@ -128,10 +130,10 @@ public class ProcessConfigurationTest {
     final String interpreter = "bash";
     final String command = "echo saptarshi";
     final File tempFile =
-        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
+        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, ProcessRunnerConstants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     final boolean fileSetToBeAutoDeleted = true;
-    new ConfigurationBuilder(interpreter, command)
+    new ConfigBuilder(interpreter, command)
         .setWorkigDir(new File("\\root\\").toPath())
         .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
         .build();
@@ -146,10 +148,10 @@ public class ProcessConfigurationTest {
     final String interpreter = "bash";
     final String command = "echo saptarshi";
     final File tempFile =
-        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, Constants.FILE_SUFFIX_JSON);
+        File.createTempFile(FILE_PREFIX_NAME_LOG_DUMP, ProcessRunnerConstants.FILE_SUFFIX_JSON);
     tempFile.deleteOnExit();
     final boolean fileSetToBeAutoDeleted = true;
-    new ConfigurationBuilder(interpreter, command)
+    new ConfigBuilder(interpreter, command)
         .setWorkigDir(tempFile.toPath())
         .setMasterLogFile(tempFile, fileSetToBeAutoDeleted)
         .build();
@@ -157,53 +159,53 @@ public class ProcessConfigurationTest {
 
   @Test(expected = ProcessConfigurationException.class)
   public void testNullParamToConfigurationBuilder() throws ProcessConfigurationException {
-    new ConfigurationBuilder("bash", "echo hello!").setParam(null).build();
+    new ConfigBuilder("bash", "echo hello!").setParam(null).build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
   public void testEmptyParamToConfigurationBuilder() throws ProcessConfigurationException {
-    new ConfigurationBuilder("bash", "echo hello!").setParam("").build();
+    new ConfigBuilder("bash", "echo hello!").setParam("").build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
   public void testNullParamListToConfigurationBuilder() throws ProcessConfigurationException {
-    new ConfigurationBuilder("bash", "echo hello!").setParamList(new ArrayList<>(0)).build();
+    new ConfigBuilder("bash", "echo hello!").setParamList(new ArrayList<>(0)).build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
   public void testEmptyParamListToConfigurationBuilder() throws ProcessConfigurationException {
-    new ConfigurationBuilder("bash", "echo hello!").setParamList(null).build();
+    new ConfigBuilder("bash", "echo hello!").setParamList(null).build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
   public void testNullInterpreterToConfigurationBuilder() throws ProcessConfigurationException {
-    new ConfigurationBuilder(null, "echo hello!").build();
+    new ConfigBuilder(null, "echo hello!").build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
   public void testEmptyInterpreterToConfigurationBuilder() throws ProcessConfigurationException {
-    new ConfigurationBuilder("", "echo hello!").build();
+    new ConfigBuilder("", "echo hello!").build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
   public void testNullCommandToConfigurationBuilder() throws ProcessConfigurationException {
-    new ConfigurationBuilder("bash", null).build();
+    new ConfigBuilder("bash", null).build();
   }
 
   @Test(expected = ProcessConfigurationException.class)
   public void testEmptyCommandToConfigurationBuilder() throws ProcessConfigurationException {
-    new ConfigurationBuilder("bash", "").build();
+    new ConfigBuilder("bash", "").build();
   }
 
   @Test
   public void testToStringMethod() throws ProcessConfigurationException, IOException {
     File masterLogFile = new TempFile().createTempLogDump();
     String configurationToString =
-        new ConfigurationBuilder("bash", "echo")
+        new ConfigBuilder("bash", "echo")
             .setParam("Saptarshi")
             .setParamList(Arrays.asList("works", "on", "java"))
-            .setWorkigDir(Constants.DEFAULT_CURRENT_DIR_PATH)
-            .setMasterLogFile(masterLogFile, true, Constants.UTF_8)
+            .setWorkigDir(ProcessRunnerConstants.DEFAULT_CURRENT_DIR_PATH)
+            .setMasterLogFile(masterLogFile, true, ProcessRunnerConstants.UTF_8)
             .enableLogStreaming(true)
             .build()
             .toString();
@@ -218,7 +220,7 @@ public class ProcessConfigurationTest {
     assertThat(
         "Validating toString method => WorkingDir",
         configurationToString,
-        containsString("workingDir=" + Constants.DEFAULT_CURRENT_DIR_PATH.toString()));
+        containsString("workingDir=" + ProcessRunnerConstants.DEFAULT_CURRENT_DIR_PATH.toString()));
     assertThat(
         "Validating toString method => MasterLogFile",
         configurationToString,
@@ -226,7 +228,7 @@ public class ProcessConfigurationTest {
     assertThat(
         "Validating toString method => Charset",
         configurationToString,
-        containsString("charset=" + Constants.UTF_8.name()));
+        containsString("charset=" + ProcessRunnerConstants.UTF_8.name()));
     assertThat(
         "Validating toString method => EnableLogStreaming",
         configurationToString,

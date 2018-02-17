@@ -28,7 +28,7 @@ package com.saptarshidebnath.lib.processrunner.exception;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.saptarshidebnath.lib.processrunner.utilities.Constants;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
 import org.junit.Test;
 
 /** Created by saptarshi on 1/2/2017. */
@@ -43,7 +43,7 @@ public class ProcessExceptionTest {
       assertThat(
           "Validating message of default ProcessException : ",
           message,
-          is(Constants.GENERIC_ERROR));
+          is(ProcessRunnerConstants.GENERIC_ERROR));
     }
   }
 }

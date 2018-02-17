@@ -25,10 +25,12 @@
 
 package com.saptarshidebnath.lib.processrunner.output;
 
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration.ConfigBuilder;
+import com.saptarshidebnath.lib.processrunner.constants.OutputSourceType;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
 import com.saptarshidebnath.lib.processrunner.exception.ProcessConfigurationException;
-import com.saptarshidebnath.lib.processrunner.process.Configuration;
-import com.saptarshidebnath.lib.processrunner.process.ConfigurationBuilder;
-import com.saptarshidebnath.lib.processrunner.utilities.Constants;
+import com.saptarshidebnath.lib.processrunner.model.OutputRecord;
 import com.saptarshidebnath.lib.processrunner.utilities.fileutils.GrepFile;
 import com.saptarshidebnath.lib.processrunner.utilities.fileutils.LogWriter;
 import java.io.File;
@@ -81,9 +83,9 @@ class OutputImpl implements Output {
    *
    * @param sysOut A {@link File} object where the log is going to be written.
    * @return A {@link File} object where the log has been written. May return null if master log
-   *     file was not configured. Please see {@link ConfigurationBuilder#setMasterLogFile(File,
-   *     boolean)} and {@link ConfigurationBuilder#setMasterLogFile(File, boolean, Charset)} for
-   *     more details on how to set Master log file.
+   *     file was not configured. Please see {@link ConfigBuilder#setMasterLogFile(File, boolean)}
+   *     and {@link ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how
+   *     to set Master log file.
    * @throws IOException In case of any IO Error while writing to disk.
    * @throws ProcessConfigurationException if master log is accessed without configuring the same.
    */
@@ -92,7 +94,8 @@ class OutputImpl implements Output {
     File response;
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration);
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration);
     }
     logger.trace("Saving sys out to {}", sysOut.getAbsolutePath());
     response = new LogWriter().writeLog(this.configuration, sysOut, OutputSourceType.SYSOUT);
@@ -105,9 +108,9 @@ class OutputImpl implements Output {
    *
    * @param sysError A {@link File} object where the log is going to be written.
    * @return A {@link File} object where the log has been written. May return null if master log
-   *     file was not configured. Please see {@link ConfigurationBuilder#setMasterLogFile(File,
-   *     boolean)} and {@link ConfigurationBuilder#setMasterLogFile(File, boolean, Charset)} for
-   *     more details on how to set Master log file.
+   *     file was not configured. Please see {@link ConfigBuilder#setMasterLogFile(File, boolean)}
+   *     and {@link ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how
+   *     to set Master log file.
    * @throws IOException In case of any IO Error while writing to disk.
    * @throws ProcessConfigurationException if master log is accessed without configuring the same.
    */
@@ -116,7 +119,8 @@ class OutputImpl implements Output {
     File response;
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration);
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration);
     } else {
       logger.trace("Saving sys error to : {}", sysError.getAbsolutePath());
       response = new LogWriter().writeLog(this.configuration, sysError, OutputSourceType.SYSERR);
@@ -129,16 +133,17 @@ class OutputImpl implements Output {
    * of type {@link OutputRecord}.
    *
    * @return A {@link File} master pointing to the Master log file. May return null if master log
-   *     file was not configured. Please see {@link ConfigurationBuilder#setMasterLogFile(File,
-   *     boolean)} and {@link ConfigurationBuilder#setMasterLogFile(File, boolean, Charset)} for
-   *     more details on how to set Master log file.
+   *     file was not configured. Please see {@link ConfigBuilder#setMasterLogFile(File, boolean)}
+   *     and {@link ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how
+   *     to set Master log file.
    * @throws ProcessConfigurationException if master log is accessed without configuring the same.
    */
   @Override
   public File getMasterLogAsJson() throws ProcessConfigurationException {
     if (this.configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration);
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration);
     }
     return this.configuration.getMasterLogFile();
   }
@@ -148,9 +153,9 @@ class OutputImpl implements Output {
    *
    * @param log A {@link File} object where the log is going to be written.
    * @return A {@link File} the log not in json format. Please see {@link
-   *     ConfigurationBuilder#setMasterLogFile(File, boolean)} and {@link
-   *     ConfigurationBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how to
-   *     set Master log file.
+   *     ConfigBuilder#setMasterLogFile(File, boolean)} and {@link
+   *     ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how to set
+   *     Master log file.
    * @throws IOException when there are problems with IO
    * @throws ProcessConfigurationException if master log is accessed without configuring the same.
    */
@@ -158,7 +163,8 @@ class OutputImpl implements Output {
   public File saveLog(File log) throws IOException, ProcessConfigurationException {
     if (configuration.getMasterLogFile() == null) {
       throw new ProcessConfigurationException(
-          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration);
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration);
     }
     return new LogWriter().writeLog(this.configuration, log, OutputSourceType.ALL);
   }
@@ -169,9 +175,9 @@ class OutputImpl implements Output {
    *
    * @param regex a proper Regular Expression that need to be searched for.
    * @return a {@link Boolean#TRUE} or {@link Boolean#FALSE} depending upon if the search is
-   *     positive or negative. Please see {@link ConfigurationBuilder#setMasterLogFile(File,
-   *     boolean)} and {@link ConfigurationBuilder#setMasterLogFile(File, boolean, Charset)} for
-   *     more details on how to set Master log file.
+   *     positive or negative. Please see {@link ConfigBuilder#setMasterLogFile(File, boolean)} and
+   *     {@link ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how to
+   *     set Master log file.
    * @throws IOException In case of any IO error.
    * @throws ProcessConfigurationException if master log is accessed without configuring the same.
    */
@@ -181,7 +187,8 @@ class OutputImpl implements Output {
     Boolean response;
     if (configuration.getMasterLogFile() == null) {
       String message =
-          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration;
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration;
       throw new ProcessConfigurationException(message);
     } else {
       response =
@@ -206,7 +213,8 @@ class OutputImpl implements Output {
       throws IOException, ProcessConfigurationException {
     if (configuration.getMasterLogFile() == null) {
       String message =
-          Constants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED + configuration;
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration;
       throw new ProcessConfigurationException(message);
     }
     return new GrepFile().grepFile(regex, configuration);
@@ -228,7 +236,7 @@ class OutputImpl implements Output {
     try (Stream<String> stream = Files.lines(Paths.get(fileToRead.getCanonicalPath()), charset)) {
       return stream
           .parallel()
-          .map(currentLine -> Constants.GSON.fromJson(currentLine, OutputRecord.class))
+          .map(currentLine -> ProcessRunnerConstants.GSON.fromJson(currentLine, OutputRecord.class))
           .anyMatch(outputRecord -> outputRecord.getOutputText().matches(regex));
     }
   }

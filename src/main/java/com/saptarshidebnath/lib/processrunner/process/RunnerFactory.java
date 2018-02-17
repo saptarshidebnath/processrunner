@@ -25,6 +25,8 @@
 
 package com.saptarshidebnath.lib.processrunner.process;
 
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration.ConfigBuilder;
 import com.saptarshidebnath.lib.processrunner.output.Output;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -33,21 +35,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Factory method to to run command or to get an instance of {@link ProcessRunner}.
+ * Factory method to to run command or to get an instance of {@link Runner}.
  *
- * <p>This is the only way to create a reference of {@link ProcessRunner}. Please note that if you
- * opt for Start process, then you either received an {@link Future} or an {@link Output}.
+ * <p>This is the only way to create a reference of {@link Runner}. Please note that if you opt for
+ * Start process, then you either received an {@link Future} or an {@link Output}.
  */
-public class ProcessRunnerFactory {
+public class RunnerFactory {
 
-  private static final Logger logger = LoggerFactory.getLogger(ProcessRunnerFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(RunnerFactory.class);
 
   /** Hidden constructor so that no body can create object of the class. */
-  private ProcessRunnerFactory() {}
+  private RunnerFactory() {}
 
   /**
-   * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
-   * Configuration}. The process is then <strong>triggered in synchronously</strong>.
+   * Create a instance of {@link Runner} by consuming a reference of the {@link Configuration}. The
+   * process is then <strong>triggered in synchronously</strong>.
    *
    * @param configuration Takes a valid {@link Configuration} object.
    * @return a reference to {@link Output}
@@ -59,12 +61,12 @@ public class ProcessRunnerFactory {
   public static Output startProcess(final Configuration configuration)
       throws IOException, InterruptedException, ExecutionException {
     logger.debug("Starting process with config : {}", configuration);
-    return new ProcessRunnerImpl(configuration).run();
+    return new RunnerImpl(configuration).run();
   }
 
   /**
-   * Create a instance of {@link ProcessRunner} by consuming a reference of the {@link
-   * Configuration}. The process is then <strong>triggered asynchronously</strong>.
+   * Create a instance of {@link Runner} by consuming a reference of the {@link Configuration}. The
+   * process is then <strong>triggered asynchronously</strong>.
    *
    * @param configuration Takes a valid {@link Configuration} object.
    * @return a reference of {@link Future} of type {@link Output} from where you can retrieve the
@@ -72,19 +74,19 @@ public class ProcessRunnerFactory {
    */
   public static Future<Output> startAsyncProcess(final Configuration configuration) {
     logger.debug("Starting asynchronous process with configuration : {}", configuration);
-    return new ProcessRunnerImpl(configuration).runAsync();
+    return new RunnerImpl(configuration).runAsync();
   }
 
   /**
-   * Create a instance of {@link ProcessRunner}. This method doesn't start the process and is upon
-   * the developer to actually trigger the process.
+   * Create a instance of {@link Runner}. This method doesn't start the process and is upon the
+   * developer to actually trigger the process.
    *
    * @param configuration a reference of {@link Configuration}. The {@link Configuration} can be
-   *     build quite easily via {@link ConfigurationBuilder}
-   * @return a reference of {@link ProcessRunner}
+   *     build quite easily via {@link ConfigBuilder}
+   * @return a reference of {@link Runner}
    */
-  public static ProcessRunner getProcess(Configuration configuration) {
+  public static Runner getProcess(Configuration configuration) {
     logger.debug("Creating Process with the configuration : ", configuration);
-    return new ProcessRunnerImpl(configuration);
+    return new RunnerImpl(configuration);
   }
 }

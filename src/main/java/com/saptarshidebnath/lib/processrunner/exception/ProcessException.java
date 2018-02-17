@@ -25,21 +25,22 @@
 
 package com.saptarshidebnath.lib.processrunner.exception;
 
-import com.saptarshidebnath.lib.processrunner.process.ProcessRunnerFactory;
-import com.saptarshidebnath.lib.processrunner.utilities.Constants;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
+import com.saptarshidebnath.lib.processrunner.process.RunnerFactory;
 
 /**
- * Blanket custom {@link Exception}. The class need to be used by the {@link ProcessRunnerFactory}
- * class and all public facing methods for this ProcessRunner library. The Developer should be able
- * to get the cause from the {@link ProcessException#getCause()} detailing exactly what triggered
- * the exception.
+ * Blanket custom {@link Exception}. The class need to be used by the {@link RunnerFactory} class
+ * and all public facing methods for this Runner library. The Developer should be able to get the
+ * cause from the {@link ProcessException#getCause()} detailing exactly what triggered the
+ * exception.
  */
 public class ProcessException extends Exception {
 
   /**
-   * Creates a generic {@link ProcessException} with the message {@link Constants#GENERIC_ERROR}.
+   * Creates a generic {@link ProcessException} with the message {@link
+   * ProcessRunnerConstants#GENERIC_ERROR}.
    */
   ProcessException() {
-    super(Constants.GENERIC_ERROR);
+    super(ProcessRunnerConstants.GENERIC_ERROR);
   }
 }

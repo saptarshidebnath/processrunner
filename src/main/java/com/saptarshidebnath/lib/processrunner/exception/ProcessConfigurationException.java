@@ -15,11 +15,12 @@
 
 package com.saptarshidebnath.lib.processrunner.exception;
 
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+
 /**
  * Custom {@link Exception} denote that configuration is not set correctly.
  *
- * <p>Denotes that there might be a logical error while configuring the class {@link
- * com.saptarshidebnath.lib.processrunner.process.Configuration}
+ * <p>Denotes that there might be a logical error while configuring the class {@link Configuration}
  *
  * @author Saptarshi Debnath (saptarshi.devnath@gmail.com)
  * @version 0.2.0

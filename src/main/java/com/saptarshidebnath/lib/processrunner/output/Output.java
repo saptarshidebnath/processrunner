@@ -25,18 +25,20 @@
 
 package com.saptarshidebnath.lib.processrunner.output;
 
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.constants.OutputSourceType;
 import com.saptarshidebnath.lib.processrunner.exception.ProcessConfigurationException;
 import com.saptarshidebnath.lib.processrunner.exception.ProcessException;
-import com.saptarshidebnath.lib.processrunner.process.Configuration;
-import com.saptarshidebnath.lib.processrunner.process.ProcessRunner;
+import com.saptarshidebnath.lib.processrunner.model.OutputRecord;
+import com.saptarshidebnath.lib.processrunner.process.Runner;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 /**
  * The Output of a run is returned as a reference of {@link Output} class. The interface for the
- * Object which is going to be returned after running {@link ProcessRunner#run()} or {@link
- * ProcessRunner#runAsync()}.
+ * Object which is going to be returned after running {@link Runner#run()} or {@link
+ * Runner#runAsync()}.
  */
 public interface Output {
 

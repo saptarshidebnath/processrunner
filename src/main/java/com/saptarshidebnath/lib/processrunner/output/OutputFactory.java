@@ -25,7 +25,7 @@
 
 package com.saptarshidebnath.lib.processrunner.output;
 
-import com.saptarshidebnath.lib.processrunner.process.Configuration;
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

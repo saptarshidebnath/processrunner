@@ -1,5 +1,6 @@
 package com.saptarshidebnath.lib.processrunner.utilities;
 
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -14,7 +15,9 @@ public class Threadify {
         runnable ->
             new Thread(
                 runnable,
-                Constants.PROCESS_RUNNER_THREAD_GROUP_NAME + "-" + threadCounter.getAndIncrement());
+                ProcessRunnerConstants.PROCESS_RUNNER_THREAD_GROUP_NAME
+                    + "-"
+                    + threadCounter.getAndIncrement());
     return Executors.newCachedThreadPool(processRunnerThreadFactory);
   }
 }

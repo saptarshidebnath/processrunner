@@ -25,10 +25,11 @@
 
 package com.saptarshidebnath.lib.processrunner.process;
 
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
+import com.saptarshidebnath.lib.processrunner.output.LogHandler;
 import com.saptarshidebnath.lib.processrunner.output.Output;
 import com.saptarshidebnath.lib.processrunner.output.OutputFactory;
-import com.saptarshidebnath.lib.processrunner.output.ProcessLogHandler;
-import com.saptarshidebnath.lib.processrunner.utilities.Constants;
 import com.saptarshidebnath.lib.processrunner.utilities.Threadify;
 import java.io.File;
 import java.io.IOException;
@@ -40,12 +41,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Implementation of the {@link ProcessRunner} interface. Gives a solid body to the {@link
- * ProcessRunner}.
- */
-class ProcessRunnerImpl implements ProcessRunner {
-  private Logger logger = LoggerFactory.getLogger(ProcessRunner.class);
+/** Implementation of the {@link Runner} interface. Gives a solid body to the {@link Runner}. */
+class RunnerImpl implements Runner {
+  private Logger logger = LoggerFactory.getLogger(Runner.class);
   private final Configuration configuration;
   private final Runtime runTime;
   private final String configurationAsString;
@@ -55,11 +53,11 @@ class ProcessRunnerImpl implements ProcessRunner {
    *
    * @param configuration a valid object of {@link Configuration}
    */
-  ProcessRunnerImpl(final Configuration configuration) {
+  RunnerImpl(final Configuration configuration) {
     this.configurationAsString = configuration.toString();
     this.configuration = configuration;
     this.runTime = Runtime.getRuntime();
-    logger.info("Process ProcessRunner created");
+    logger.info("Process Runner created");
     logger.debug("With configuration : {}", this.configurationAsString);
   }
 
@@ -75,7 +73,7 @@ class ProcessRunnerImpl implements ProcessRunner {
     final StringBuilder commandToExecute = new StringBuilder();
     commandToExecute
         .append(this.configuration.getInterpreter())
-        .append(Constants.SPACE_CHAR)
+        .append(ProcessRunnerConstants.SPACE_CHAR)
         .append(this.configuration.getCommand());
     logger.debug("Executing command : {}", commandToExecute);
     Path currentWorkingDir = this.configuration.getWorkingDir();
@@ -92,9 +90,9 @@ class ProcessRunnerImpl implements ProcessRunner {
             .toArray(new String[] {});
     final Process currentProcess =
         this.runTime.exec(commandToExecute.toString(), environmentVariable, currentWorkingDirFile);
-    ProcessLogHandler processLogHandler = new ProcessLogHandler(currentProcess, configuration);
+    LogHandler logHandler = new LogHandler(currentProcess, configuration);
     logger.trace("Waiting for Log handlers to complete writing / handling logs.");
-    processLogHandler.waitForShutdown();
+    logHandler.waitForShutdown();
     logger.info("Waiting for the process to terminate");
     currentProcess.waitFor();
     final Integer processExitValue = currentProcess.exitValue();
@@ -117,6 +115,6 @@ class ProcessRunnerImpl implements ProcessRunner {
 
   @Override
   public String toString() {
-    return "ProcessRunnerImpl{" + "configuration=" + configuration + ", runTime=" + runTime + '}';
+    return "RunnerImpl{" + "configuration=" + configuration + ", runTime=" + runTime + '}';
   }
 }
