@@ -23,7 +23,8 @@
   ~ SOFTWARE.
   -->
 
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -77,6 +78,9 @@
     <javasrcversion>1.8</javasrcversion>
     <pmdversion>3.9.0</pmdversion>
     <sonar.jacoco.itReportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.itReportPath>
+    <checkstyle.version>3.0.0</checkstyle.version>
+    <site.path>snapshot</site.path>
+    <github.global.server>github</github.global.server>
   </properties>
 
   <dependencies>
@@ -123,6 +127,27 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${checkstyle.version}</version>
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>validate</phase>
+            <configuration>
+              <configLocation>google_checks.xml</configLocation>
+              <encoding>UTF-8</encoding>
+              <consoleOutput>true</consoleOutput>
+              <failsOnError>true</failsOnError>
+              <linkXRef>true</linkXRef>
+            </configuration>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
         <version>${pmdversion}</version>
         <executions>
@@ -149,17 +174,18 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.6</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.doxia</groupId>
-            <artifactId>doxia-module-markdown</artifactId>
-            <version>1.7</version>
-          </dependency>
-        </dependencies>
+        <version>3.7</version>
+        <!--<dependencies>-->
+        <!--<dependency>-->
+        <!--<groupId>org.apache.maven.doxia</groupId>-->
+        <!--<artifactId>doxia-module-markdown</artifactId>-->
+        <!--<version>1.8</version>-->
+        <!--</dependency>-->
+        <!--</dependencies>-->
         <configuration>
           <skipDeploy>true</skipDeploy>
         </configuration>
@@ -242,7 +268,7 @@
         <configuration>
           <useReleaseProfile>true</useReleaseProfile>
           <releaseProfiles>release</releaseProfiles>
-          <goals>deploy</goals>
+          <goals>deploy site site-deploy</goals>
         </configuration>
       </plugin>
       <plugin>
@@ -283,6 +309,9 @@
   <profiles>
     <profile>
       <id>release</id>
+      <properties>
+        <site.path>release</site.path>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -291,13 +320,16 @@
             <version>0.12</version>
             <configuration>
               <message>Creating site for ${project.version}</message>
+              <noJekyll>true</noJekyll>
+              <dryRun>false</dryRun>
+              <server>github</server>
             </configuration>
             <executions>
               <execution>
                 <goals>
                   <goal>site</goal>
                 </goals>
-                <phase>site</phase>
+                <phase>site-deploy</phase>
               </execution>
             </executions>
           </plugin>
@@ -327,7 +359,10 @@
               </execution>
             </executions>
             <configuration>
-              <additionalparam>-Xdoclint:none</additionalparam>
+              <additionalparam>-Xdoclint:all</additionalparam>
+              <author>true</author>
+              <failOnError>true</failOnError>
+              <linksource>true</linksource>
             </configuration>
           </plugin>
           <plugin>
@@ -353,7 +388,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>${checkstyle.version}</version>
+        <configuration>
+          <configLocation>google_checks.xml</configLocation>
+        </configuration>
         <reportSets>
           <reportSet>
             <reports>

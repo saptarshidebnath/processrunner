@@ -8,6 +8,7 @@ import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
 import com.saptarshidebnath.lib.processrunner.model.OutputRecord;
 import com.saptarshidebnath.lib.processrunner.utilities.Threadify;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,9 +41,12 @@ public class LogHandler {
   private boolean streamingEnabled;
   private ArrayList<Future> inputStreamReadingThreads;
   private ExecutorService executorService;
-  private Configuration processConfiguration;
   private Future diskWritingThread;
   private String processConfigrationAsString;
+  private File masterLogFile;
+  private boolean logsNeedTobeWritten;
+  private Process process;
+  private Configuration configuration;
 
   /**
    * The construcor of the class {@link LogHandler}.
@@ -58,15 +62,19 @@ public class LogHandler {
    * Threadify#getProcessRunnerExecutorService()}
    *
    * @param process a object of type {@link Process}
-   * @param processConfiguration a reference of type {@link Configuration}
+   * @param configuration a reference of type {@link Configuration}
    * @throws IOException in case of oany IOError
    */
-  public LogHandler(Process process, Configuration processConfiguration) throws IOException {
-    this.processConfiguration = processConfiguration;
-    File masterLogFile = processConfiguration.getMasterLogFile();
-    streamingEnabled = processConfiguration.isEnableLogStreaming();
-    boolean logsNeedTobeWritten = processConfiguration.getMasterLogFile() != null;
-    this.processConfigrationAsString = processConfiguration.toString();
+  public LogHandler(Process process, Configuration configuration) throws IOException {
+    this.process = process;
+    this.configuration = configuration;
+    this.masterLogFile = this.configuration.getMasterLogFile();
+    this.streamingEnabled = this.configuration.isEnableLogStreaming();
+    this.logsNeedTobeWritten = this.configuration.getMasterLogFile() != null;
+    this.processConfigrationAsString = this.configuration.toString();
+  }
+
+  public LogHandler start() throws FileNotFoundException {
 
     boolean logsNeedTobeRead = logsNeedTobeWritten || streamingEnabled;
     if (logsNeedTobeRead) {
@@ -93,7 +101,7 @@ public class LogHandler {
         this.printWriter =
             new PrintWriter(
                 new OutputStreamWriter(
-                    new FileOutputStream(masterLogFile), processConfiguration.getCharset()));
+                    new FileOutputStream(masterLogFile), this.configuration.getCharset()));
         this.diskWritingThread = executorService.submit(this::writeToDisk);
       } else {
         logger.warn(
@@ -103,11 +111,12 @@ public class LogHandler {
       // Mark for shutdown after execution is complete.
       //
       this.executorService.shutdown();
-      logger.trace("Created LogHandler. Tracking SYSOUT and SYSERROR");
+      logger.debug("Created LogHandler. Tracking SYSOUT and SYSERROR");
     } else {
       logger.warn("Log Streaming is not enabled and Master logfile not set. Discarding logs.");
       logger.warn("Configuration received : {}", processConfigrationAsString);
     }
+    return this;
   }
 
   /**
@@ -136,7 +145,7 @@ public class LogHandler {
    * @throws ExecutionException when waiting for the disk writer to finish.
    */
   public void waitForShutdown() throws InterruptedException, ExecutionException {
-    if (processConfiguration.getMasterLogFile() != null) {
+    if (this.configuration.getMasterLogFile() != null) {
       logger.info("Waiting for all the logs writing thread to shutdown.");
       //
       // Wait for the disk writing thread to stop.

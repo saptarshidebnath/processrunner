@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Process Runner"
+  xmlns="http://maven.apache.org/DECORATION/1.3.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.3.0 http://maven.apache.org/xsd/decoration-1.3.0.xsd">
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.7</version>
+  </skin>
+
+  <bannerLeft>
+    <name>Process Runner</name>
+    <src>images/process-runner.svg</src>
+    <href>http://code.saptarshidebnath.com/processrunner/</href>
+  </bannerLeft>
+  <version position="bottom"/>
+  <publishDate position="bottom"/>
+  <body>
+
+    <menu>
+      <item name="Home" href="index.html"/>
+    </menu>
+    <menu ref="reports" inherit="top"/>
+    <footer>
+      <![CDATA[
+  <div>Icons made by
+    <a
+      href="https://www.flaticon.com/authors/vectors-market"
+      title="Vectors Market">Vectors Market</a>
+    from
+    <a
+      href="https://www.flaticon.com/"
+      title="Flaticon">www.flaticon.com
+      </a>
+      is licensed by
+      <a
+        href="http://creativecommons.org/licenses/by/3.0/"
+        title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+    </div>
+  ]]>
+    </footer>
+  </body>
+  <custom>
+    <fluidoSkin>
+      <topBarEnabled>true</topBarEnabled>
+      <topBarContainerStyle>width: 90%;</topBarContainerStyle>
+      <navBarStyle>navbar-inverse</navBarStyle>
+      <sourceLineNumbersEnabled>true</sourceLineNumbersEnabled>
+      <copyrightClass>pull-right</copyrightClass>
+    </fluidoSkin>
+  </custom>
+</project>

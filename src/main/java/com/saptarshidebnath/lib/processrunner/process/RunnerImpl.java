@@ -90,7 +90,7 @@ class RunnerImpl implements Runner {
             .toArray(new String[] {});
     final Process currentProcess =
         this.runTime.exec(commandToExecute.toString(), environmentVariable, currentWorkingDirFile);
-    LogHandler logHandler = new LogHandler(currentProcess, configuration);
+    LogHandler logHandler = new LogHandler(currentProcess, configuration).start();
     logger.trace("Waiting for Log handlers to complete writing / handling logs.");
     logHandler.waitForShutdown();
     logger.info("Waiting for the process to terminate");

@@ -85,7 +85,7 @@ public class RunnerFactory {
    *     build quite easily via {@link ConfigBuilder}
    * @return a reference of {@link Runner}
    */
-  public static Runner getProcess(Configuration configuration) {
+  public static Runner getRunner(Configuration configuration) {
     logger.debug("Creating Process with the configuration : ", configuration);
     return new RunnerImpl(configuration);
   }

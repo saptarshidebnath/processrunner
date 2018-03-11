@@ -152,7 +152,7 @@ public class RunnerFactoryTest {
       throws ProcessConfigurationException, IOException, InterruptedException, ExecutionException {
 
     final Runner runner =
-        RunnerFactory.getProcess(
+        RunnerFactory.getRunner(
             new ConfigBuilder(getDefaultInterpreter(), getInterPreterVersion())
                 .setWorkigDir(ProcessRunnerConstants.DEFAULT_CURRENT_DIR_PATH)
                 .setMasterLogFile(new TempFile().createTempLogDump(), true)
@@ -229,7 +229,7 @@ public class RunnerFactoryTest {
   public void getProcessLessDetailed()
       throws IOException, InterruptedException, ProcessConfigurationException, ExecutionException {
     final Runner runner =
-        RunnerFactory.getProcess(
+        RunnerFactory.getRunner(
             new ConfigBuilder(getDefaultInterpreter(), getInterPreterVersion())
                 .setWorkigDir(ProcessRunnerConstants.DEFAULT_CURRENT_DIR_PATH)
                 .build());
@@ -327,7 +327,7 @@ public class RunnerFactoryTest {
                     ProcessRunnerConstants.FILE_SUFFIX_JSON),
                 false)
             .build();
-    final Runner runner = RunnerFactory.getProcess(configuration);
+    final Runner runner = RunnerFactory.getRunner(configuration);
     final Output response = runner.run();
     assertThat("Validating process return code : ", response.getReturnCode(), is(0));
     final File masterLog = response.getMasterLogAsJson();
@@ -355,7 +355,7 @@ public class RunnerFactoryTest {
       throws IOException, ProcessException, InterruptedException, ProcessConfigurationException,
           ExecutionException {
     final Runner runner =
-        RunnerFactory.getProcess(
+        RunnerFactory.getRunner(
             new ConfigBuilder(getDefaultInterpreter(), getInterPreterVersion())
                 .setWorkigDir(ProcessRunnerConstants.DEFAULT_CURRENT_DIR_PATH)
                 .setMasterLogFile(new TempFile().createTempLogDump(), true)
@@ -400,7 +400,7 @@ public class RunnerFactoryTest {
                       .toPath())
               .setMasterLogFile(tempFile, Boolean.TRUE)
               .build();
-      runner = RunnerFactory.getProcess(configuration);
+      runner = RunnerFactory.getRunner(configuration);
     } else if (SystemUtils.IS_OS_LINUX) {
       System.out.println("LINUX");
       configuration =
@@ -420,7 +420,7 @@ public class RunnerFactoryTest {
                       .toPath())
               .setMasterLogFile(tempFile, Boolean.TRUE)
               .build();
-      runner = RunnerFactory.getProcess(configuration);
+      runner = RunnerFactory.getRunner(configuration);
     }
     assertThat("Validating if processrunner got created or not", runner, not(nullValue()));
     assert runner != null;
@@ -482,7 +482,7 @@ public class RunnerFactoryTest {
                       .toPath())
               .setMasterLogFile(tempFile, true)
               .build();
-      runner = RunnerFactory.getProcess(configuration);
+      runner = RunnerFactory.getRunner(configuration);
     } else if (SystemUtils.IS_OS_LINUX) {
       configuration =
           new ConfigBuilder("bash", "largefile.sh")
@@ -500,7 +500,7 @@ public class RunnerFactoryTest {
                       .toPath())
               .setMasterLogFile(tempFile, true)
               .build();
-      runner = RunnerFactory.getProcess(configuration);
+      runner = RunnerFactory.getRunner(configuration);
     }
 
     assertThat("Validating if processrunner is not null", runner, not(nullValue()));
