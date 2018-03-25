@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>RunnerImpl.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ProcessRunner</a> &gt; <a href="index.source.html" class="el_package">com.saptarshidebnath.lib.processrunner.process</a> &gt; <span class="el_source">RunnerImpl.java</span></div><h1>RunnerImpl.java</h1><pre class="source lang-java linenums">/*
+ *
+ * MIT License
+ *
+ * Copyright (c) [2016] [Saptarshi Debnath]
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the &quot;Software&quot;), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package com.saptarshidebnath.lib.processrunner.process;
+
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
+import com.saptarshidebnath.lib.processrunner.output.LogHandler;
+import com.saptarshidebnath.lib.processrunner.output.Output;
+import com.saptarshidebnath.lib.processrunner.output.OutputFactory;
+import com.saptarshidebnath.lib.processrunner.utilities.Threadify;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/** Implementation of the {@link Runner} interface. Gives a solid body to the {@link Runner}. */
+class RunnerImpl implements Runner {
+<span class="fc" id="L46">  private Logger logger = LoggerFactory.getLogger(Runner.class);</span>
+  private final Configuration configuration;
+  private final Runtime runTime;
+  private final String configurationAsString;
+
+  /**
+   * Constructor receiving the {@link Configuration} to create the process runner.
+   *
+   * @param configuration a valid object of {@link Configuration}
+   */
+<span class="fc" id="L56">  RunnerImpl(final Configuration configuration) {</span>
+<span class="fc" id="L57">    this.configurationAsString = configuration.toString();</span>
+<span class="fc" id="L58">    this.configuration = configuration;</span>
+<span class="fc" id="L59">    this.runTime = Runtime.getRuntime();</span>
+<span class="fc" id="L60">    logger.info(&quot;Process Runner created&quot;);</span>
+<span class="fc" id="L61">    logger.debug(&quot;With configuration : {}&quot;, this.configurationAsString);</span>
+<span class="fc" id="L62">  }</span>
+
+  /**
+   * Runs the process with the provided configuration in the same {@link Thread}.
+   *
+   * @return integer value depicting the process exit code
+   */
+  @Override
+  public Output run() throws IOException, InterruptedException, ExecutionException {
+    final Output output;
+<span class="fc" id="L72">    this.logger.info(&quot;Starting process execution&quot;);</span>
+<span class="fc" id="L73">    final StringBuilder commandToExecute = new StringBuilder();</span>
+<span class="fc" id="L74">    commandToExecute</span>
+<span class="fc" id="L75">        .append(this.configuration.getInterpreter())</span>
+<span class="fc" id="L76">        .append(ProcessRunnerConstants.SPACE_CHAR)</span>
+<span class="fc" id="L77">        .append(this.configuration.getCommand());</span>
+<span class="fc" id="L78">    logger.debug(&quot;Executing command : {}&quot;, commandToExecute);</span>
+<span class="fc" id="L79">    Path currentWorkingDir = this.configuration.getWorkingDir();</span>
+<span class="fc" id="L80">    File currentWorkingDirFile = null;</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    if (null != currentWorkingDir) {</span>
+<span class="fc" id="L82">      currentWorkingDirFile = currentWorkingDir.toFile();</span>
+    }
+    String[] environmentVariable =
+<span class="fc" id="L85">        System.getenv()</span>
+<span class="fc" id="L86">            .entrySet()</span>
+<span class="fc" id="L87">            .stream()</span>
+<span class="fc" id="L88">            .map(setElement -&gt; setElement.getKey() + &quot;=&quot; + setElement.getValue())</span>
+<span class="fc" id="L89">            .collect(Collectors.toList())</span>
+<span class="fc" id="L90">            .toArray(new String[] {});</span>
+<span class="fc" id="L91">    final Process currentProcess =</span>
+<span class="fc" id="L92">        this.runTime.exec(commandToExecute.toString(), environmentVariable, currentWorkingDirFile);</span>
+<span class="fc" id="L93">    LogHandler logHandler = new LogHandler(currentProcess, configuration).start();</span>
+<span class="fc" id="L94">    logger.trace(&quot;Waiting for Log handlers to complete writing / handling logs.&quot;);</span>
+<span class="fc" id="L95">    logHandler.waitForShutdown();</span>
+<span class="fc" id="L96">    logger.info(&quot;Waiting for the process to terminate&quot;);</span>
+<span class="fc" id="L97">    currentProcess.waitFor();</span>
+<span class="fc" id="L98">    final Integer processExitValue = currentProcess.exitValue();</span>
+<span class="fc" id="L99">    output = new OutputFactory().createOutput(this.configuration, processExitValue);</span>
+<span class="fc" id="L100">    logger.trace(&quot;Process exited with exit value : {}&quot;, processExitValue);</span>
+<span class="fc" id="L101">    return output;</span>
+  }
+
+  /**
+   * Runs the process with the provided configuration in the separate {@link Thread}.
+   *
+   * @return {@link Future} of type {@link Output} reference so that the result of the method
+   *     invocation can be retrieved.
+   */
+  @Override
+  public Future&lt;Output&gt; runAsync() {
+<span class="fc" id="L112">    ExecutorService executorService = new Threadify().getProcessRunnerExecutorService();</span>
+<span class="fc" id="L113">    return executorService.submit(this::run);</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L118">    return &quot;RunnerImpl{&quot; + &quot;configuration=&quot; + configuration + &quot;, runTime=&quot; + runTime + '}';</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

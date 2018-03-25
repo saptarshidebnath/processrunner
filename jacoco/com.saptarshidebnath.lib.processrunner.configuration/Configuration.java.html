@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Configuration.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ProcessRunner</a> &gt; <a href="index.source.html" class="el_package">com.saptarshidebnath.lib.processrunner.configuration</a> &gt; <span class="el_source">Configuration.java</span></div><h1>Configuration.java</h1><pre class="source lang-java linenums">/*
+ *
+ * MIT License
+ *
+ * Copyright (c) [2016] [Saptarshi Debnath]
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the &quot;Software&quot;), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package com.saptarshidebnath.lib.processrunner.configuration;
+
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
+import com.saptarshidebnath.lib.processrunner.exception.ProcessConfigurationException;
+import com.saptarshidebnath.lib.processrunner.process.Runner;
+import java.io.File;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * The {@link Configuration} object holds the configuration.
+ *
+ * &lt;p&gt;The created configuration is used by the {@link Runner}.
+ */
+public class Configuration {
+
+<span class="fc" id="L49">  private static final Logger logger = LoggerFactory.getLogger(Configuration.class);</span>
+  private final String interpreter;
+  private final String command;
+  private final Path workingDir;
+  private final File masterLogFile;
+  private final Charset charset;
+  private final boolean autoDeleteFileOnExit;
+  private final boolean enableLogStreaming;
+
+  /**
+   * Constructor to set the configuration to be consumed by {@link Runner}.
+   *
+   * @param interpreter : sets the {@link String} command interpreter like /bin/bash in unix
+   * @param command : set the actual {@link String} command to be executed
+   * @param workingDir : sets the working directory in {@link File} format
+   * @param masterLogFile : {@link File} where the log data will be stored.
+   * @param charset : a reference of which {@link Charset} to use while writing the {@link
+   *     Configuration#masterLogFile}
+   * @param autoDeleteFileOnExit : set the flag to denote if the sysout and the syserror {@link
+   *     File} going to be auto deleted on exit.
+   * @param enableLogStreaming : enable lor disable log streaming by passing a @{@link Boolean}
+   *     value
+   */
+  Configuration(
+      final String interpreter,
+      final String command,
+      final Path workingDir,
+      final File masterLogFile,
+      final Charset charset,
+      final boolean autoDeleteFileOnExit,
+<span class="fc" id="L79">      final boolean enableLogStreaming) {</span>
+<span class="fc" id="L80">    this.interpreter = interpreter.trim();</span>
+<span class="fc" id="L81">    this.command = command.trim();</span>
+<span class="fc" id="L82">    this.workingDir = workingDir;</span>
+<span class="fc" id="L83">    this.autoDeleteFileOnExit = autoDeleteFileOnExit;</span>
+<span class="fc" id="L84">    this.masterLogFile = masterLogFile;</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    if (this.autoDeleteFileOnExit) {</span>
+<span class="fc" id="L86">      this.masterLogFile.deleteOnExit();</span>
+    }
+<span class="fc" id="L88">    this.enableLogStreaming = enableLogStreaming;</span>
+<span class="fc" id="L89">    this.charset = charset;</span>
+<span class="fc" id="L90">    logger.debug(&quot;Process Runner Configuration : {}&quot;, this);</span>
+<span class="fc" id="L91">  }</span>
+
+  /**
+   * Getter for flag if {@link Configuration#getMasterLogFile()} is going to auto deleted or not.
+   *
+   * @return a {@link Boolean} value depicting the same.
+   */
+  public boolean getAutoDeleteFileOnExit() {
+<span class="fc" id="L99">    return this.autoDeleteFileOnExit;</span>
+  }
+
+  /**
+   * A {@link File} reference for the masterLogFile.
+   *
+   * @return a {@link File} reference where master logs need to be considered.
+   */
+  public File getMasterLogFile() {
+<span class="fc" id="L108">    return this.masterLogFile;</span>
+  }
+
+  /**
+   * Get the currently configured command interpreter.
+   *
+   * @return a {@link String} value.
+   */
+  public String getInterpreter() {
+<span class="fc" id="L117">    return this.interpreter;</span>
+  }
+
+  /**
+   * Get the command / process to be executed.
+   *
+   * @return a {@link String} value
+   */
+  public String getCommand() {
+<span class="fc" id="L126">    return this.command;</span>
+  }
+
+  /**
+   * Get the currently configured current directory.
+   *
+   * @return a {@link Path} reference where the current working directory is.
+   */
+  public Path getWorkingDir() {
+<span class="fc" id="L135">    return this.workingDir;</span>
+  }
+
+  /**
+   * Returns the charset set for the {@link Configuration#masterLogFile}.
+   *
+   * @return a reference of the class {@link Charset} in which the {@link
+   *     Configuration#masterLogFile} will be written.
+   */
+  public Charset getCharset() {
+<span class="fc" id="L145">    return charset;</span>
+  }
+
+  /**
+   * Denotes if the master log file is going to be auto deleted when teh JVM exits.
+   *
+   * @return a {@link Boolean}
+   */
+  public boolean isAutoDeleteFileOnExit() {
+<span class="nc" id="L154">    return autoDeleteFileOnExit;</span>
+  }
+
+  /**
+   * Returns {@link Boolean#TRUE} or @{@link Boolean#FALSE} to denote if log streaming on the run
+   * time is enabled or not.
+   *
+   * @return a {@link Boolean}
+   */
+  public boolean isEnableLogStreaming() {
+<span class="fc" id="L164">    return enableLogStreaming;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="fc" id="L169">    return &quot;Configuration{&quot;</span>
+        + &quot;interpreter='&quot;
+        + interpreter
+        + '\''
+        + &quot;, command='&quot;
+        + command
+        + '\''
+        + &quot;, workingDir=&quot;
+        + workingDir
+        + &quot;, masterLogFile=&quot;
+        + masterLogFile
+        + &quot;, charset=&quot;
+        + charset
+        + &quot;, autoDeleteFileOnExit=&quot;
+        + autoDeleteFileOnExit
+        + &quot;, enableLogStreaming=&quot;
+        + enableLogStreaming
+        + '}';
+  }
+
+  /**
+   * {@link ConfigBuilder} helps in composing a {@link Configuration}.
+   *
+   * &lt;p&gt;The {@link Configuration} can be composed using the {@link ConfigBuilder}.
+   */
+  public static class ConfigBuilder {
+
+<span class="fc" id="L196">    private static final Logger logger = LoggerFactory.getLogger(ConfigBuilder.class);</span>
+    private final String interpreter;
+    private final String command;
+    private final List&lt;String&gt; comamndParams;
+    private Path workingDir;
+    private File masterLogFile;
+    private boolean autoDeleteFileOnExit;
+    private boolean logStreamingEnabled;
+    private Charset charset;
+
+    /**
+     * The constructor for {@link ConfigBuilder}. The only required parameters are the {@link
+     * String} interpreter and the {@link String} command.
+     *
+     * @param interpreter as {@link String} for example &quot;bash&quot;, &quot;cmd.exe /c&quot;
+     * @param command as {@link String} for example &quot;echo 'I solemnly swear I am up to no good'&quot;
+     * @throws ProcessConfigurationException is thrown if the interpreter or the command is null or
+     *     empty {@link String}
+     */
+<span class="fc" id="L215">    public ConfigBuilder(String interpreter, String command) throws ProcessConfigurationException {</span>
+<span class="fc bfc" id="L216" title="All 4 branches covered.">      if (interpreter == null || interpreter.trim().length() == 0) {</span>
+<span class="fc" id="L217">        throw new ProcessConfigurationException(</span>
+            &quot;Command RunnerImpl Interpreter is set '&quot;
+                + interpreter
+                + &quot;'. Need a valid command runner interpreter as /bin/bash in unix&quot;);
+<span class="fc bfc" id="L221" title="All 4 branches covered.">      } else if (null == command || 0 == command.trim().length()) {</span>
+<span class="fc" id="L222">        throw new ProcessConfigurationException(</span>
+            &quot;Command is set '&quot; + command + &quot;'. Need a valid command like 'echo Hello World'&quot;);
+      }
+<span class="fc" id="L225">      logger.trace(&quot;Interpreter and command validation passed&quot;);</span>
+<span class="fc" id="L226">      this.interpreter = interpreter;</span>
+<span class="fc" id="L227">      this.command = command;</span>
+<span class="fc" id="L228">      this.comamndParams = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L229">      this.logStreamingEnabled = false;</span>
+<span class="fc" id="L230">    }</span>
+
+    /**
+     * Add a {@link String} parameter the the command to be executed.
+     *
+     * @param param as {@link String}
+     * @return the {@link ConfigBuilder}
+     * @throws ProcessConfigurationException if the parameter is null or an empty String.
+     */
+    public ConfigBuilder setParam(String param) throws ProcessConfigurationException {
+<span class="fc bfc" id="L240" title="All 4 branches covered.">      if (param == null || param.length() == 0) {</span>
+<span class="fc" id="L241">        throw new ProcessConfigurationException(&quot;Param is either null or empty.&quot;);</span>
+      }
+<span class="fc" id="L243">      logger.trace(&quot;Param parameter passed validation&quot;);</span>
+<span class="fc" id="L244">      comamndParams.add(param);</span>
+<span class="fc" id="L245">      return this;</span>
+    }
+
+    /**
+     * Add a {@link List} parameter of type {@link String} to the command to be executed.
+     *
+     * @param paramList as {@link List} of type {@link String}. The order of the parameters are
+     *     maintained.
+     * @return the {@link ConfigBuilder}
+     * @throws ProcessConfigurationException if the parameter is null or an empty String.
+     */
+    public ConfigBuilder setParamList(List&lt;String&gt; paramList) throws ProcessConfigurationException {
+<span class="fc bfc" id="L257" title="All 4 branches covered.">      if (paramList == null || paramList.isEmpty()) {</span>
+<span class="fc" id="L258">        throw new ProcessConfigurationException(&quot;Param list is either null or empty.&quot;);</span>
+      }
+<span class="fc" id="L260">      logger.trace(&quot;Param list parameter passed validation&quot;);</span>
+<span class="fc" id="L261">      comamndParams.addAll(paramList);</span>
+<span class="fc" id="L262">      return this;</span>
+    }
+
+    /**
+     * Set the current working Directory as {@link Path}.
+     *
+     * @param workingDir accepts {@link Path} current working directory
+     * @return the {@link ConfigBuilder}
+     * @throws ProcessConfigurationException if the working directory is not a directory or it
+     *     doesn't exist.
+     */
+    public ConfigBuilder setWorkigDir(Path workingDir) throws ProcessConfigurationException {
+<span class="fc bfc" id="L274" title="All 4 branches covered.">      if (!workingDir.toFile().exists() || !workingDir.toFile().isDirectory()) {</span>
+<span class="fc" id="L275">        throw new ProcessConfigurationException(</span>
+            &quot;Command's current directory is set '&quot;
+<span class="fc" id="L277">                + workingDir.toAbsolutePath().toString()</span>
+                + &quot;'. Either the Directory doesn't exist or is not a directory at all&quot;);
+      }
+<span class="fc" id="L280">      logger.trace(&quot;Working dir parameter passed validation&quot;);</span>
+<span class="fc" id="L281">      this.workingDir = workingDir;</span>
+<span class="fc" id="L282">      return this;</span>
+    }
+
+    /**
+     * Set the master log file as {@link File}.
+     *
+     * &lt;p&gt;Master log file is a {@link File} where all the logs are stored by default. If the {@link
+     * Configuration#masterLogFile} is not set, the logs are not store anywhere and are discarded.
+     *
+     * @param masterLogFile accepts a {@link File} reference as master log file.
+     * @param autoDeleteFileOnExit accepts a {@link Boolean} flag to determine if the master log
+     *     file is going to be auto deleted or not on JVM exit.
+     * @return the {@link ConfigBuilder}
+     * @throws ProcessConfigurationException is thrown if the {@link File} object passed refers to a
+     *     * directory or is a read only file
+     */
+    public ConfigBuilder setMasterLogFile(File masterLogFile, boolean autoDeleteFileOnExit)
+        throws ProcessConfigurationException {
+<span class="fc" id="L300">      return this.setMasterLogFile(</span>
+          masterLogFile, autoDeleteFileOnExit, ProcessRunnerConstants.UTF_8);
+    }
+
+    /**
+     * Set the master log file as {@link File} with {@link Boolean} autodelete and {@link Charset}.
+     *
+     * &lt;p&gt;Master log file is a {@link File} where all the logs are stored by default. If the {@link
+     * Configuration#masterLogFile} is not set, the logs are not store anywhere and are discarded.
+     *
+     * @param masterLogFile accepts a {@link File} reference as master log file.
+     * @param autoDeleteFileOnExit accepts a {@link Boolean} flag to determine if the master log
+     *     file is going to be auto deleted or not on JVM exit.
+     * @param charset a reference of {@link Charset} class to set in which chaset the output file is
+     *     going to be written.
+     * @return the {@link ConfigBuilder}
+     * @throws ProcessConfigurationException is thrown if the {@link File} object passed refers to a
+     *     directory or is a read only file
+     */
+    public ConfigBuilder setMasterLogFile(
+        File masterLogFile, boolean autoDeleteFileOnExit, Charset charset)
+        throws ProcessConfigurationException {
+<span class="fc bfc" id="L322" title="All 2 branches covered.">      if (masterLogFile.isDirectory()) {</span>
+<span class="fc" id="L323">        throw new ProcessConfigurationException(</span>
+            &quot;Master log file : &quot;
+<span class="fc" id="L325">                + masterLogFile.getAbsolutePath()</span>
+                + &quot; is a directory. It must be a writable file&quot;);
+<span class="fc bfc" id="L327" title="All 2 branches covered.">      } else if (!masterLogFile.canWrite()) {</span>
+<span class="fc" id="L328">        throw new ProcessConfigurationException(</span>
+            &quot;Master log file : &quot;
+<span class="fc" id="L330">                + masterLogFile.getAbsolutePath()</span>
+                + &quot; is a readonly. It must be a writable file&quot;);
+      }
+
+<span class="fc" id="L334">      this.masterLogFile = masterLogFile;</span>
+<span class="fc" id="L335">      this.autoDeleteFileOnExit = autoDeleteFileOnExit;</span>
+<span class="fc" id="L336">      this.charset = charset;</span>
+<span class="fc" id="L337">      return this;</span>
+    }
+
+    /**
+     * Enable or disable log streaming. Please note that streaming will happen or not depends if the
+     * SLF4j finding the logging framework binding and the current log level set for that particular
+     * logging framework. All the log streaming will happen in the level equivalent to {@link
+     * java.util.logging.Level#INFO}
+     *
+     * @param logStreamingEnabled a reference of {@link PrintStream}
+     * @return the {@link ConfigBuilder}
+     */
+    public ConfigBuilder enableLogStreaming(boolean logStreamingEnabled) {
+<span class="fc" id="L350">      logger.trace(&quot;Setting log streaming as per request&quot;);</span>
+<span class="fc" id="L351">      this.logStreamingEnabled = logStreamingEnabled;</span>
+<span class="fc" id="L352">      return this;</span>
+    }
+
+    /**
+     * Builds the {@link Configuration} object and returns it back.
+     *
+     * @return a reference to the {@link Configuration} object created.
+     */
+    public Configuration build() {
+<span class="fc" id="L361">      logger.trace(&quot;Building configuration&quot;);</span>
+<span class="fc" id="L362">      String commandWithParam =</span>
+          new StringJoiner(ProcessRunnerConstants.SPACE_STR)
+<span class="fc" id="L364">              .add(command)</span>
+<span class="fc" id="L365">              .add(</span>
+                  comamndParams
+<span class="fc" id="L367">                      .stream()</span>
+<span class="fc" id="L368">                      .collect(Collectors.joining(ProcessRunnerConstants.SPACE_STR)))</span>
+<span class="fc" id="L369">              .toString();</span>
+<span class="fc" id="L370">      logger.trace(&quot;Command to be executed : {}&quot;, commandWithParam);</span>
+<span class="fc" id="L371">      return new Configuration(</span>
+          interpreter,
+          commandWithParam,
+          workingDir,
+          masterLogFile,
+          charset,
+          autoDeleteFileOnExit,
+          logStreamingEnabled);
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

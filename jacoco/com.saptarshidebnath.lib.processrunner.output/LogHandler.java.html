@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>LogHandler.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ProcessRunner</a> &gt; <a href="index.source.html" class="el_package">com.saptarshidebnath.lib.processrunner.output</a> &gt; <span class="el_source">LogHandler.java</span></div><h1>LogHandler.java</h1><pre class="source lang-java linenums">package com.saptarshidebnath.lib.processrunner.output;
+
+import static com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants.EMPTY_STR;
+
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.constants.OutputSourceType;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
+import com.saptarshidebnath.lib.processrunner.model.OutputRecord;
+import com.saptarshidebnath.lib.processrunner.utilities.Threadify;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.StringJoiner;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Writes the process logs as single line json of format {@link OutputRecord} to the file as
+ * configured in {@link Configuration#getMasterLogFile()}. If {@link
+ * Configuration#getMasterLogFile()} returns null, the logs will not be written.
+ */
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">public class LogHandler {</span>
+
+<span class="fc" id="L38">  private Logger logger = LoggerFactory.getLogger(LogHandler.class);</span>
+  private PrintWriter printWriter;
+  private BlockingQueue&lt;OutputRecord&gt; queue;
+  private boolean streamingEnabled;
+  private ArrayList&lt;Future&gt; inputStreamReadingThreads;
+  private ExecutorService executorService;
+  private Future diskWritingThread;
+  private String processConfigrationAsString;
+  private File masterLogFile;
+  private boolean logsNeedTobeWritten;
+  private Process process;
+  private Configuration configuration;
+
+  /**
+   * The construcor of the class {@link LogHandler}.
+   *
+   * &lt;p&gt;The class receives a reference of the {@link Process} and {@link Configuration}. The class
+   * then internally takes care of creating all the process output reading threads i.e. both {@link
+   * OutputSourceType#SYSERR} and {@link OutputSourceType#SYSOUT} and writing the same to the disk
+   * in separate thread. The class also provides a blocking method {@link
+   * LogHandler#waitForShutdown()} so that you can wait for all logs to be streamed, written to disk
+   * or both.
+   *
+   * &lt;p&gt;The class internally uses an executor service from {@link
+   * Threadify#getProcessRunnerExecutorService()}
+   *
+   * @param process a object of type {@link Process}
+   * @param configuration a reference of type {@link Configuration}
+   * @throws IOException in case of oany IOError
+   */
+<span class="fc" id="L68">  public LogHandler(Process process, Configuration configuration) throws IOException {</span>
+<span class="fc" id="L69">    this.process = process;</span>
+<span class="fc" id="L70">    this.configuration = configuration;</span>
+<span class="fc" id="L71">    this.masterLogFile = this.configuration.getMasterLogFile();</span>
+<span class="fc" id="L72">    this.streamingEnabled = this.configuration.isEnableLogStreaming();</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">    this.logsNeedTobeWritten = this.configuration.getMasterLogFile() != null;</span>
+<span class="fc" id="L74">    this.processConfigrationAsString = this.configuration.toString();</span>
+<span class="fc" id="L75">  }</span>
+
+  public LogHandler start() throws FileNotFoundException {
+
+<span class="fc bfc" id="L79" title="All 4 branches covered.">    boolean logsNeedTobeRead = logsNeedTobeWritten || streamingEnabled;</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    if (logsNeedTobeRead) {</span>
+<span class="fc" id="L81">      this.queue = new LinkedBlockingQueue&lt;&gt;(ProcessRunnerConstants.CACHE_SIZE);</span>
+<span class="fc" id="L82">      executorService = new Threadify().getProcessRunnerExecutorService();</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">      if (streamingEnabled) {</span>
+<span class="fc" id="L84">        logger.info(&quot;Logs will be streamed on real time.&quot;);</span>
+      } else {
+<span class="fc" id="L86">        logger.warn(&quot;Logs streaming disabled.&quot;);</span>
+      }
+<span class="fc" id="L88">      this.inputStreamReadingThreads = new ArrayList&lt;&gt;();</span>
+      //
+      // Track SYSOUT
+      //
+<span class="fc" id="L92">      this.saveInpuStreamToDisk(process.getInputStream(), OutputSourceType.SYSOUT);</span>
+      //
+      // Track SYSERR
+      //
+<span class="fc" id="L96">      this.saveInpuStreamToDisk(process.getErrorStream(), OutputSourceType.SYSERR);</span>
+      //
+      // Write content to DISK
+      //
+<span class="fc bfc" id="L100" title="All 2 branches covered.">      if (logsNeedTobeWritten) {</span>
+<span class="fc" id="L101">        this.printWriter =</span>
+            new PrintWriter(
+                new OutputStreamWriter(
+<span class="fc" id="L104">                    new FileOutputStream(masterLogFile), this.configuration.getCharset()));</span>
+<span class="fc" id="L105">        this.diskWritingThread = executorService.submit(this::writeToDisk);</span>
+      } else {
+<span class="fc" id="L107">        logger.warn(</span>
+            &quot;Logs not written to file as per configuration : {}&quot;, processConfigrationAsString);
+      }
+      //
+      // Mark for shutdown after execution is complete.
+      //
+<span class="fc" id="L113">      this.executorService.shutdown();</span>
+<span class="fc" id="L114">      logger.debug(&quot;Created LogHandler. Tracking SYSOUT and SYSERROR&quot;);</span>
+    } else {
+<span class="fc" id="L116">      logger.warn(&quot;Log Streaming is not enabled and Master logfile not set. Discarding logs.&quot;);</span>
+<span class="fc" id="L117">      logger.warn(&quot;Configuration received : {}&quot;, processConfigrationAsString);</span>
+    }
+<span class="fc" id="L119">    return this;</span>
+  }
+
+  /**
+   * Threadify the writing of the inputStream to disk.
+   *
+   * &lt;p&gt;Internal method and shouldn't be used externally.
+   *
+   * @param inputStream {@link InputStream} from {@link Process#getInputStream()} and {@link
+   *     Process#getErrorStream()}.
+   * @param outputSourceType Type of Output as per {@link OutputSourceType}
+   */
+  private void saveInpuStreamToDisk(InputStream inputStream, OutputSourceType outputSourceType) {
+<span class="fc" id="L132">    inputStreamReadingThreads.add(</span>
+<span class="fc" id="L133">        this.executorService.submit(() -&gt; this.readInputStream(inputStream, outputSourceType)));</span>
+<span class="fc" id="L134">  }</span>
+
+  /**
+   * Blocking method to wait for all all 3 threads to be finished. 2 threads are to read {@link
+   * OutputSourceType#SYSOUT} and {@link OutputSourceType#SYSERR}. The last thread is to write the
+   * read {@link InputStream} to disk.
+   *
+   * &lt;p&gt;Call this method to wait for the log handler threads to be finished execution.
+   *
+   * @throws InterruptedException when the {@link ExecutorService#awaitTermination(long, TimeUnit)}
+   *     is interrupted by some other {@link Thread}.
+   * @throws ExecutionException when waiting for the disk writer to finish.
+   */
+  public void waitForShutdown() throws InterruptedException, ExecutionException {
+<span class="fc bfc" id="L148" title="All 2 branches covered.">    if (this.configuration.getMasterLogFile() != null) {</span>
+<span class="fc" id="L149">      logger.info(&quot;Waiting for all the logs writing thread to shutdown.&quot;);</span>
+      //
+      // Wait for the disk writing thread to stop.
+      //
+<span class="fc" id="L153">      this.diskWritingThread.get();</span>
+      //
+      // Wait for the termination of executor service.
+      //
+<span class="fc" id="L157">      this.executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);</span>
+<span class="fc" id="L158">      logger.info(&quot;Waiting for all the logs writing thread to shutdown.&quot;);</span>
+
+    } else {
+<span class="fc" id="L161">      logger.error(&quot;Masterfile Configuration is missing : {}&quot;, this.processConfigrationAsString);</span>
+<span class="fc" id="L162">      logger.error(&quot;Discarding logs.&quot;);</span>
+    }
+<span class="fc" id="L164">  }</span>
+
+  /**
+   * Write the content of {@link LogHandler#queue} to the file as recived from {@link Configuration}
+   * object.
+   *
+   * &lt;p&gt;Internal method, shouldn't be used externallyy. Automatically called when a object of {@link
+   * LogHandler} is created.
+   *
+   * @return int depciting the number of lines written.
+   * @throws InterruptedException if the disk writing thread is interrupted.
+   */
+  private int writeToDisk() throws InterruptedException {
+<span class="fc" id="L177">    String threadName =</span>
+        new StringJoiner(EMPTY_STR)
+<span class="fc" id="L179">            .add(Thread.currentThread().getName())</span>
+<span class="fc" id="L180">            .add(ProcessRunnerConstants.DISK_WRITER_THREAD_NAME_SUFFIX)</span>
+<span class="fc" id="L181">            .toString();</span>
+<span class="fc" id="L182">    Thread.currentThread().setName(threadName);</span>
+<span class="fc" id="L183">    logger.info(&quot;Starting {}  to write to disk&quot;, threadName);</span>
+    //
+    // Look for log while the intputstream still have data or the queue have not
+    // finished writing to
+    // disk
+    //
+<span class="fc" id="L189">    int counter = -1;</span>
+<span class="fc bfc" id="L190" title="All 4 branches covered.">    while (this.inputStreamReadingThreads.stream().anyMatch(future -&gt; !future.isDone())</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        || !queue.isEmpty()) {</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">      if (queue.isEmpty()) {</span>
+        //
+        // If queue is empty wait for some time
+        //
+<span class="fc" id="L196">        logger.debug(</span>
+<span class="fc" id="L197">            &quot;Queue is empty, waiting for {} milliseconds&quot;, ProcessRunnerConstants.THREAD_WAIT_TIME);</span>
+<span class="fc" id="L198">        Thread.sleep(ProcessRunnerConstants.THREAD_WAIT_TIME);</span>
+      } else {
+        //
+        // Write all the element in the queue to the disk.
+        //
+<span class="fc" id="L203">        List&lt;OutputRecord&gt; record = new ArrayList&lt;&gt;(ProcessRunnerConstants.FILE_WRITER_OBJECT_SIZE);</span>
+<span class="fc" id="L204">        int numberElementDrained =</span>
+<span class="fc" id="L205">            queue.drainTo(record, ProcessRunnerConstants.FILE_WRITER_OBJECT_SIZE);</span>
+<span class="pc bpc" id="L206" title="2 of 4 branches missed.">        assert numberElementDrained == record.size();</span>
+<span class="fc" id="L207">        counter += record.size();</span>
+<span class="fc" id="L208">        record.stream().map(ProcessRunnerConstants.GSON::toJson).forEach(printWriter::println);</span>
+      }
+      //
+      // Force flush
+      //
+<span class="fc" id="L213">      printWriter.flush();</span>
+    }
+<span class="fc" id="L215">    printWriter.close();</span>
+<span class="fc" id="L216">    logger.debug(&quot;Wrote {} lines to master log file.&quot;, ++counter);</span>
+<span class="fc" id="L217">    return counter;</span>
+  }
+
+  /**
+   * Reads the {@link InputStream} and write them to a {@link LogHandler#queue} as {@link
+   * OutputRecord}.
+   *
+   * &lt;p&gt;This is a internal method and shouldn't be used by any body in the library.
+   *
+   * @param inputStream the {@link InputStream} to be read. The inputStream is received from {@link
+   *     Process#getErrorStream()} and {@link Process#getInputStream()}.
+   * @param outputSourceType either as input {@link OutputSourceType#SYSOUT} or {@link
+   *     OutputSourceType#SYSERR}.
+   */
+  private void readInputStream(InputStream inputStream, OutputSourceType outputSourceType) {
+<span class="fc" id="L232">    String outputSourceTypeAsString = outputSourceType.toString();</span>
+<span class="fc" id="L233">    logger.trace(&quot;Saving input stream for : {}&quot;, outputSourceTypeAsString);</span>
+<span class="fc" id="L234">    String threadName =</span>
+        new StringJoiner(&quot;&quot;)
+<span class="fc" id="L236">            .add(Thread.currentThread().getName())</span>
+<span class="fc" id="L237">            .add(ProcessRunnerConstants.STREAM_READER_THREAD_NAME_SUFFIX)</span>
+<span class="fc" id="L238">            .add(outputSourceType.toString())</span>
+<span class="fc" id="L239">            .toString();</span>
+<span class="fc" id="L240">    Thread.currentThread().setName(threadName);</span>
+<span class="fc" id="L241">    logger.trace(&quot;Starting {} to read {}&quot;, threadName, outputSourceTypeAsString);</span>
+<span class="fc" id="L242">    Scanner scanner = new Scanner(inputStream, Charset.defaultCharset().toString());</span>
+    String currentLine;
+    String loggingMessage;
+<span class="fc bfc" id="L245" title="All 2 branches covered.">    while (scanner.hasNextLine()) {</span>
+<span class="fc" id="L246">      currentLine = scanner.nextLine();</span>
+<span class="fc" id="L247">      loggingMessage =</span>
+<span class="fc" id="L248">          new StringJoiner(&quot; &gt;&gt; &quot;).add(outputSourceType.toString()).add(currentLine).toString();</span>
+<span class="fc bfc" id="L249" title="All 2 branches covered.">      if (streamingEnabled) {</span>
+<span class="fc" id="L250">        logger.info(loggingMessage);</span>
+      } else {
+<span class="fc" id="L252">        logger.trace(loggingMessage);</span>
+      }
+<span class="fc" id="L254">      boolean response = this.queue.add(new OutputRecord(outputSourceType, currentLine));</span>
+<span class="pc bpc" id="L255" title="2 of 4 branches missed.">      assert response;</span>
+<span class="fc" id="L256">    }</span>
+<span class="fc" id="L257">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

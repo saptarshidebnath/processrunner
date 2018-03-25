@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>OutputImpl.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ProcessRunner</a> &gt; <a href="index.source.html" class="el_package">com.saptarshidebnath.lib.processrunner.output</a> &gt; <span class="el_source">OutputImpl.java</span></div><h1>OutputImpl.java</h1><pre class="source lang-java linenums">/*
+ *
+ * MIT License
+ *
+ * Copyright (c) [2016] [Saptarshi Debnath]
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the &quot;Software&quot;), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package com.saptarshidebnath.lib.processrunner.output;
+
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration;
+import com.saptarshidebnath.lib.processrunner.configuration.Configuration.ConfigBuilder;
+import com.saptarshidebnath.lib.processrunner.constants.OutputSourceType;
+import com.saptarshidebnath.lib.processrunner.constants.ProcessRunnerConstants;
+import com.saptarshidebnath.lib.processrunner.exception.ProcessConfigurationException;
+import com.saptarshidebnath.lib.processrunner.model.OutputRecord;
+import com.saptarshidebnath.lib.processrunner.utilities.fileutils.GrepFile;
+import com.saptarshidebnath.lib.processrunner.utilities.fileutils.LogWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Default Implementation of {@link Output}.
+ *
+ * &lt;p&gt;If the masterlog file is configured, the class gives the ability to :-
+ *
+ * &lt;ul&gt;
+ *   &lt;li&gt;Save the {@link OutputSourceType#SYSOUT} to a file.
+ *   &lt;li&gt;Save the {@link OutputSourceType#SYSERR} to a file.
+ *   &lt;li&gt;Save both {@link OutputSourceType#ALL} to file.
+ *   &lt;li&gt;Search the master log file for a regular expression pattern.
+ *   &lt;li&gt;get the return code and the actual log file if saved while executing the program.
+ * &lt;/ul&gt;
+ */
+class OutputImpl implements Output {
+<span class="fc" id="L60">  private static Logger logger = LoggerFactory.getLogger(Output.class);</span>
+  private final Configuration configuration;
+  private final int returnCode;
+
+  /**
+   * Accepts {@link Configuration} and return code to create a {@link Output} object.
+   *
+   * @param configuration a valid {@link Configuration} object.
+   * @param returnCode a {@link Integer} value typically ranging from 0 - 255
+   */
+<span class="fc" id="L70">  OutputImpl(final Configuration configuration, final int returnCode) {</span>
+<span class="fc" id="L71">    this.configuration = configuration;</span>
+<span class="fc" id="L72">    this.returnCode = returnCode;</span>
+<span class="fc" id="L73">  }</span>
+
+  @Override
+  public String toString() {
+<span class="fc" id="L77">    return &quot;OutputImpl{&quot; + &quot;configuration=&quot; + configuration + &quot;, returnCode=&quot; + returnCode + '}';</span>
+  }
+
+  /**
+   * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSOUT} to the
+   * {@link File} supplied.
+   *
+   * @param sysOut A {@link File} object where the log is going to be written.
+   * @return A {@link File} object where the log has been written. May return null if master log
+   *     file was not configured. Please see {@link ConfigBuilder#setMasterLogFile(File, boolean)}
+   *     and {@link ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how
+   *     to set Master log file.
+   * @throws IOException In case of any IO Error while writing to disk.
+   * @throws ProcessConfigurationException if master log is accessed without configuring the same.
+   */
+  @Override
+  public File saveSysOut(final File sysOut) throws ProcessConfigurationException, IOException {
+    File response;
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (configuration.getMasterLogFile() == null) {</span>
+<span class="fc" id="L96">      throw new ProcessConfigurationException(</span>
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration);
+    }
+<span class="fc" id="L100">    logger.trace(&quot;Saving sys out to {}&quot;, sysOut.getAbsolutePath());</span>
+<span class="fc" id="L101">    response = new LogWriter().writeLog(this.configuration, sysOut, OutputSourceType.SYSOUT);</span>
+<span class="fc" id="L102">    return response;</span>
+  }
+
+  /**
+   * Prints the {@link OutputRecord#getOutputText()} of type {@link OutputSourceType#SYSERR} to the
+   * {@link File} supplied.
+   *
+   * @param sysError A {@link File} object where the log is going to be written.
+   * @return A {@link File} object where the log has been written. May return null if master log
+   *     file was not configured. Please see {@link ConfigBuilder#setMasterLogFile(File, boolean)}
+   *     and {@link ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how
+   *     to set Master log file.
+   * @throws IOException In case of any IO Error while writing to disk.
+   * @throws ProcessConfigurationException if master log is accessed without configuring the same.
+   */
+  @Override
+  public File saveSysError(final File sysError) throws ProcessConfigurationException, IOException {
+    File response;
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    if (configuration.getMasterLogFile() == null) {</span>
+<span class="fc" id="L121">      throw new ProcessConfigurationException(</span>
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration);
+    } else {
+<span class="fc" id="L125">      logger.trace(&quot;Saving sys error to : {}&quot;, sysError.getAbsolutePath());</span>
+<span class="fc" id="L126">      response = new LogWriter().writeLog(this.configuration, sysError, OutputSourceType.SYSERR);</span>
+    }
+<span class="fc" id="L128">    return response;</span>
+  }
+
+  /**
+   * Returns the master log file originally captured while executing the Process. Its an Json Array
+   * of type {@link OutputRecord}.
+   *
+   * @return A {@link File} master pointing to the Master log file. May return null if master log
+   *     file was not configured. Please see {@link ConfigBuilder#setMasterLogFile(File, boolean)}
+   *     and {@link ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how
+   *     to set Master log file.
+   * @throws ProcessConfigurationException if master log is accessed without configuring the same.
+   */
+  @Override
+  public File getMasterLogAsJson() throws ProcessConfigurationException {
+<span class="fc bfc" id="L143" title="All 2 branches covered.">    if (this.configuration.getMasterLogFile() == null) {</span>
+<span class="fc" id="L144">      throw new ProcessConfigurationException(</span>
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration);
+    }
+<span class="fc" id="L148">    return this.configuration.getMasterLogFile();</span>
+  }
+
+  /**
+   * Save the log of the process executed as a text file.
+   *
+   * @param log A {@link File} object where the log is going to be written.
+   * @return A {@link File} the log not in json format. Please see {@link
+   *     ConfigBuilder#setMasterLogFile(File, boolean)} and {@link
+   *     ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how to set
+   *     Master log file.
+   * @throws IOException when there are problems with IO
+   * @throws ProcessConfigurationException if master log is accessed without configuring the same.
+   */
+  @Override
+  public File saveLog(File log) throws IOException, ProcessConfigurationException {
+<span class="fc bfc" id="L164" title="All 2 branches covered.">    if (configuration.getMasterLogFile() == null) {</span>
+<span class="fc" id="L165">      throw new ProcessConfigurationException(</span>
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration);
+    }
+<span class="fc" id="L169">    return new LogWriter().writeLog(this.configuration, log, OutputSourceType.ALL);</span>
+  }
+
+  /**
+   * Search the content of the {@link Configuration#getMasterLogFile()} for a particular regex. The
+   * search is done line by line.
+   *
+   * @param regex a proper Regular Expression that need to be searched for.
+   * @return a {@link Boolean#TRUE} or {@link Boolean#FALSE} depending upon if the search is
+   *     positive or negative. Please see {@link ConfigBuilder#setMasterLogFile(File, boolean)} and
+   *     {@link ConfigBuilder#setMasterLogFile(File, boolean, Charset)} for more details on how to
+   *     set Master log file.
+   * @throws IOException In case of any IO error.
+   * @throws ProcessConfigurationException if master log is accessed without configuring the same.
+   */
+  @Override
+  public boolean searchMasterLog(final String regex)
+      throws IOException, ProcessConfigurationException {
+    Boolean response;
+<span class="fc bfc" id="L188" title="All 2 branches covered.">    if (configuration.getMasterLogFile() == null) {</span>
+<span class="fc" id="L189">      String message =</span>
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration;
+<span class="fc" id="L192">      throw new ProcessConfigurationException(message);</span>
+    } else {
+<span class="fc" id="L194">      response =</span>
+<span class="fc" id="L195">          this.searchFile(configuration.getMasterLogFile(), regex, this.configuration.getCharset());</span>
+    }
+<span class="fc" id="L197">    return response;</span>
+  }
+
+  /**
+   * Searches the file for the regular expression and returns a {@link List} of type {@link String}
+   * containing all the matching lines.
+   *
+   * @param regex accepts a {@link String} object to search for
+   * @return a {@link List} of {@link OutputRecord} containing all the lines in the output that have
+   *     matched the regex
+   * @throws IOException if there are any error reading the master log file.
+   * @throws ProcessConfigurationException if master log file not configured to be saved when the
+   *     process is started and later user is trying to grep for non existent file.
+   */
+  @Override
+  public List&lt;OutputRecord&gt; grepForRegex(String regex)
+      throws IOException, ProcessConfigurationException {
+<span class="fc bfc" id="L214" title="All 2 branches covered.">    if (configuration.getMasterLogFile() == null) {</span>
+<span class="fc" id="L215">      String message =</span>
+          ProcessRunnerConstants.STRING_CONSTANT_EXCEPTION_MASTER_LOG_FILE_NOT_CONFIGURED
+              + configuration;
+<span class="fc" id="L218">      throw new ProcessConfigurationException(message);</span>
+    }
+<span class="fc" id="L220">    return new GrepFile().grepFile(regex, configuration);</span>
+  }
+
+  /**
+   * Returns the process exit / return code.
+   *
+   * @return return the exit code as an integer value from 0 - 255
+   */
+  @Override
+  public int getReturnCode() {
+<span class="fc" id="L230">    return this.returnCode;</span>
+  }
+
+  private boolean searchFile(File fileToRead, final String regex, Charset charset)
+      throws IOException {
+<span class="fc" id="L235">    logger.trace(&quot;Searching for regular expression : {}&quot;, regex);</span>
+<span class="pc" id="L236">    try (Stream&lt;String&gt; stream = Files.lines(Paths.get(fileToRead.getCanonicalPath()), charset)) {</span>
+<span class="fc" id="L237">      return stream</span>
+<span class="fc" id="L238">          .parallel()</span>
+<span class="fc" id="L239">          .map(currentLine -&gt; ProcessRunnerConstants.GSON.fromJson(currentLine, OutputRecord.class))</span>
+<span class="fc" id="L240">          .anyMatch(outputRecord -&gt; outputRecord.getOutputText().matches(regex));</span>
+<span class="pc bpc" id="L241" title="6 of 8 branches missed.">    }</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
